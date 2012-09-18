@@ -1,7 +1,16 @@
 {
-    "accounts_title":"Rekeningen",
-    "assets":        "Activa",
-    "liabilities":   "Passiva",
-    "incomes":       "Inkomsten",
-    "expenses":      "Uitgaven"
+    "accounts_title" : "Overzicht Rekeningen",
+    "account"        : "Rekening",
+    "account_detail" : "Gegevens van de rekening",
+    "account_name"   : "Naam",
+    "assets"         : "Activa",
+    "liabilities"    : "Passiva",
+    "incomes"        : "Inkomsten",
+    "expenses"       : "Uitgaven",
+    "no_accounts"    : "Geen rekeningen gevonden",
+    "account_saved"  : "Rekening is bewaard",
+    
+    "save"           : "Opslaan",
+    "cancel"         : "Annuleer",
+    "success"        : "Gelukt!"
 }
