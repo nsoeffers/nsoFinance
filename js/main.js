@@ -23,10 +23,12 @@ requirejs.config({
     }
 });
 
-require([ 'jquery', 'angular', 'bootstrap', 'i18next', 'controllers', 'domReady'], function($, angular, bootstrap, i18next, controllers) {
+require([ 'jquery', 'angular', 'bootstrap', 'i18next', 'controllers', 'dao', 'domReady'], 
+        function($, angular, bootstrap, i18next, controllers, dao) {
     angular.module('nsoFinance', [])
         .controller('AccountListCtrl', controllers.AccountListCtrl)
-        .controller('AccountDetailCtrl', controllers.AccountDetailCtrl);
+        .controller('AccountDetailCtrl', controllers.AccountDetailCtrl)
+        .factory('Dao', dao.init) ;
     i18next.init({   ns: { namespaces: ['translation'], defaultNs: 'translation'},
                     lng: 'nl',
                     fallbackLng: 'nl',
