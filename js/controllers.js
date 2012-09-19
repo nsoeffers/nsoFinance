@@ -1,4 +1,4 @@
-define('controllers', ['angular', 'dao'], function(angular, dao) {
+define('controllers', ['angular', 'dao', 'domain'], function(angular, dao, domain) {
     
     var result = {};
         
@@ -19,7 +19,7 @@ define('controllers', ['angular', 'dao'], function(angular, dao) {
             });
         };
         
-        $scope.account = { name: ''};
+        $scope.account = domain.Account(domain.AccountType.ASSET, '');
         
         $scope.showSuccessMessage = false;    
     };

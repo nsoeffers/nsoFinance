@@ -15,27 +15,23 @@ requirejs.config({
         'bootstrap': {
             deps: ['jquery'],
             exports: 'bootstrap'
-        },
-        'i18next' : {
-            deps: ['jquery'],
-            exports: '$.i18n'
         }
     }
 });
 
-require([ 'jquery', 'angular', 'bootstrap', 'i18next', 'controllers', 'dao', 'domReady'], 
-        function($, angular, bootstrap, i18next, controllers, dao) {
+require([ 'jquery', 'angular', 'bootstrap', 'translations', 'dao', 'domain', 'controllers', 'domReady'], 
+        function($, angular, bootstrap, translations, dao, domain, controllers) {
     angular.module('nsoFinance', [])
         .controller('AccountListCtrl', controllers.AccountListCtrl)
         .controller('AccountDetailCtrl', controllers.AccountDetailCtrl)
-        .factory('Dao', dao.init) ;
-    i18next.init({   ns: { namespaces: ['translation'], defaultNs: 'translation'},
-                    lng: 'nl',
-                    fallbackLng: 'nl',
-                    resGetPath: 'locales/__lng__/__ns__.json',
-                    useLocalStorage: false,
-                    debug: true
-                }, function() {
-                    $('*[data-i18n]').i18n();
-                });    
+        .factory('Dao', dao.init)
+        .value('Translations', translations)
+        .directive('myappLabel', function(Translations,$locale){ 
+            return function(scope, elm, attrs){
+                elm.text(Translations[$locale.id][attrs.label]);
+            }; 
+        })
+        .run(function() {
+            $('.loadingPanel').hide();
+        });
 });
