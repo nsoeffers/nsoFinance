@@ -31,6 +31,24 @@ require([ 'jquery', 'angular', 'bootstrap', 'translations', 'dao', 'domain', 'co
                 elm.text(Translations[$locale.id][attrs.label]);
             }; 
         })
+        .directive('bankAccountNumber', function(){
+            var BANK_ACCOUNT_NUMBER_REGEXP = /^(\d{3})-(\d{7})-(\d{2})$/;
+            return {
+                require: 'ngModel',
+                link: function(scope, elm, attrs, ctrl) {
+                  ctrl.$parsers.unshift(function(viewValue) {
+                    var parts = BANK_ACCOUNT_NUMBER_REGEXP.exec(viewValue);
+                    if ( parts !== null && ((parseFloat(parts[1]) * 10000000) + parseFloat(parts[2])) % 97 == parseFloat(parts[3])) {
+                      ctrl.$setValidity('bankAccountNumber', true);
+                      return viewValue;
+                    } else {
+                      ctrl.$setValidity('bankAccountNumber', false);
+                      return undefined;
+                    }
+                  });
+                }
+            };
+        })
         .run(function() {
             $('.loadingPanel').hide();
         });

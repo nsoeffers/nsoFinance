@@ -3,12 +3,20 @@ define('controllers', ['angular', 'dao', 'domain'], function(angular, dao, domai
     var result = {};
         
     result.AccountListCtrl = function ($scope, $window, Dao) {    
-        $scope.accounts = [];          
+        $scope.accounts = [];
+        
+        $scope.refresh = function() {
+            Dao.retrieveAll(function(results){
+                $scope.accounts = results;
+                $scope.$apply();
+            });
+        }
+        
+        $scope.refresh();
     };
     
     result.AccountDetailCtrl = function ($scope, $window, $timeout, Dao) {              
         $scope.save = function() {
-            $window.alert('Test2' + Dao);
             Dao.save($scope.account, function(){
                 $scope.showSuccessMessage = true;
                 $timeout(function() {
@@ -19,7 +27,7 @@ define('controllers', ['angular', 'dao', 'domain'], function(angular, dao, domai
             });
         };
         
-        $scope.account = domain.Account(domain.AccountType.ASSET, '');
+        $scope.account = new domain.Account(domain.AccountType.ASSET, '');
         
         $scope.showSuccessMessage = false;    
     };

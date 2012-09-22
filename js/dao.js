@@ -53,7 +53,7 @@ define('dao', [], function() {
     }
     
     dao.save = function (entity, successCallback, failureCallback){
-        var transaction = db.transaction([ 'Account' ], window.IDBTransaction.READ_WRITE);
+        var transaction = db.transaction([ 'Account' ], "readwrite");
         var store = transaction.objectStore("Account");        
         var saveRequest = store.add(entity);
             
@@ -63,6 +63,28 @@ define('dao', [], function() {
         };
         saveRequest.onsuccess = function() {
             successCallback(entity);
+        };
+    };
+    
+    dao.retrieveAll = function (callback){
+        if ( !db ) {
+            setTimeout(function() { dao.retrieveAll(callback); }, 100);
+            return;
+        }
+        var transaction = db.transaction([ 'Account' ], "readonly");
+        var store = transaction.objectStore('Account');
+        var cursorRequest = store.openCursor();
+        var results = [];
+        cursorRequest.onsuccess = function(e) {
+            if ( !e.target || !e.target.result || e.target.result === null) {
+                callback(results);
+                return;
+            }
+            results.push(e.target.result.value);
+            e.target.result.continue();
+        };
+        cursorRequest.onerror = function(){
+            alert('Failed to retrieve items from IndexedDB');
         };
     };
     

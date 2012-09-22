@@ -4,8 +4,9 @@ define('translations', [], function() {
     translations['en-us'] = {
         "accounts_title" : "Account overview",
         "account"        : "Account",
-        "account_detail" : "Gegevens van de rekening",
+        "account_detail" : "Account info",
         "account_name"   : "Name",
+        "bankaccount_nr" : "Bank Account Number", 
         "assets"         : "Assets",
         "liabilities"    : "Liabilities",
         "incomes"        : "Incomes",
@@ -23,6 +24,7 @@ define('translations', [], function() {
         "account"        : "Rekening",
         "account_detail" : "Gegevens van de rekening",
         "account_name"   : "Naam",
+        "bankaccount_nr" : "Bankrekening nummer",
         "assets"         : "Activa",
         "liabilities"    : "Passiva",
         "incomes"        : "Inkomsten",
