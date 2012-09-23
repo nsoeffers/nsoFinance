@@ -13,68 +13,7 @@
                 <p>Loading...</p>
               </div>
         </div>
-        <div ng-cloak class="ng-cloak">        
-            <div class="well">
-                <h1 myapp-label data-label="accounts_title"></h1>
-            </div>
-            <div class="container-fluid">
-                <div class="row-fluid" ng-controller="AccountListCtrl">
-                    <div class="span2">
-                        <!-- Left side -->
-                        <div class="row-fluid">
-                            <select>
-                                <option myapp-label data-label="assets"></option>
-                                <option myapp-label data-label="liabilities"></option>
-                                <option myapp-label data-label="incomes"></option>
-                                <option myapp-label data-label="expenses"></option>
-                            </select>
-                        </div>
-                        <div class="row-fluid">
-                            <table ng-class="{true:'table table-condensed', false:'table table-striped table-hover'}[accounts.length == 0]">
-                                <thead>
-                                    <tr>
-                                        <th myapp-label data-label="account"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr ng-show="accounts.length == 0">
-                                        <td><p myapp-label data-label="no_accounts" class="muted"></p></td>
-                                    </tr>
-                                    <tr ng-repeat="account in accounts" ng-click="select(account)">
-                                        <td>{{account.name}}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="span10" ng-controller="AccountDetailCtrl">
-                        <!-- Right side -->
-                        <form name="accountForm" class="css-form" ng-submit="save()">
-                            <legend myapp-label data-label="account_detail"></legend>
-                            <div class="alert alert-success" ng-show="showSuccessMessage">
-                                <button type="button" class="close" data-dismiss="alert">×</button>
-                                <strong myapp-label data-label="success"></strong> <span myapp-label data-label="account_saved"></span>
-                            </div>
-                            <div class="control-group">
-                                <label class="control-label" for="inputAccountName" myapp-label data-label="account_name"></label>
-                                <div class="controls">
-                                    <input type="text" id="inputAccountName" ng-model="account.name" required="true">
-                                </div>
-                            </div>
-                            <div class="control-group">
-                                <label class="control-label" for="inputBankAccountNumber" myapp-label data-label="bankaccount_nr"></label>
-                                <div class="controls">
-                                    <input type="text" name="inputBankAccountNumber" ng-model="account.bankAccountNumber" bank-account-number ng-minlength="14" maxlength="14">
-                                    <span ng-show="accountForm.inputBankAccountNumber.$error.minlength">Should be a number</span>                                    
-                                </div>                            
-                            </div>
-                            <div class="form-actions">
-                              <button type="submit" class="btn btn-primary" myapp-label data-label="save" ng-disabled="accountForm.$invalid"></button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
+        <div ng-cloak class="ng-cloak" ng-view>        
         </div>
     </body>
 </html>

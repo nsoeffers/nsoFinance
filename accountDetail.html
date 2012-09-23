@@ -1,0 +1,26 @@
+<div ng-controller="AccountDetailCtrl">
+    <!-- Right side -->
+    <form name="accountForm" class="css-form" ng-submit="save()">
+        <legend myapp-label data-label="account_detail"></legend>
+        <div class="alert alert-success" ng-show="showSuccessMessage">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            <strong myapp-label data-label="success"></strong> <span myapp-label data-label="account_saved"></span>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="inputAccountName" myapp-label data-label="account_name"></label>
+            <div class="controls">
+                <input type="text" id="inputAccountName" ng-model="account.name" required="true">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="inputBankAccountNumber" myapp-label data-label="bankaccount_nr"></label>
+            <div class="controls">
+                <input type="text" name="inputBankAccountNumber" ng-model="account.bankAccountNumber" bank-account-number ng-minlength="14" maxlength="14">
+                <span ng-show="accountForm.inputBankAccountNumber.$error.minlength">Should be a number</span>                                    
+            </div>                            
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" myapp-label data-label="save" ng-disabled="accountForm.$invalid"></button>
+        </div>
+    </form>
+</div>

@@ -2,8 +2,7 @@ requirejs.config({
     paths: {
         'jquery'    : 'https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min',
         'angular'   : 'https://ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular.min',
-        'bootstrap' : 'https://netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/js/bootstrap.min',
-        'i18next'   : 'i18next-1.5.6.min'
+        'bootstrap' : 'https://netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/js/bootstrap.min'
     },
     shim: {
         'angular': {
@@ -48,6 +47,13 @@ require([ 'jquery', 'angular', 'bootstrap', 'translations', 'dao', 'domain', 'co
                   });
                 }
             };
+        })
+        .config(function($routeProvider){
+            $routeProvider.when('/Account/', {
+                templateUrl: 'account.html'
+            }).otherwise({
+                templateUrl: 'account.html'
+            });
         })
         .run(function() {
             $('.loadingPanel').hide();

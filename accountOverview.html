@@ -1,0 +1,28 @@
+<div ng-controller="AccountListCtrl">
+    <!-- Left side -->
+    <div class="row-fluid">
+        <select>
+            <option myapp-label data-label="assets"></option>
+            <option myapp-label data-label="liabilities"></option>
+            <option myapp-label data-label="incomes"></option>
+            <option myapp-label data-label="expenses"></option>
+        </select>
+    </div>
+    <div class="row-fluid">
+        <table ng-class="{true:'table table-condensed', false:'table table-striped table-hover'}[accounts.length == 0]">
+            <thead>
+                <tr>
+                    <th myapp-label data-label="account"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-show="accounts.length == 0">
+                    <td><p myapp-label data-label="no_accounts" class="muted"></p></td>
+                </tr>
+                <tr ng-repeat="account in accounts" ng-click="select(account)">
+                    <td>{{account.name}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
