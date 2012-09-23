@@ -40,7 +40,7 @@
                                     <tr ng-show="accounts.length == 0">
                                         <td><p myapp-label data-label="no_accounts" class="muted"></p></td>
                                     </tr>
-                                    <tr ng-repeat="account in accounts">
+                                    <tr ng-repeat="account in accounts" ng-click="select(account)">
                                         <td>{{account.name}}</td>
                                     </tr>
                                 </tbody>
