@@ -12,7 +12,9 @@
         <table ng-class="{true:'table table-condensed', false:'table table-striped table-hover'}[accounts.length == 0]">
             <thead>
                 <tr>
-                    <th myapp-label data-label="account"></th>
+                    <th myapp-label data-label="account">                        
+                    </th>
+                    <th><i class="icon-plus" ng-click="add()"></i></th>
                 </tr>
             </thead>
             <tbody>
@@ -21,6 +23,7 @@
                 </tr>
                 <tr ng-repeat="account in accounts" ng-click="select(account)">
                     <td>{{account.name}}</td>
+                    <td><i class="icon-remove"></i></td>
                 </tr>
             </tbody>
         </table>

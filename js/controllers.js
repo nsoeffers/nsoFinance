@@ -1,5 +1,6 @@
 define('controllers', ['angular', 'dao', 'domain'], function(angular, dao, domain) {
     
+    var ACCOUNT_SELECTED_EVENT = 'accountSelected';
     var result = {};
         
     result.AccountListCtrl = function ($scope, $rootScope, $window, Dao) {    
@@ -13,7 +14,11 @@ define('controllers', ['angular', 'dao', 'domain'], function(angular, dao, domai
         };
         
         $scope.select = function(account) {
-            $rootScope.$broadcast('selectAccount', account);
+            $rootScope.$broadcast(ACCOUNT_SELECTED_EVENT, account);
+        };
+        
+        $scope.add = function() {  
+            $rootScope.$broadcast(ACCOUNT_SELECTED_EVENT, new domain.Account(domain.AccountType.ASSET, ''));
         };
         
         $scope.refresh();
@@ -21,7 +26,7 @@ define('controllers', ['angular', 'dao', 'domain'], function(angular, dao, domai
     
     result.AccountDetailCtrl = function ($scope, $window, $timeout, Dao) {              
         
-        $scope.$on('selectAccount', function(event, account) {
+        $scope.$on(ACCOUNT_SELECTED_EVENT, function(event, account) {
             $scope.account = account;
             $scope.$apply();
         });
@@ -36,8 +41,8 @@ define('controllers', ['angular', 'dao', 'domain'], function(angular, dao, domai
                 $window.alert(errorMessage);
             });
         };
-                
-        $scope.account = new domain.Account(domain.AccountType.ASSET, '');
+                        
+        $scope.account = null;
         
         $scope.showSuccessMessage = false;    
     };

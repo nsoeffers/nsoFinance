@@ -12,6 +12,7 @@ define('translations', [], function() {
         "incomes"        : "Incomes",
         "expenses"       : "Expenses",
         "no_accounts"    : "No accounts found",
+        "choose_account_or_create_new" : "Choose an account or create a new one",
         "account_saved"  : "Account is saved",
         
         "save"           : "Save",
@@ -30,6 +31,7 @@ define('translations', [], function() {
         "incomes"        : "Inkomsten",
         "expenses"       : "Uitgaven",
         "no_accounts"    : "Geen rekeningen gevonden",
+        "choose_account_or_create_new" : "Selecteer een rekening of creeer een nieuwe",
         "account_saved"  : "Rekening is bewaard",
         
         "save"           : "Opslaan",
