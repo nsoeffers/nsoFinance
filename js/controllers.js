@@ -18,11 +18,13 @@ define('controllers', ['angular', 'dao', 'domain'], function(angular, dao, domai
         };
         
         $scope.add = function() {  
-            $rootScope.$broadcast(ACCOUNT_SELECTED_EVENT, new domain.Account(domain.AccountType.ASSET, ''));
+            var newAccount = new domain.Account(domain.AccountType.ASSET, '');
+            $rootScope.$broadcast(ACCOUNT_SELECTED_EVENT, newAccount);
+            $scope.accounts.push(newAccount);
         };
         
         $scope.remove = function(account) {
-            Dao.remove(account.name, function() {
+            Dao.remove(account.id, function() {
                 $scope.accounts.splice($scope.accounts.indexOf(account), 1);
                 $scope.$apply();
             });

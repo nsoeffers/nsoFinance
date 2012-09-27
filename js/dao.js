@@ -10,6 +10,7 @@ define('dao', [], function() {
           window.indexedDB      = window.webkitIndexedDB;
           window.IDBTransaction = window.webkitIDBTransaction;
           window.IDBKeyRange    = window.webkitIDBKeyRange;
+          window.IDBCursor      = window.webkitIDBCursor;
           // ...
         } else if ( "moz_indexedDB" in window ) {
           window.indexedDB = window.moz_indexedDB;
@@ -28,19 +29,31 @@ define('dao', [], function() {
             if ( db.version === '') {                
                 var versionRequest = db.setVersion( '1.0' );
                 versionRequest.onsuccess = function (  ) {
-                    db.createObjectStore(
-                      "Account",  // The Object Store’s name
-                      {keyPath: 'name'}
-                    ); 
+                    db.createObjectStore("Account", {keyPath: 'name'}); 
                 };
                 versionRequest.onerror = function() {
                     alert('Error occurred while creating indexedDb');
                 };
-//            } else if ( db.version === '1.0'){
-//                alert('Trying to delete');
-//                var dbDeleteRequest = window.indexedDB.deleteDatabase('Groceries');
-//                dbDeleteRequest.onerror = function() { alert('Error deleting database'); };
-//                dbDeleteRequest.onsuccess = function() { alert('Successfully deleting database'); };
+            } else if ( db.version === '1.0'){
+                var versionRequest = db.setVersion( '1.1' );
+                versionRequest.onsuccess = function (  ) {
+                    db.deleteObjectStore("Account"); 
+                };                
+            } else if ( db.version === '1.1'){
+                var versionRequest = db.setVersion( '1.2' );
+                versionRequest.onsuccess = function () {
+                    db.createObjectStore("Account", {keyPath: 'id', autoIncrement: true});
+                };                
+            } else if ( db.version === '1.2'){
+                var versionRequest = db.setVersion( '1.3' );
+                versionRequest.onsuccess = function () {
+                    db.deleteObjectStore("Account"); 
+                    var store = db.createObjectStore("Account", {keyPath: 'id', autoIncrement: true});
+                    store.createIndex('caseInsensitiveName', 'caseInsensitiveName', {unique : true});
+                };
+                versionRequest.onerror = function() {
+                    window.alert('Error occurred while creating indexedDb');
+                }
             }
         };
         
@@ -55,15 +68,21 @@ define('dao', [], function() {
     dao.save = function (entity, successCallback, failureCallback){
         var transaction = db.transaction([ 'Account' ], "readwrite");
         var store = transaction.objectStore("Account");        
-        var saveRequest = store.add(entity);
-            
-        saveRequest.onerror = function(){
-            transaction.abort();
-            failureCallback('Entry with description "' + entity.description + '" already exists');
-        };
-        saveRequest.onsuccess = function() {
-            successCallback(entity);
-        };
+        if ( entity !== null && entity.id !== undefined && entity.id !== null ) {
+            var getRequest = store.put(entity);
+            getRequest.onsuccess = successCallback;
+            getRequest.onerror = failureCallback;
+        } else {
+            var saveRequest = store.add(entity);
+                
+            saveRequest.onerror = function(){
+                transaction.abort();
+                failureCallback('Entry with description "' + entity.description + '" already exists');
+            };
+            saveRequest.onsuccess = function() {
+                successCallback(entity);
+            };
+        }
     };
     
     dao.remove = function (key, successCallback, failureCallback){
@@ -87,7 +106,7 @@ define('dao', [], function() {
         }
         var transaction = db.transaction([ 'Account' ], "readonly");
         var store = transaction.objectStore('Account');
-        var cursorRequest = store.openCursor();
+        var cursorRequest = store.index('caseInsensitiveName').openCursor();
         var results = [];
         cursorRequest.onsuccess = function(e) {
             if ( !e.target || !e.target.result || e.target.result === null) {
