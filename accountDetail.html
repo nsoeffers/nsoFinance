@@ -4,9 +4,10 @@
         <legend myapp-label data-label="account_detail"></legend>
         <div class="alert alert-info" ng-show="account == null">
             <i class="icon-info-sign"></i>
-            <span myapp-label data-label="choose_account_or_create_new"></span>
+            <strong myapp-label data-label="choose_account_or_create_new"></strong>
         </div>
         <div class="alert alert-success" ng-show="showSuccessMessage">
+            <i class="icon-info-sign"></i>
             <button type="button" class="close" data-dismiss="alert">×</button>
             <strong myapp-label data-label="success"></strong> <span myapp-label data-label="account_saved"></span>
         </div>
@@ -25,7 +26,7 @@
             </div>                            
         </div>
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary" myapp-label data-label="save" ng-disabled="accountForm.$invalid"></button>
+          <button type="submit" class="btn btn-primary" myapp-label data-label="save" ng-disabled="accountForm.$invalid || alreadySubmitted"></button>
         </div>
     </form>
 </div>

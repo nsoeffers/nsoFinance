@@ -66,6 +66,20 @@ define('dao', [], function() {
         };
     };
     
+    dao.remove = function (key, successCallback, failureCallback){
+        var transaction = db.transaction([ 'Account' ], "readwrite");
+        var store = transaction.objectStore("Account");        
+        var deleteRequest = store.delete(key);
+            
+        deleteRequest.onerror = function(){
+            transaction.abort();
+            failureCallback('Entry with description "' + entity.description + '" already exists');
+        };
+        deleteRequest.onsuccess = function() {
+            successCallback();
+        };
+    };
+    
     dao.retrieveAll = function (callback){
         if ( !db ) {
             setTimeout(function() { dao.retrieveAll(callback); }, 100);

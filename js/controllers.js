@@ -21,17 +21,26 @@ define('controllers', ['angular', 'dao', 'domain'], function(angular, dao, domai
             $rootScope.$broadcast(ACCOUNT_SELECTED_EVENT, new domain.Account(domain.AccountType.ASSET, ''));
         };
         
+        $scope.remove = function(account) {
+            Dao.remove(account.name, function() {
+                $scope.accounts.splice($scope.accounts.indexOf(account), 1);
+                $scope.$apply();
+            });
+        };
+        
         $scope.refresh();
     };
     
     result.AccountDetailCtrl = function ($scope, $window, $timeout, Dao) {              
         
         $scope.$on(ACCOUNT_SELECTED_EVENT, function(event, account) {
-            $scope.account = account;
+            $scope.alreadySubmitted = false;
+            $scope.account = account;            
             $scope.$apply();
         });
         
-        $scope.save = function() {
+        $scope.save = function() {     
+            $scope.alreadySubmitted = true;
             Dao.save($scope.account, function(){
                 $scope.showSuccessMessage = true;
                 $timeout(function() {
@@ -41,6 +50,8 @@ define('controllers', ['angular', 'dao', 'domain'], function(angular, dao, domai
                 $window.alert(errorMessage);
             });
         };
+        
+        $scope.alreadySubmitted = false;
                         
         $scope.account = null;
         
