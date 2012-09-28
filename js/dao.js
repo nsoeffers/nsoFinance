@@ -99,9 +99,9 @@ define('dao', [], function() {
         };
     };
     
-    dao.retrieveAll = function (callback){
+    dao.retrieveAll = function (callback, mappingMethod){
         if ( !db ) {
-            setTimeout(function() { dao.retrieveAll(callback); }, 100);
+            setTimeout(function() { dao.retrieveAll(callback, mappingMethod); }, 100);
             return;
         }
         var transaction = db.transaction([ 'Account' ], "readonly");
@@ -113,7 +113,7 @@ define('dao', [], function() {
                 callback(results);
                 return;
             }
-            results.push(e.target.result.value);
+            results.push(mappingMethod(e.target.result.value));
             e.target.result.continue();
         };
         cursorRequest.onerror = function(){

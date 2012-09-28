@@ -7,6 +7,7 @@ define('domain', [], function(){
     Object.defineProperty( domain.AccountType, "INCOME", {  value: "INCOME",  writable: false, enumerable: true, configurable: false});
     Object.defineProperty( domain.AccountType, "EXPENSE", {  value: "EXPENSE",  writable: false, enumerable: true, configurable: false});
     
+    
     domain.Account = function(accountType, name, bankAccountNumber) {
         this.accountType = accountType;
         this.bankAccountNumber = bankAccountNumber;        
@@ -27,6 +28,12 @@ define('domain', [], function(){
                                                 }, 
                                                 enumerable: true, configurable: false});
                                                 
+    };
+    
+    domain.Account.createFromDBO = function(dbo){
+         var newAccount = new domain.Account(dbo.accountType, dbo.name, dbo.bankAccountNumber);
+         Object.defineProperty( newAccount, "id", {  value: dbo.id,  writable: false, enumerable: true, configurable: false});
+         return newAccount;
     };
     
     return domain;

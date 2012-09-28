@@ -10,7 +10,7 @@ define('controllers', ['angular', 'dao', 'domain'], function(angular, dao, domai
             Dao.retrieveAll(function(results){
                 $scope.accounts = results;
                 $scope.$apply();
-            });
+            }, domain.Account.createFromDBO);
         };
         
         $scope.select = function(account) {
@@ -30,7 +30,6 @@ define('controllers', ['angular', 'dao', 'domain'], function(angular, dao, domai
             });
         };
         
-        $scope.refresh();
     };
     
     result.AccountDetailCtrl = function ($scope, $window, $timeout, Dao) {              
