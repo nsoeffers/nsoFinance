@@ -20,9 +20,19 @@
         <div class="control-group">
             <label class="control-label" for="inputBankAccountNumber" myapp-label data-label="bankaccount_nr"></label>
             <div class="controls">
-                <input type="text" name="inputBankAccountNumber" ng-model="account.bankAccountNumber" 
-                       ng-disabled="account == null" bank-account-number ng-minlength="14" maxlength="14">
-                <span ng-show="accountForm.inputBankAccountNumber.$error.minlength">Should be a number</span>                                    
+                <div class="input-append">
+                    <input type="text" name="inputBankAccountNumber" ng-model="account.bankAccountNumber" 
+                           ng-disabled="account == null" bank-account-number ng-minlength="14" maxlength="14">
+                    <span class="add-on text-error" ng-show="accountForm.inputBankAccountNumber.$error.minlength">Should be a number</span>
+                    <span class="add-on text-error" ng-show="accountForm.inputBankAccountNumber.$error.bankAccountNumber" myapp-label data-label="invalidBankAccountNumber"></span>
+                </div>
+            </div>                            
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="inputAccountDescription" myapp-label data-label="description"></label>
+            <div class="controls">
+                <textarea name="inputAccountDescription" ng-model="account.description" 
+                       ng-disabled="account == null" maxlength="500"/>                
             </div>                            
         </div>
         <div class="form-actions">

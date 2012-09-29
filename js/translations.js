@@ -14,7 +14,9 @@ define('translations', [], function() {
         "no_accounts"    : "No accounts found",
         "choose_account_or_create_new" : "Choose an account or create a new one",
         "account_saved"  : "Account is saved",
+        "invalidBankAccountNumber": "Invalid bank account number",
         
+        "description"    : "Description",
         "save"           : "Save",
         "cancel"         : "Cancel",
         "success"        : "Well done!"
@@ -33,7 +35,9 @@ define('translations', [], function() {
         "no_accounts"    : "Geen rekeningen gevonden",
         "choose_account_or_create_new" : "Selecteer een rekening of creeer een nieuwe",
         "account_saved"  : "Rekening is bewaard",
+        "invalidBankAccountNumber": "Geen geldige bankrekeningnummer",
         
+        "description"    : "Omschrijving",
         "save"           : "Opslaan",
         "cancel"         : "Annuleer",
         "success"        : "Gelukt!"
