@@ -3,6 +3,7 @@
     <head>
         <!-- Stylesheets -->
         <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/css/bootstrap-combined.min.css" rel="stylesheet">
+        <link href="css/nsoFinance.css" rel="stylesheet">
         
         <!-- Javascripts -->
         <script data-main="js/main" src="js/requirejs-2.0.6.min.js"></script>                
@@ -13,7 +14,17 @@
                 <p>Loading...</p>
               </div>
         </div>
-        <div ng-cloak class="ng-cloak" ng-view>        
+        <div ng-cloak class="ng-cloak" ng-controller="RootCtrl" ng-init="populateLanguages()">
+            <div id="feedback_area">
+                <div ng-repeat="notification in notifications" class="alert alert-{{notification.type}}">
+                    <button type="button" class="close" data-dismiss="alert">×</button>
+                    <strong myapp-label data-label="{{notification.type}}"></strong> <span>{{notification.message}}</span>
+                </div>
+            </div>
+            <ul class="nav nav-pills pull-right">                
+                <li ng-repeat="language in languages" ng-class="getLanguageSelectedClass(language)"><a ng-click="setLanguage(language)">{{language}}</a></li>
+            </ul>
+            <div ng-view></div>
         </div>
     </body>
 </html>

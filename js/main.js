@@ -1,16 +1,18 @@
 requirejs.config({
     paths: {
-        'jquery'    : 'https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min',
-        'angular'   : 'https://ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular.min',
-        'bootstrap' : 'https://netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/js/bootstrap.min'
+        'jquery'            : 'https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min',
+        'angular'           : 'https://ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular.min',
+        'angularCookies'    : 'https://ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular-cookies.min',
+        'bootstrap'         : 'https://netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/js/bootstrap.min'
     },
     shim: {
         'angular': {
-            //These script dependencies should be loaded before loading
-            //backbone.js
             deps: ['jquery'],
             exports: 'angular'
         },
+        'angularCookies': {
+            deps: ['angular']
+        },        
         'bootstrap': {
             deps: ['jquery'],
             exports: 'bootstrap'
@@ -18,16 +20,18 @@ requirejs.config({
     }
 });
 
-require([ 'jquery', 'angular', 'bootstrap', 'translations', 'dao', 'domain', 'controllers', 'domReady'], 
-        function($, angular, bootstrap, translations, dao, domain, controllers) {
-    angular.module('nsoFinance', [])
+require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'dao', 'domain', 'controllers', 'domReady'], 
+        function($, angular, angularCookies, bootstrap, translations, dao, domain, controllers) {
+    angular.module('nsoFinance', ['ngCookies'])
+        .controller('RootCtrl', controllers.RootCtrl)
         .controller('AccountListCtrl', controllers.AccountListCtrl)
-        .controller('AccountDetailCtrl', controllers.AccountDetailCtrl)
+        .controller('AccountDetailCtrl', controllers.AccountDetailCtrl)        
         .factory('Dao', dao.init)
         .value('Translations', translations)
-        .directive('myappLabel', function(Translations,$locale){ 
+        .directive('myappLabel', function(Translations,$locale, $cookies){ 
             return function(scope, elm, attrs){
-                elm.text(Translations[$locale.id][attrs.label]);
+                var language = $cookies.languagePreference !== undefined ? $cookies.languagePreference : $locale.id;
+                elm.text(Translations[language][attrs.label]);
             }; 
         })
         .directive('bankAccountNumber', function(){
@@ -48,7 +52,7 @@ require([ 'jquery', 'angular', 'bootstrap', 'translations', 'dao', 'domain', 'co
                 }
             };
         })
-        .config(function($routeProvider){
+        .config(function($routeProvider){            
             $routeProvider.when('/Account/', {
                 templateUrl: 'account.html'
             }).otherwise({

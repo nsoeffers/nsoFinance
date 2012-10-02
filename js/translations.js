@@ -12,17 +12,22 @@ define('translations', [], function() {
         "incomes"        : "Incomes",
         "expenses"       : "Expenses",
         "no_accounts"    : "No accounts found",
-        "choose_account_or_create_new" : "Choose an account or create a new one",
-        "account_saved"  : "Account is saved",
-        "invalidBankAccountNumber": "Invalid bank account number",
+        "choose_account_or_create_new"  : "Choose an account or create a new one",
+        "account_saved"                 : "Account is saved",
+        "invalidBankAccountNumber"      : "Invalid bank account number",
+        "requiredAccountName"           : "Account name is required",
+        "duplicateAccountName"          : "An account with this name already exists, to avoid confusion it is not allowed to give different accounts the same name",
         
         "description"    : "Description",
         "save"           : "Save",
         "cancel"         : "Cancel",
-        "success"        : "Well done!"
+        "success"        : "Well done!",
+        "error"          : "Error!"
     };
+    
+    translations['en'] = translations['en-us'];
 
-    translations['nl'] = {
+    translations['nl-be'] = {
         "accounts_title" : "Overzicht Rekeningen",
         "account"        : "Rekening",
         "account_detail" : "Gegevens van de rekening",
@@ -33,15 +38,21 @@ define('translations', [], function() {
         "incomes"        : "Inkomsten",
         "expenses"       : "Uitgaven",
         "no_accounts"    : "Geen rekeningen gevonden",
-        "choose_account_or_create_new" : "Selecteer een rekening of creeer een nieuwe",
-        "account_saved"  : "Rekening is bewaard",
-        "invalidBankAccountNumber": "Geen geldige bankrekeningnummer",
+        "choose_account_or_create_new"  : "Selecteer een rekening of creeer een nieuwe",
+        "account_saved"                 : "Rekening is bewaard",
+        "invalidBankAccountNumber"      : "Geen geldige bankrekeningnummer",
+        "requiredAccountName"           : "De naam van een rekening is verplicht",
+        "duplicateAccountName"          : "Een rekening met deze naam bestaat reeds, om verwarring te vermijden is het niet toegelaten verschillende rekeningen dezelfde naam te geven",
         
         "description"    : "Omschrijving",
         "save"           : "Opslaan",
         "cancel"         : "Annuleer",
-        "success"        : "Gelukt!"
-    }
+        "success"        : "Gelukt!",
+        "error"          : "Foutmelding!"
+    };
+    
+    translations['nl-nl'] = translations['nl-be'];
+    translations['nl'] = translations['nl-be'];
 
     return translations;
 });

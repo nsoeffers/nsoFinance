@@ -2,19 +2,17 @@
     <!-- Right side -->
     <form name="accountForm" class="css-form" ng-submit="save()">
         <legend myapp-label data-label="account_detail"></legend>
-        <div class="alert alert-info" ng-show="account == null">
+        <div class="alert alert-info fade in" id="infoMessageForm">
             <i class="icon-info-sign"></i>
             <strong myapp-label data-label="choose_account_or_create_new"></strong>
-        </div>
-        <div class="alert alert-success" ng-show="showSuccessMessage">
-            <i class="icon-info-sign"></i>
-            <button type="button" class="close" data-dismiss="alert">×</button>
-            <strong myapp-label data-label="success"></strong> <span myapp-label data-label="account_saved"></span>
         </div>
         <div class="control-group">
             <label class="control-label" for="inputAccountName" myapp-label data-label="account_name"></label>
             <div class="controls">
-                <input type="text" id="inputAccountName" ng-model="account.name" required="true" ng-disabled="account == null">
+                <div class="input-append">
+                    <input type="text" id="inputAccountName" name="inputAccountName" ng-model="account.name" required="true" ng-disabled="account == null">
+                    <span class="add-on text-error" ng-show="accountForm.inputAccountName.$error.required && account != null" myapp-label data-label="requiredAccountName"></span>
+                </div>
             </div>
         </div>
         <div class="control-group">
@@ -34,6 +32,16 @@
                 <textarea name="inputAccountDescription" ng-model="account.description" 
                        ng-disabled="account == null" maxlength="500"/>                
             </div>                            
+        </div>
+        <div class="alert alert-success fade in" ng-show="showSuccessMessage">
+            <i class="icon-info-sign"></i>
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            <strong myapp-label data-label="success"></strong> <span myapp-label data-label="account_saved"></span>
+        </div>        
+        <div class="alert alert-error fade in" ng-show="errorMessage != null">
+            <i class="icon-exclamation-sign"></i>
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            <strong myapp-label data-label="error"></strong> <span>{{errorMessage}}</span>
         </div>
         <div class="form-actions">
           <button type="submit" class="btn btn-primary" myapp-label data-label="save" ng-disabled="accountForm.$invalid || alreadySubmitted"></button>
