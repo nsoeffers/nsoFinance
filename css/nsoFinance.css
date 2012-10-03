@@ -5,3 +5,10 @@
     left: 10%;
     z-index: 1;
 }
+
+INPUT:focus.ng-invalid-bank-account-number {
+    border-color: #E9322D;
+    -webkit-box-shadow: 0 0 6px #F8B9B7;
+    -moz-box-shadow: 0 0 6px #f8b9b7;
+    box-shadow: 0 0 6px #F8B9B7;
+}

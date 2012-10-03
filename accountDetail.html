@@ -20,8 +20,7 @@
             <div class="controls">
                 <div class="input-append">
                     <input type="text" name="inputBankAccountNumber" ng-model="account.bankAccountNumber" 
-                           ng-disabled="account == null" bank-account-number ng-minlength="14" maxlength="14">
-                    <span class="add-on text-error" ng-show="accountForm.inputBankAccountNumber.$error.minlength">Should be a number</span>
+                           ng-disabled="account == null" bank-account-number maxlength="14">
                     <span class="add-on text-error" ng-show="accountForm.inputBankAccountNumber.$error.bankAccountNumber" myapp-label data-label="invalidBankAccountNumber"></span>
                 </div>
             </div>                            
