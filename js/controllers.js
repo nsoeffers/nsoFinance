@@ -82,9 +82,9 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             if ( account !== null ) {
                 $('#infoMessageForm').alert('close');
             }
-            $('#inputAccountName').focus();
             $scope.alreadySubmitted = false;
             $scope.account = account;            
+            $timeout(function(){ $('#inputAccountName').focus(); }, 100);
             //$scope.$apply();
         });
         
