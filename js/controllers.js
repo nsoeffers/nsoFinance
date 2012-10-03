@@ -41,10 +41,16 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
     result.AccountListCtrl = function ($scope, $rootScope, $window, Dao) {    
         $scope.accounts = [];
         $scope.errorMessage = null;
+        $scope.loading = false;
+        $scope.selectedAccountType = domain.AccountType.ASSET;
         
         $scope.refresh = function() {
-            Dao.retrieveAll(function(results){
+            $scope.loading = true;
+            $window.console.log('Test:' + $scope.selectedAccountType);
+            Dao.findAccountsByType($scope.selectedAccountType, function(results){                
+                $window.console.log('Receiving results:' + $scope.selectedAccountType);
                 $scope.accounts = results;
+                $scope.loading = false;
                 $scope.$apply();
             }, domain.Account.createFromDBO);
         };
@@ -54,7 +60,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         };
         
         $scope.add = function() {  
-            var newAccount = new domain.Account(domain.AccountType.ASSET, '');
+            var newAccount = new domain.Account($scope.selectedAccountType, '');
             $rootScope.$broadcast(ACCOUNT_SELECTED_EVENT, newAccount);
             $scope.accounts.push(newAccount);
         };

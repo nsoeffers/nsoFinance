@@ -21,6 +21,7 @@ define('translations', [], function() {
         "description"    : "Description",
         "save"           : "Save",
         "cancel"         : "Cancel",
+        "loading"        : "Loading...",
         "success"        : "Well done!",
         "error"          : "Error!"
     };
@@ -47,6 +48,7 @@ define('translations', [], function() {
         "description"    : "Omschrijving",
         "save"           : "Opslaan",
         "cancel"         : "Annuleer",
+        "loading"        : "Laden...",
         "success"        : "Gelukt!",
         "error"          : "Foutmelding!"
     };

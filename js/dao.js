@@ -26,30 +26,12 @@ define('dao', [], function() {
         
         dbRequest.onsuccess = function () {
             db = dbRequest.result;
-            if ( db.version === '') {                
+            if ( db.version === '' || db.version === '0.0') {                
                 var versionRequest = db.setVersion( '1.0' );
-                versionRequest.onsuccess = function (  ) {
-                    db.createObjectStore("Account", {keyPath: 'name'}); 
-                };
-                versionRequest.onerror = function() {
-                    alert('Error occurred while creating indexedDb');
-                };
-            } else if ( db.version === '1.0'){
-                var versionRequest = db.setVersion( '1.1' );
-                versionRequest.onsuccess = function (  ) {
-                    db.deleteObjectStore("Account"); 
-                };                
-            } else if ( db.version === '1.1'){
-                var versionRequest = db.setVersion( '1.2' );
-                versionRequest.onsuccess = function () {
-                    db.createObjectStore("Account", {keyPath: 'id', autoIncrement: true});
-                };                
-            } else if ( db.version === '1.2'){
-                var versionRequest = db.setVersion( '1.3' );
-                versionRequest.onsuccess = function () {
-                    db.deleteObjectStore("Account"); 
+                versionRequest.onsuccess = function () {                    
                     var store = db.createObjectStore("Account", {keyPath: 'id', autoIncrement: true});
                     store.createIndex('caseInsensitiveName', 'caseInsensitiveName', {unique : true});
+                    store.createIndex('accountType', 'accountType', {unique : false});
                 };
                 versionRequest.onerror = function() {
                     window.alert('Error occurred while creating indexedDb');
@@ -99,14 +81,14 @@ define('dao', [], function() {
         };
     };
     
-    dao.retrieveAll = function (callback, mappingMethod){
+    dao.findAccountsByType = function(accountType, callback, mappingMethod){
         if ( !db ) {
-            setTimeout(function() { dao.retrieveAll(callback, mappingMethod); }, 100);
+            setTimeout(function() { dao.findAccountsByType(accountType, callback, mappingMethod); }, 100);
             return;
         }
         var transaction = db.transaction([ 'Account' ], "readonly");
         var store = transaction.objectStore('Account');
-        var cursorRequest = store.index('caseInsensitiveName').openCursor();
+        var cursorRequest = store.index('accountType').openCursor(accountType);
         var results = [];
         cursorRequest.onsuccess = function(e) {
             if ( !e.target || !e.target.result || e.target.result === null) {

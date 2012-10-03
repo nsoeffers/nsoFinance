@@ -1,11 +1,11 @@
 <div ng-controller="AccountListCtrl" ng-init="refresh()">
     <!-- Left side -->
     <div class="row-fluid">
-        <select>
-            <option myapp-label data-label="assets"></option>
-            <option myapp-label data-label="liabilities"></option>
-            <option myapp-label data-label="incomes"></option>
-            <option myapp-label data-label="expenses"></option>
+        <select ng-change="refresh()" ng-model="selectedAccountType">
+            <option value="ASSET" selected myapp-label data-label="assets"></option>
+            <option value="LIABILITY" myapp-label data-label="liabilities"></option>
+            <option value="INCOME"  myapp-label data-label="incomes"></option>
+            <option value="EXPENSE" myapp-label data-label="expenses"></option>
         </select>
     </div>
     <div class="row-fluid">
@@ -18,9 +18,12 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-show="accounts.length == 0">
+                <tr ng-show="accounts.length == 0 && !loading">
                     <td colspan="2"><p myapp-label data-label="no_accounts" class="muted"></p></td>
                 </tr>
+                <tr ng-show="accounts.length == 0 && loading">
+                    <td colspan="2"><p myapp-label data-label="loading" class="muted"></p></td>
+                </tr>                
                 <tr ng-repeat="account in accounts" ng-click="select(account)">
                     <td>{{account.name}}</td>
                     <td><i class="icon-remove" ng-click="remove(account)"></i></td>
