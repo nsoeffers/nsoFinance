@@ -39,7 +39,7 @@ define('translations', [], function() {
         "incomes"        : "Inkomsten",
         "expenses"       : "Uitgaven",
         "no_accounts"    : "Geen rekeningen gevonden",
-        "choose_account_or_create_new"  : "Selecteer een rekening of creeer een nieuwe",
+        "choose_account_or_create_new"  : "Selecteer een rekening of maak een nieuwe rekening aan via het plus symbool aan de linkerkant",
         "account_saved"                 : "Rekening is bewaard",
         "invalidBankAccountNumber"      : "Geen geldige bankrekeningnummer",
         "requiredAccountName"           : "De naam van een rekening is verplicht",

@@ -67,7 +67,9 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         
         $scope.remove = function(account) {
             Dao.remove(account.id, function() {
-                $scope.accounts.splice($scope.accounts.indexOf(account), 1);
+                var selectedIndex =  $scope.accounts.indexOf(account);
+                $scope.accounts.splice(selectedIndex, 1);                
+                $rootScope.$broadcast(ACCOUNT_SELECTED_EVENT, (selectedIndex-1) < $scope.accounts.length && (selectedIndex-1) >= 0? $scope.accounts[selectedIndex-1]: null);
                 $scope.$apply();
             });
         };
@@ -80,6 +82,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             if ( account !== null ) {
                 $('#infoMessageForm').alert('close');
             }
+            $('#inputAccountName').focus();
             $scope.alreadySubmitted = false;
             $scope.account = account;            
             //$scope.$apply();
