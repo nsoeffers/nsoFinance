@@ -1,4 +1,5 @@
 define('tests', ['domain'], function(domain) {         
+    "use strict";
 
     test( "When Account is initialized then caseInsensitiveName is also set", function() {
         equal( "TESTNAME", new domain.Account('ASSETS', 'TestName').caseInsensitiveName);
@@ -14,10 +15,53 @@ define('tests', ['domain'], function(domain) {
         equal( "Account", new domain.Account('ASSETS', 'AccountName').className);
     });
 
-    test( "When Account className is set then nothing happens", function() {
+    test( "When Account className is set then exception is thrown", function() {
         var account = new domain.Account('ASSETS', 'AccountName');
-        account.className = 'UnexistingClass';
-        equal( "Account", account.className);
+        try {
+            account.className = 'UnexistingClass';
+        } catch ( ex ) {
+            equal( "className", ex['arguments'][0]);
+        }        
+    });
+    
+    test( "When trying to overwrite Account class of domain package then exception is thrown", function() {
+        try {
+            domain.Account = function(){ window.alert('dummyAccount'); };
+        } catch ( ex ) {
+            equal( "Account", ex['arguments'][0]);
+        }
+    });
+
+    test( "When trying to overwrite TransactionField enum of domain package then exception is thrown", function() {
+        try {
+            domain.TransactionField = {};
+        } catch ( ex ) {
+            equal( "TransactionField", ex['arguments'][0]);
+        }
+    });
+    
+    test( "When TransactionField enum value is modified then exception is thrown", function() {
+        try {
+            domain.TransactionField.DATE = {};
+        } catch ( ex ) {
+            equal( "DATE", ex['arguments'][0]);
+        }
+    });
+
+    test( "When field of enumValue is modified then exception is thrown", function() {
+        try {
+            domain.TransactionField.DATE.required = false;
+        } catch ( ex ) {
+            equal( "required", ex['arguments'][0]);
+        }
+    });
+    
+    test( "When trying to access private functions of domain package then undefined", function() {
+        strictEqual(undefined, domain.createTransactionFieldEnumValue);
+    });
+    
+    test( "When Transaction is initialized then className is set", function() {
+        equal( "Transaction", new domain.Transaction(new Date(), 10.0).className);
     });
 
 

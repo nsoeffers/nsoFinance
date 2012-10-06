@@ -12,3 +12,34 @@ INPUT:focus.ng-invalid-bank-account-number {
     -moz-box-shadow: 0 0 6px #f8b9b7;
     box-shadow: 0 0 6px #F8B9B7;
 }
+
+.step {
+    border: 1px solid #e3e3e3;
+    padding: 5px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.stepLabel {
+    font-size: 5em;
+    line-height: 100%;
+    text-align: center;
+    color: #888;
+}
+
+.tablePreview {    
+    overflow-y: auto;
+}
+
+.tablePreview TABLE {
+    font-size: 0.8em;    
+}
+
+.labelsArea {
+    background: transparent;
+    text-align: center;
+}
+
+.labelsArea SPAN.label {
+    margin-right: 10px;
+}

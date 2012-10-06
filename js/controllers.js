@@ -1,4 +1,5 @@
-define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', 'translations'], function($, angular, angularCookies, dao, domain, translations) {
+define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', 'translations', 'jquery.csv', 'modernizr'], 
+    function($, angular, angularCookies, dao, domain, translations, jqueryCsv, Modernizr) {
     
     var ACCOUNT_SELECTED_EVENT = 'accountSelected';
     var NOTIFICATION_EVENT = 'notification';
@@ -114,6 +115,35 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         $scope.account = null;
         
         $scope.showSuccessMessage = false;    
+    };
+    
+    result.ImportCtrl = function($scope) {
+        
+        $scope.selectedFile = null;
+        $scope.csvData = null;
+        $scope.unmappedFields = ["dateField", "amountField"];
+                
+        $scope.chooseFile = function() {
+            $('input[id=csvFile]')[0].addEventListener('change', $scope.onFileSelected, false);
+            $('input[id=csvFile]').click();
+        };
+        
+        $scope.onFileSelected = function(e) {
+            var file = null;
+            if ( e.target.files !== undefined && e.target.files !== null && e.target.files.length === 1 ) {
+                file = e.target.files[0];
+            }
+            if (file !== null ) {
+                var fileReader = new FileReader();
+                fileReader.onload = function(e){
+                    $scope.csvData = $.csv.toArrays(e.target.result, { separator: ';', escaper: '\\' });
+                    $scope.$apply();
+                };
+                fileReader.readAsText(file.slice(0, 3*1024));
+            }
+            $scope.selectedFile = file === null ? null : file.name;
+            $scope.$apply();
+        };
     };
     
     return result;
