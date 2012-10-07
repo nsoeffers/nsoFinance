@@ -159,7 +159,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                 var fileReader = new FileReader();
                 fileReader.onload = function(e){
                     $scope.csvData = $.csv.toArrays(e.target.result, { separator: ';', escaper: '\\' });
-                    //autoMap();
+                    autoMap();
                     $scope.$apply();
                     refreshDragAndDropTargets();
                 };
