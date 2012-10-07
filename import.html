@@ -1,4 +1,4 @@
-<div class="well">
+<div class="well well-small">
     <h1>        
         <span myapp-label data-label="import_title"></span>
     </h1>
@@ -18,7 +18,10 @@
                             <input id="csvFile" type="file" style="display:none" accept="text/csv">
                             <div class="input-append">
                                 <input id="filePath" class="input-large" type="text" ng-model="selectedFile" disabled="true">
-                                <a class="btn btn-primary" ng-click="chooseFile()" myapp-label data-label="select"></a>
+                                <a class="btn btn-primary" ng-click="chooseFile()">
+                                    <i class="icon-upload icon-white"></i>
+                                    <span myapp-label data-label="select"></span>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -34,14 +37,17 @@
                     <p class="muted" myapp-label data-label="mapConceptsOntoData"></p>
                 </blockquote>
                 <div class="well well-small labelsArea">
-                    <span ng-repeat="field in unmappedFields" class="label" >{{field}}<span>
+                    <span ng-repeat="field in unmappedFields" ng-class="{true: 'label label-important', false: 'label'}[field.required]" >{{field.i18nKey | translate}}<span>
                 </div>
                 <div class="tablePreview">
                     <table class="table table-striped table-hover table-condensed">
                         <caption myapp-label data-label="previewTable"></caption>
                         <thead>
                             <tr>
-                                <th ng-repeat="header in csvData[0]">{{header}}</th>
+                                <th ng-repeat="header in csvData[0]">
+                                    {{header}}
+                                    <span ng-show="csvColumnToField[$index] != undefined" ng-class="{true: 'label label-important', false: 'label'}[csvColumnToField[$index].required]" >{{csvColumnToField[$index].i18nKey | translate}}<span>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>

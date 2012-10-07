@@ -1,4 +1,4 @@
-define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', 'translations', 'jquery.csv', 'modernizr'], 
+define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', 'translations', 'jquery.csv', 'modernizr', 'jqueryUI'], 
     function($, angular, angularCookies, dao, domain, translations, jqueryCsv, Modernizr) {
     
     var ACCOUNT_SELECTED_EVENT = 'accountSelected';
@@ -117,16 +117,38 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         $scope.showSuccessMessage = false;    
     };
     
-    result.ImportCtrl = function($scope) {
+    result.ImportCtrl = function($scope, $locale, $cookies) {
         
         $scope.selectedFile = null;
         $scope.csvData = null;
-        $scope.unmappedFields = ["dateField", "amountField"];
-                
+        $scope.unmappedFields = domain.TransactionField.values;
+        $scope.csvColumnToField = [];
+                        
         $scope.chooseFile = function() {
             $('input[id=csvFile]')[0].addEventListener('change', $scope.onFileSelected, false);
             $('input[id=csvFile]').click();
         };
+        
+        $scope.onFieldDropped = function(event, ui){
+            $(event.srcElement).draggable('option', 'revert', false); 
+            var selectedColumn = $('.tablePreview TH').index($(event.target));
+            var selectedUnmappedIndex = $('.labelsArea SPAN.label').index($(event.srcElement));
+            var selectedTransactionField = null;
+            if ( selectedUnmappedIndex === -1 ){
+                selectedTransactionField = $scope.csvColumnToField[$('.tablePreview TH').index($(event.srcElement).parent())];
+                $scope.csvColumnToField.splice($('.tablePreview TH').index($(event.srcElement).parent()), 1);
+            } else {
+                selectedTransactionField  = $scope.unmappedFields[selectedUnmappedIndex];
+                $scope.unmappedFields.splice($('.labelsArea SPAN.label').index($(event.srcElement)), 1);
+            }
+            $scope.csvColumnToField[selectedColumn] = selectedTransactionField;
+            $scope.$apply();
+            refreshDragAndDropTargets();
+        };
+        
+        $scope.onFieldDragged = function(event, ui){
+        };
+
         
         $scope.onFileSelected = function(e) {
             var file = null;
@@ -137,14 +159,56 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                 var fileReader = new FileReader();
                 fileReader.onload = function(e){
                     $scope.csvData = $.csv.toArrays(e.target.result, { separator: ';', escaper: '\\' });
+                    //autoMap();
                     $scope.$apply();
+                    refreshDragAndDropTargets();
                 };
+                // Only process the first 3kb to construct a preview
                 fileReader.readAsText(file.slice(0, 3*1024));
             }
             $scope.selectedFile = file === null ? null : file.name;
             $scope.$apply();
         };
+        
+        var refreshDragAndDropTargets = function() {
+            $('.labelsArea .label').draggable('destroy');
+            $('.tablePreview TH').droppable('destroy');
+            $('.labelsArea .label').draggable({scope: 'Field', revert: true, 
+                                                drag: $scope.onFieldDragged });
+            $('.tablePreview TH .label').draggable({scope: 'Field', revert: true, 
+                                                drag: $scope.onFieldDragged });                                                
+            $('.tablePreview TH')
+                .filter(function() { return !($(this).children().is('.label')); })
+                .droppable({scope: 'Field', hoverClass: 'dropFieldHover', 
+                            drop: $scope.onFieldDropped});                    
+        };
+        
+        var autoMap = function() {
+            if ( $scope.csvData === null || $scope.csvData === undefined || $scope.csvData.length <= 0 ) {
+                return;
+            }
+            var fieldTranslations = {};
+            for(var fieldIndex in domain.TransactionField.values) {
+                var field = domain.TransactionField.values[fieldIndex];
+                fieldTranslations[translate(field.i18nKey, $cookies, $locale)] = field;
+            }
+            for(var index in $scope.csvData[0]){
+                if ( fieldTranslations[$scope.csvData[0][index]] !== undefined ) {
+                    var indexInUnmappedFields = $scope.unmappedFields.indexOf(fieldTranslations[$scope.csvData[0][index]]);
+                    if ( indexInUnmappedFields != -1 ) {
+                        $scope.csvColumnToField[index] = fieldTranslations[$scope.csvData[0][index]];  
+                        $scope.unmappedFields.splice(indexInUnmappedFields, 1);
+                    }
+                }
+            }
+        };
+        
     };
+    
+    var translate = function(key, $cookies, $locale) {
+        var selectedLanguage = $cookies.languagePreference !== undefined ? $cookies.languagePreference : $locale.id.substring(0,2);
+        return translations[selectedLanguage][key];
+    }
     
     return result;
 });

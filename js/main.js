@@ -1,12 +1,13 @@
 requirejs.config({
     paths: {
-        'jquery'                    : 'https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min',
-        'angular'                   : 'https://ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular.min',
-        'angularCookies'            : 'https://ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular-cookies.min',
-        'bootstrap'                 : 'https://netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/js/bootstrap.min',
-        'jquery.csv'                : 'jquery.csv-0.63',
-        'tableFixedHeader'          : 'table-fixed-header',
-        'modernizr'                 : 'modernizr-2.6.2.min'
+        'jquery'            : 'https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min',
+        'jqueryUI'          : 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/jquery-ui.min',
+        'angular'           : 'https://ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular.min',
+        'angularCookies'    : 'https://ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular-cookies.min',
+        'bootstrap'         : 'https://netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/js/bootstrap.min',
+        'jquery.csv'        : 'jquery.csv-0.63',
+        'modernizr'         : 'modernizr-2.6.2.min',
+        'angularUI'         : 'angular-ui.min'
     },
     shim: {
         'angular': {
@@ -22,11 +23,14 @@ requirejs.config({
         },
         'modernizr' : {
             exports: 'Modernizr'
+        },
+        'angularUI': {
+            deps: ['jquery', 'jqueryUI', 'angular']
         }
     }
 });
 
-require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'dao', 'domain', 'controllers', 'modernizr', 'domReady'], 
+require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'dao', 'domain', 'controllers', 'modernizr', 'jqueryUI', 'angularUI', 'domReady'], 
         function($, angular, angularCookies, bootstrap, translations, dao, domain, controllers, Modernizr) {
     angular.module('nsoFinance', ['ngCookies'])
         .controller('RootCtrl', controllers.RootCtrl)
@@ -40,6 +44,12 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
                 var language = $cookies.languagePreference !== undefined ? $cookies.languagePreference : $locale.id;
                 elm.text(Translations[language][attrs.label]);
             }; 
+        })
+        .filter('translate', function(Translations, $locale, $cookies) {
+            return function(input) {
+                var language = $cookies.languagePreference !== undefined ? $cookies.languagePreference : $locale.id;
+                return Translations[language][input];
+            };
         })
         .directive('bankAccountNumber', function(){
             var BANK_ACCOUNT_NUMBER_REGEXP = /^(\d{3})-(\d{7})-(\d{2})$/;

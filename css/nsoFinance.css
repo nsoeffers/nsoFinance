@@ -42,4 +42,14 @@ INPUT:focus.ng-invalid-bank-account-number {
 
 .labelsArea SPAN.label {
     margin-right: 10px;
+    cursor: default;
+}
+
+.dropFieldHover {
+    background-color: whiteSmoke;
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border: 2px dotted #333;
+    margin-top: 2px;
 }
