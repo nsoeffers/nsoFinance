@@ -39,7 +39,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         });
     };
         
-    result.AccountListCtrl = function ($scope, $rootScope, $window, Dao) {    
+    result.AccountListCtrl = function ($scope, $rootScope, $window, accountRepository) {    
         $scope.accounts = [];
         $scope.errorMessage = null;
         $scope.loading = false;
@@ -48,7 +48,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         $scope.refresh = function() {
             $scope.loading = true;
             $window.console.log('Test:' + $scope.selectedAccountType);
-            Dao.findAccountsByType($scope.selectedAccountType, function(results){                
+            accountRepository.findAccountsByType($scope.selectedAccountType, function(results){                
                 $window.console.log('Receiving results:' + $scope.selectedAccountType);
                 $scope.accounts = results;
                 $scope.loading = false;
@@ -67,7 +67,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         };
         
         $scope.remove = function(account) {
-            Dao.remove(account.id, function() {
+            accountRepository.remove(account.id, function() {
                 var selectedIndex =  $scope.accounts.indexOf(account);
                 $scope.accounts.splice(selectedIndex, 1);                
                 $rootScope.$broadcast(ACCOUNT_SELECTED_EVENT, (selectedIndex-1) < $scope.accounts.length && (selectedIndex-1) >= 0? $scope.accounts[selectedIndex-1]: null);
@@ -77,7 +77,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         
     };
     
-    result.AccountDetailCtrl = function ($scope, $rootScope, $window, $timeout, $cookies, Dao) {              
+    result.AccountDetailCtrl = function ($scope, $rootScope, $window, $timeout, $cookies, $locale, accountRepository) {              
         
         $scope.$on(ACCOUNT_SELECTED_EVENT, function(event, account) {
             if ( account !== null ) {
@@ -91,7 +91,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         
         $scope.save = function() {     
             $scope.alreadySubmitted = true;
-            Dao.save($scope.account, function(){
+            accountRepository.save($scope.account, function(){
                 $scope.showSuccessMessage = true;
                 $scope.$apply();
                 $timeout(function() {
@@ -117,12 +117,21 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         $scope.showSuccessMessage = false;    
     };
     
-    result.ImportCtrl = function($scope, $locale, $cookies) {
+    result.ImportCtrl = function($scope, $locale, $cookies, $timeout, transactionRepository) {
         
+        $scope.delimiter = ';';
+        $scope.escaper = '\\';
+        $scope.dateFormat = 'dd/MM/yyyy';
         $scope.selectedFile = null;
         $scope.csvData = null;
         $scope.unmappedFields = domain.TransactionField.values;
         $scope.csvColumnToField = [];
+        $scope.importStarted = false;
+        $scope.savedTransactionCount = 0;
+        $scope.fileReadingProgress = 0;
+        $scope.saveProgress = 0;        
+        
+        var file = null;
                         
         $scope.chooseFile = function() {
             $('input[id=csvFile]')[0].addEventListener('change', $scope.onFileSelected, false);
@@ -131,17 +140,19 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         
         $scope.onFieldDropped = function(event, ui){
             $(event.srcElement).draggable('option', 'revert', false); 
+            $(event.srcElement).hide(); 
             var selectedColumn = $('.tablePreview TH').index($(event.target));
             var selectedUnmappedIndex = $('.labelsArea SPAN.label').index($(event.srcElement));
             var selectedTransactionField = null;
             if ( selectedUnmappedIndex === -1 ){
                 selectedTransactionField = $scope.csvColumnToField[$('.tablePreview TH').index($(event.srcElement).parent())];
-                $scope.csvColumnToField.splice($('.tablePreview TH').index($(event.srcElement).parent()), 1);
+                $scope.csvColumnToField[$('.tablePreview TH').index($(event.srcElement).parent())] = undefined;
             } else {
                 selectedTransactionField  = $scope.unmappedFields[selectedUnmappedIndex];
                 $scope.unmappedFields.splice($('.labelsArea SPAN.label').index($(event.srcElement)), 1);
             }
             $scope.csvColumnToField[selectedColumn] = selectedTransactionField;
+            refreshMappingReadyStatus();
             $scope.$apply();
             refreshDragAndDropTargets();
         };
@@ -151,14 +162,13 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
 
         
         $scope.onFileSelected = function(e) {
-            var file = null;
             if ( e.target.files !== undefined && e.target.files !== null && e.target.files.length === 1 ) {
                 file = e.target.files[0];
             }
             if (file !== null ) {
                 var fileReader = new FileReader();
                 fileReader.onload = function(e){
-                    $scope.csvData = $.csv.toArrays(e.target.result, { separator: ';', escaper: '\\' });
+                    $scope.csvData = $.csv.toArrays(e.target.result, { separator: $scope.delimiter, escaper: $scope.escaper });
                     autoMap();
                     $scope.$apply();
                     refreshDragAndDropTargets();
@@ -170,17 +180,62 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             $scope.$apply();
         };
         
+        $scope.continueImport = function() {
+            $scope.importStarted = true;
+            if (file !== null ) {
+                var fieldToColumnIndexMap = {};
+                for( var columnIndex in $scope.csvColumnToField ) {
+                    fieldToColumnIndexMap[$scope.csvColumnToField[columnIndex].fieldName] = columnIndex;
+                }
+                var fileReader = new FileReader();
+                fileReader.onload = function(e){
+                    var data = $.csv.toArrays(e.target.result, { separator: ';', escaper: '\\' });
+                    var successCallback = function() { 
+                        $scope.savedTransactionCount++; 
+                        $scope.saveProgress = ($scope.savedTransactionCount * 100 ) / data.length;
+                        $scope.$apply();
+                    };
+                    var errorCallback = function() { window.alert('Error saving transaction: '); };
+                    for( var rowIndex in data ) {
+                        var row = data[rowIndex];
+                        var transaction = new domain.Transaction(Date.parseExact(row[fieldToColumnIndexMap[domain.TransactionField.DATE.fieldName]], $scope.dateFormat), 
+                                                          parseFloat(row[fieldToColumnIndexMap[domain.TransactionField.AMOUNT.fieldName]]),
+                                                          row[fieldToColumnIndexMap[domain.TransactionField.DESCRIPTION.fieldName]]);
+                        transactionRepository.save(transaction, successCallback, errorCallback);
+                    }
+                };
+                fileReader.onprogress = function(e) {
+                    $scope.fileReadingProgress = (e.loaded * 100) / e.total;  
+                    $scope.$apply();
+                };
+                fileReader.readAsText(file);
+            }            
+        };
+        
+        var refreshMappingReadyStatus = function() {
+            $scope.mappingReady = true;
+            for ( var index in $scope.unmappedFields ) {
+                if ( $scope.unmappedFields[index].required ) {
+                    $scope.mappingReady = false;
+                }
+            }
+        };
+        
         var refreshDragAndDropTargets = function() {
-            $('.labelsArea .label').draggable('destroy');
-            $('.tablePreview TH').droppable('destroy');
-            $('.labelsArea .label').draggable({scope: 'Field', revert: true, 
-                                                drag: $scope.onFieldDragged });
-            $('.tablePreview TH .label').draggable({scope: 'Field', revert: true, 
-                                                drag: $scope.onFieldDragged });                                                
-            $('.tablePreview TH')
-                .filter(function() { return !($(this).children().is('.label')); })
-                .droppable({scope: 'Field', hoverClass: 'dropFieldHover', 
-                            drop: $scope.onFieldDropped});                    
+            $('.tablePreview TH .label').css('left', '0px');
+            $('.tablePreview TH .label').css('top', '0px');
+            $timeout(function(){
+                $('.labelsArea .label').draggable('destroy');
+                $('.tablePreview TH').droppable('destroy');
+                $('.labelsArea .label').draggable({scope: 'Field', revert: true, containment: 'window',
+                                                    drag: $scope.onFieldDragged, opacity: 0.5 });
+                $('.tablePreview TH .label').draggable({scope: 'Field', revert: true, containment: 'window',
+                                                    drag: $scope.onFieldDragged, opacity: 0.5});                                                
+                $('.tablePreview TH')
+                    .filter(function() { return !($(this).children().is('.label')); })
+                    .droppable({scope: 'Field', hoverClass: 'dropFieldHover', 
+                                drop: $scope.onFieldDropped}); 
+            }, 200);
         };
         
         var autoMap = function() {
@@ -201,14 +256,22 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                     }
                 }
             }
+            refreshMappingReadyStatus();
+        };    
+    };
+    
+    result.SettingsCtrl = function($scope, $window, transactionRepository) {
+        $scope.removeAllTransactions = function() {
+            transactionRepository.reset(function(){ 
+                
+            });
         };
-        
     };
     
     var translate = function(key, $cookies, $locale) {
         var selectedLanguage = $cookies.languagePreference !== undefined ? $cookies.languagePreference : $locale.id.substring(0,2);
         return translations[selectedLanguage][key];
-    }
+    };
     
     return result;
 });

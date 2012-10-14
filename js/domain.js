@@ -45,24 +45,27 @@ define('domain', [], function(){
     var TransactionField = {};    
     var transactionFieldValues = [];
     
-    var createTransactionFieldEnumValue = function(enumValue, i18nKey, required){
+    var createTransactionFieldEnumValue = function(enumValue, i18nKey, fieldName,required){
         var newEnumValue = {};
         Object.defineProperty( newEnumValue, "i18nKey", {  value: i18nKey,  writable: false, enumerable: true, configurable: false});
+        Object.defineProperty( newEnumValue, "fieldName", {  value: fieldName,  writable: false, enumerable: true, configurable: false});
         Object.defineProperty( newEnumValue, "required", {  value: required,  writable: false, enumerable: true, configurable: false});
         Object.defineProperty( TransactionField, enumValue, {  value: newEnumValue,  writable: false, enumerable: true, configurable: false});
         transactionFieldValues.push(newEnumValue);
     };
     
-    createTransactionFieldEnumValue('DATE', 'transactionDateField', true);
-    createTransactionFieldEnumValue('AMOUNT', 'transactionAmountField', true);
-    createTransactionFieldEnumValue('ADDRESS', 'transactionAddressField', false);
+    createTransactionFieldEnumValue('DATE', 'transactionDateField', 'date', true);
+    createTransactionFieldEnumValue('AMOUNT', 'transactionAmountField', 'amount', true);
+    createTransactionFieldEnumValue('DESCRIPTION', 'transactionDescriptionField', 'description', true);
+    createTransactionFieldEnumValue('ADDRESS', 'transactionAddressField', 'address', false);
     Object.defineProperty( TransactionField, "values", {  value: transactionFieldValues,  writable: false, enumerable: true, configurable: false});
     Object.defineProperty( domain, "TransactionField", {  value: TransactionField,  writable: false, enumerable: true, configurable: false});    
     
     /* Transaction */
-    var Transaction = function(date, amount) {
+    var Transaction = function(date, amount, description) {
         this.date = date;
         this.amount = amount;
+        this.description = description;
         Object.defineProperty( this, "className", {  value: "Transaction",  writable: false, enumerable: true, configurable: false});
     };
     Object.defineProperty( domain, "Transaction", {  value: Transaction,  writable: false, enumerable: true, configurable: false});    

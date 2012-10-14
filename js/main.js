@@ -30,14 +30,16 @@ requirejs.config({
     }
 });
 
-require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'dao', 'domain', 'controllers', 'modernizr', 'jqueryUI', 'angularUI', 'domReady'], 
+require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'dao', 'domain', 'controllers', 'modernizr', 'jqueryUI', 'angularUI', 'datejs', 'domReady'], 
         function($, angular, angularCookies, bootstrap, translations, dao, domain, controllers, Modernizr) {
     angular.module('nsoFinance', ['ngCookies'])
         .controller('RootCtrl', controllers.RootCtrl)
         .controller('AccountListCtrl', controllers.AccountListCtrl)
         .controller('AccountDetailCtrl', controllers.AccountDetailCtrl)
+        .controller('SettingsCtrl', controllers.SettingsCtrl)        
         .controller('ImportCtrl', controllers.ImportCtrl)        
-        .factory('Dao', dao.init)
+        .factory('accountRepository', dao.createAccountRepository)
+        .factory('transactionRepository', dao.createTransactionRepository)
         .value('Translations', translations)
         .directive('myappLabel', function(Translations,$locale, $cookies){ 
             return function(scope, elm, attrs){
@@ -75,6 +77,9 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
             }).when('/import', {
                 templateUrl: 'import.html',
                 controller: 'ImportCtrl'
+            }).when('/settings', {
+                templateUrl: 'settings.html',
+                controller: 'SettingsCtrl'
             }).when('/unsupported', {
                 templateUrl: 'unsupportedBrowser.html'
             }).otherwise({

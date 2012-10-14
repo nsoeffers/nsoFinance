@@ -3,8 +3,10 @@ define('dao', [], function() {
     var dao = {};
     
     var db;
+    var isInitialized = false;
     
-    dao.init = function() {
+    var init = function() {
+        isInitialized = true;
         // Deal with vendor prefixes
         if ( "webkitIndexedDB" in window ) {
           window.indexedDB      = window.webkitIndexedDB;
@@ -27,15 +29,25 @@ define('dao', [], function() {
         dbRequest.onsuccess = function () {
             db = dbRequest.result;
             if ( db.version === '' || db.version === '0.0') {                
-                var versionRequest = db.setVersion( '1.0' );
+                var versionRequest = db.setVersion( '1.1' );
                 versionRequest.onsuccess = function () {                    
-                    var store = db.createObjectStore("Account", {keyPath: 'id', autoIncrement: true});
-                    store.createIndex('caseInsensitiveName', 'caseInsensitiveName', {unique : true});
-                    store.createIndex('accountType', 'accountType', {unique : false});
+                    var accountStore = db.createObjectStore("Account", {keyPath: 'id', autoIncrement: true});
+                    accountStore.createIndex('caseInsensitiveName', 'caseInsensitiveName', {unique : true});
+                    accountStore.createIndex('accountType', 'accountType', {unique : false});
+                    
+                    db.createObjectStore("Transaction", {keyPath: 'id', autoIncrement: true});                    
                 };
                 versionRequest.onerror = function() {
                     window.alert('Error occurred while creating indexedDb');
-                }
+                };
+            } else if ( db.version === '1.0') {
+                var versionRequest = db.setVersion( '1.1' );
+                versionRequest.onsuccess = function () {                    
+                    db.createObjectStore("Transaction", {keyPath: 'id', autoIncrement: true});
+                };
+                versionRequest.onerror = function() {
+                    window.alert('Error occurred while creating indexedDb');
+                };               
             }
         };
         
@@ -45,11 +57,75 @@ define('dao', [], function() {
         
         return dao;
         
-    }
+    };
     
-    dao.save = function (entity, successCallback, failureCallback){
-        var transaction = db.transaction([ 'Account' ], "readwrite");
-        var store = transaction.objectStore("Account");        
+    var createRepository = function(storeName) {
+        var repository = {};
+        
+        if ( !isInitialized ) {
+            init();
+        }
+        
+        repository.save = function(entity, successCallback, failureCallback) {
+            save(entity, successCallback, failureCallback, storeName);
+        };
+        
+        repository.remove = function(key, successCallback, failureCallback){
+            remove(key, successCallback, failureCallback, storeName);
+        };
+                
+        return repository;
+    };
+    
+    dao.createAccountRepository = function() {
+        var repository = createRepository('Account');
+        repository.findAccountsByType = function(accountType, callback, mappingMethod){
+            if ( !db ) {
+                setTimeout(function() { repository.findAccountsByType(accountType, callback, mappingMethod); }, 100);
+                return;
+            }
+            var transaction = db.transaction([ 'Account' ], "readonly");
+            var store = transaction.objectStore('Account');
+            var cursorRequest = store.index('accountType').openCursor(accountType);
+            var results = [];
+            cursorRequest.onsuccess = function(e) {
+                if ( !e.target || !e.target.result || e.target.result === null) {
+                    callback(results);
+                    return;
+                }
+                results.push(mappingMethod(e.target.result.value));
+                e.target.result.continue();
+            };
+            cursorRequest.onerror = function(){
+                alert('Failed to retrieve items from IndexedDB');
+            };
+        };
+
+        return repository;
+    };
+
+    dao.createTransactionRepository = function() {
+        var repository = createRepository('Transaction');
+        
+        repository.reset = function() {
+            var versionRequest = db.setVersion( '1.0' );
+            versionRequest.onsuccess = function () {                    
+                db.deleteObjectStore('Transaction');
+                init();
+            };
+            versionRequest.onerror = function() {
+                window.alert('Error occurred while removing transaction store');
+            };               
+
+        };
+        
+        return repository;
+    };
+    
+
+    var save = function (entity, successCallback, failureCallback, storeName){
+        var transaction = db.transaction([ storeName ], "readwrite");
+        var store = transaction.objectStore(storeName);        
         if ( entity !== null && entity.id !== undefined && entity.id !== null ) {
             var getRequest = store.put(entity);
             getRequest.onsuccess = successCallback;
@@ -67,9 +143,9 @@ define('dao', [], function() {
         }
     };
     
-    dao.remove = function (key, successCallback, failureCallback){
-        var transaction = db.transaction([ 'Account' ], "readwrite");
-        var store = transaction.objectStore("Account");        
+    var remove = function (key, successCallback, failureCallback, storeName){
+        var transaction = db.transaction([ storeName ], "readwrite");
+        var store = transaction.objectStore(storeName);        
         var deleteRequest = store.delete(key);
             
         deleteRequest.onerror = function(){
@@ -81,27 +157,6 @@ define('dao', [], function() {
         };
     };
     
-    dao.findAccountsByType = function(accountType, callback, mappingMethod){
-        if ( !db ) {
-            setTimeout(function() { dao.findAccountsByType(accountType, callback, mappingMethod); }, 100);
-            return;
-        }
-        var transaction = db.transaction([ 'Account' ], "readonly");
-        var store = transaction.objectStore('Account');
-        var cursorRequest = store.index('accountType').openCursor(accountType);
-        var results = [];
-        cursorRequest.onsuccess = function(e) {
-            if ( !e.target || !e.target.result || e.target.result === null) {
-                callback(results);
-                return;
-            }
-            results.push(mappingMethod(e.target.result.value));
-            e.target.result.continue();
-        };
-        cursorRequest.onerror = function(){
-            alert('Failed to retrieve items from IndexedDB');
-        };
-    };
     
     return dao;
 });

@@ -35,6 +35,14 @@ INPUT:focus.ng-invalid-bank-account-number {
     font-size: 0.8em;    
 }
 
+.tablePreview TABLE THEAD TH {
+    border: none;
+}
+
+.tablePreview TABLE THEAD TH .label {
+    position: inline;
+}
+
 .labelsArea {
     background: transparent;
     text-align: center;
@@ -45,11 +53,7 @@ INPUT:focus.ng-invalid-bank-account-number {
     cursor: default;
 }
 
-.dropFieldHover {
-    background-color: whiteSmoke;
-    border-radius: 4px;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border: 2px dotted #333;
-    margin-top: 2px;
+.tablePreview TABLE THEAD TH.dropFieldHover {
+    background-color: #DFF0D8;
+    border: 2px dotted #D6E9C6;
 }
