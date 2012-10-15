@@ -129,7 +129,8 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         $scope.importStarted = false;
         $scope.savedTransactionCount = 0;
         $scope.fileReadingProgress = 0;
-        $scope.saveProgress = 0;        
+        $scope.saveProgress = 0;   
+        $scope.firstRowIsHeader = true;
         
         var file = null;
                         
@@ -169,6 +170,13 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                 var fileReader = new FileReader();
                 fileReader.onload = function(e){
                     $scope.csvData = $.csv.toArrays(e.target.result, { separator: $scope.delimiter, escaper: $scope.escaper });
+                    if ( !$scope.firstRowIsHeader ) {
+                        var headerRow = [];
+                        for( columnIndex in $scope.csvData[0] ) {
+                            headerRow.push(translate('column', $cookies, $locale) + columnIndex);
+                        }
+                        $scope.csvData.unshift(headerRow);
+                    }
                     autoMap();
                     $scope.$apply();
                     refreshDragAndDropTargets();
@@ -197,6 +205,9 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                     };
                     var errorCallback = function() { window.alert('Error saving transaction: '); };
                     for( var rowIndex in data ) {
+                        if ( rowIndex === "0" && $scope.firstRowIsHeader ) {
+                            continue;
+                        }
                         var row = data[rowIndex];
                         var transaction = new domain.Transaction(Date.parseExact(row[fieldToColumnIndexMap[domain.TransactionField.DATE.fieldName]], $scope.dateFormat), 
                                                           parseFloat(row[fieldToColumnIndexMap[domain.TransactionField.AMOUNT.fieldName]]),
