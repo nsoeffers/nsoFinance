@@ -117,7 +117,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         $scope.showSuccessMessage = false;    
     };
     
-    result.ImportCtrl = function($scope, $locale, $cookies, $timeout, transactionRepository) {
+    result.ImportCtrl = function($scope, $locale, $cookies, $timeout, transactionRepository, $window) {
         
         $scope.delimiter = ';';
         $scope.escaper = '\\';
@@ -172,7 +172,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                     $scope.csvData = $.csv.toArrays(e.target.result, { separator: $scope.delimiter, escaper: $scope.escaper });
                     if ( !$scope.firstRowIsHeader ) {
                         var headerRow = [];
-                        for( columnIndex in $scope.csvData[0] ) {
+                        for( var columnIndex in $scope.csvData[0] ) {
                             headerRow.push(translate('column', $cookies, $locale) + columnIndex);
                         }
                         $scope.csvData.unshift(headerRow);
@@ -200,7 +200,9 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                     var data = $.csv.toArrays(e.target.result, { separator: ';', escaper: '\\' });
                     var successCallback = function() { 
                         $scope.savedTransactionCount++; 
-                        $scope.saveProgress = ($scope.savedTransactionCount * 100 ) / data.length;
+                        var total = $scope.firstRowIsHeader ? data.length - 1 : data.length;
+                        $scope.saveProgress = ($scope.savedTransactionCount * 100 ) / total;
+                        $window.console.log('transaction:' + $scope.savedTransactionCount + ', length: ' + total + ', percent: ' + $scope.saveProgress);
                         $scope.$apply();
                     };
                     var errorCallback = function() { window.alert('Error saving transaction: '); };

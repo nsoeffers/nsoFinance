@@ -43,6 +43,7 @@ define('translations', [], function() {
         "savingTransactions"            : "Saving Transactions",
         "file"                          : "File",
         "advancedSettings"              : "Advanced Settings",
+        "successImport"                 : "Successfully imported transactions",
         
         "settings"                      : "Settings",
         "removeAllTransactionsDescription" : "Select this button if you want to delete all transactions. Other data like accounts and rules will not be touched.",
@@ -103,6 +104,7 @@ define('translations', [], function() {
         "savingTransactions"            : "Transacties opslaan",
         "file"                          : "Bestand",
         "advancedSettings"              : "Geavanceerde Instellingen",
+        "successImport"                 : "De verrichtingen zijn succesvol geimporteerd",
         
         "settings"                      : "Instellingen",
         "removeAllTransactionsDescription" : "Selecteer onderstaande knop indien u alle verrichtingen wilt verwijderen. Andere data zoals rekeningen en regels zullen blijven bestaan.",
