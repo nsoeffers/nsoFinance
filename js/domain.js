@@ -67,6 +67,13 @@ define('domain', [], function(){
         this.amount = amount;
         this.description = description;
         Object.defineProperty( this, "className", {  value: "Transaction",  writable: false, enumerable: true, configurable: false});
+        Object.defineProperty( this, "status", {    get: function() { 
+                                                           return (this.debetAccount !== undefined && this.creditAccount != undefined &&
+                                                                this.debetAccount !== null && this.creditAccount != null)? "MAPPED" : "UNMAPPED";
+                                                        },
+                                                    set: function(newValue) {
+                                                        },
+                                                    enumerable: true, configurable: false});
     };
     Object.defineProperty( domain, "Transaction", {  value: Transaction,  writable: false, enumerable: true, configurable: false});    
     

@@ -41,10 +41,10 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
         .factory('accountRepository', dao.createAccountRepository)
         .factory('transactionRepository', dao.createTransactionRepository)
         .value('Translations', translations)
-        .directive('myappLabel', function(Translations,$locale, $cookies){ 
+        .directive('i18nKey', function(Translations,$locale, $cookies){ 
             return function(scope, elm, attrs){
                 var language = $cookies.languagePreference !== undefined ? $cookies.languagePreference : $locale.id;
-                elm.text(Translations[language][attrs.label]);
+                elm.text(Translations[language][attrs.i18nKey]);
             }; 
         })
         .filter('translate', function(Translations, $locale, $cookies) {

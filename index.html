@@ -21,23 +21,23 @@
         <div ng-cloak class="ng-cloak" ng-controller="RootCtrl" ng-init="populateLanguages()">
             <div class="navbar navbar-static-top">
                 <div class="navbar-inner">
-                    <a href="#" class="brand" myapp-label data-label="product_name"></a> 
+                    <a href="#" class="brand" data-i18n-key="product_name"></a> 
                     <ul class="nav">
-                        <li><a href="#/account" myapp-label data-label="accounts"></a></li>
+                        <li><a href="#/account" data-i18n-key="accounts"></a></li>
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" myapp-label data-label="transactions"></a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" data-i18n-key="transactions"></a>
                             <ul class="dropdown-menu">
-                                <li><a href="#/import" myapp-label data-label="import"></a></li>
+                                <li><a href="#/import" data-i18n-key="import"></a></li>
                             </ul>
                         </li>
-                        <li><a href="#/settings" myapp-label data-label="settings"></a></li>
+                        <li><a href="#/settings" data-i18n-key="settings"></a></li>
                     </ul>
                 </div>
             </div>
             <div id="feedback_area">
                 <div ng-repeat="notification in notifications" class="alert alert-{{notification.type}}">
                     <button type="button" class="close" data-dismiss="alert">×</button>
-                    <strong myapp-label data-label="{{notification.type}}"></strong> <span>{{notification.message}}</span>
+                    <strong data-i18n-key="{{notification.type}}"></strong> <span>{{notification.message}}</span>
                 </div>
             </div>
             <ul class="nav nav-pills pull-right">                

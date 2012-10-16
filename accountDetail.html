@@ -1,32 +1,32 @@
 <div ng-controller="AccountDetailCtrl">
     <!-- Right side -->
     <form name="accountForm" class="css-form" ng-submit="save()">
-        <legend myapp-label data-label="account_detail"></legend>
+        <legend data-i18n-key="account_detail"></legend>
         <div class="alert alert-info fade in" id="infoMessageForm">
             <i class="icon-info-sign"></i>
-            <strong myapp-label data-label="choose_account_or_create_new"></strong>
+            <strong data-i18n-key="choose_account_or_create_new"></strong>
         </div>
         <div class="control-group">
-            <label class="control-label" for="inputAccountName" myapp-label data-label="account_name"></label>
+            <label class="control-label" for="inputAccountName" data-i18n-key="account_name"></label>
             <div class="controls">
                 <div class="input-append">
                     <input type="text" id="inputAccountName" name="inputAccountName" ng-model="account.name" required="true" ng-disabled="account == null">
-                    <span class="add-on text-error" ng-show="accountForm.inputAccountName.$error.required && account != null" myapp-label data-label="requiredAccountName"></span>
+                    <span class="add-on text-error" ng-show="accountForm.inputAccountName.$error.required && account != null" data-i18n-key="requiredAccountName"></span>
                 </div>
             </div>
         </div>
         <div class="control-group">
-            <label class="control-label" for="inputBankAccountNumber" myapp-label data-label="bankaccount_nr"></label>
+            <label class="control-label" for="inputBankAccountNumber" data-i18n-key="bankaccount_nr"></label>
             <div class="controls">
                 <div class="input-append">
                     <input type="text" name="inputBankAccountNumber" ng-model="account.bankAccountNumber" 
                            ng-disabled="account == null" bank-account-number maxlength="14">
-                    <span class="add-on text-error" ng-show="accountForm.inputBankAccountNumber.$error.bankAccountNumber" myapp-label data-label="invalidBankAccountNumber"></span>
+                    <span class="add-on text-error" ng-show="accountForm.inputBankAccountNumber.$error.bankAccountNumber" data-i18n-key="invalidBankAccountNumber"></span>
                 </div>
             </div>                            
         </div>
         <div class="control-group">
-            <label class="control-label" for="inputAccountDescription" myapp-label data-label="description"></label>
+            <label class="control-label" for="inputAccountDescription" data-i18n-key="description"></label>
             <div class="controls">
                 <textarea name="inputAccountDescription" ng-model="account.description" 
                        ng-disabled="account == null" maxlength="500"/>                
@@ -35,15 +35,15 @@
         <div class="alert alert-success fade in" ng-show="showSuccessMessage">
             <i class="icon-info-sign"></i>
             <button type="button" class="close" data-dismiss="alert">×</button>
-            <strong myapp-label data-label="success"></strong> <span myapp-label data-label="account_saved"></span>
+            <strong data-i18n-key="success"></strong> <span data-i18n-key="account_saved"></span>
         </div>        
         <div class="alert alert-error fade in" ng-show="errorMessage != null">
             <i class="icon-exclamation-sign"></i>
             <button type="button" class="close" data-dismiss="alert">×</button>
-            <strong myapp-label data-label="error"></strong> <span>{{errorMessage}}</span>
+            <strong data-i18n-key="error"></strong> <span>{{errorMessage}}</span>
         </div>
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary" myapp-label data-label="save" ng-disabled="accountForm.$invalid || alreadySubmitted"></button>
+          <button type="submit" class="btn btn-primary" data-i18n-key="save" ng-disabled="accountForm.$invalid || alreadySubmitted"></button>
         </div>
     </form>
 </div>

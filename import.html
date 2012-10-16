@@ -1,6 +1,6 @@
 <div class="well well-small">
     <h1>        
-        <span myapp-label data-label="import_title"></span>
+        <span data-i18n-key="import_title"></span>
     </h1>
 </div>
 <div class="container-fluid">
@@ -9,18 +9,18 @@
         <div class="span11">
             <div class="step">
                 <blockquote>
-                    <p class="muted" myapp-label data-label="configureImportFile"></p>
+                    <p class="muted" data-i18n-key="configureImportFile"></p>
                 </blockquote>
                 <form class="form-horizontal">  
                     <div class="accordion" id="accordion2">
                         <div class="accordion-group">
                             <div class="accordion-heading">
-                                <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion2" href="#advancedSettings" myapp-label data-label="advancedSettings"></a>
+                                <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion2" href="#advancedSettings" data-i18n-key="advancedSettings"></a>
                             </div>
                             <div id="advancedSettings" class="accordion-body collapse">                            
                                 <div class="accordion-inner">                            
                                     <div class="control-group">
-                                        <label class="control-label" for="delimiter" myapp-label data-label="delimiter"></label>
+                                        <label class="control-label" for="delimiter" data-i18n-key="delimiter"></label>
                                         <div class="control-group">
                                             <div class="controls">
                                                 <input type="text" id="delimiter" name="delimiter" maxlength="1" ng-model="delimiter"></input>
@@ -28,7 +28,7 @@
                                         </div>
                                     </div>
                                     <div class="control-group">
-                                        <label class="control-label" for="escaper" myapp-label data-label="escaper"></label>
+                                        <label class="control-label" for="escaper" data-i18n-key="escaper"></label>
                                         <div class="control-group">
                                             <div class="controls">
                                                 <input type="text" id="escaper" name="escaper" maxlength="2" ng-model="escaper"></input>
@@ -36,7 +36,7 @@
                                         </div>
                                     </div>                                    
                                     <div class="control-group">
-                                        <label class="control-label" for="dateFormat" myapp-label data-label="dateFormat"></label>
+                                        <label class="control-label" for="dateFormat" data-i18n-key="dateFormat"></label>
                                         <div class="control-group">
                                             <div class="controls">
                                                 <input type="text" id="dateFormat" name="dateFormat" maxlength="2" ng-model="dateFormat"></input>
@@ -44,7 +44,7 @@
                                         </div>
                                     </div>
                                     <div class="control-group">
-                                        <label class="control-label" for="firstRowIsHeader" myapp-label data-label="firstRowIsHeader"></label>
+                                        <label class="control-label" for="firstRowIsHeader" data-i18n-key="firstRowIsHeader"></label>
                                         <div class="control-group">
                                             <div class="controls">
                                                 <input type="checkbox" id="firstRowIsHeader" name="firstRowIsHeader" ng-model="firstRowIsHeader"></input>
@@ -56,14 +56,14 @@
                         </div>
                     </div>                
                     <div class="control-group">
-                        <label class="control-label" for="filePath" myapp-label data-label="file"></label>
+                        <label class="control-label" for="filePath" data-i18n-key="file"></label>
                         <div class="controls">
                             <input id="csvFile" type="file" style="display:none" accept="text/csv">
                             <div class="input-append">
                                 <input id="filePath" class="input-large" type="text" ng-model="selectedFile" disabled="true">
                                 <a class="btn btn-primary" ng-click="chooseFile()">
                                     <i class="icon-upload icon-white"></i>
-                                    <span myapp-label data-label="select"></span>
+                                    <span data-i18n-key="select"></span>
                                 </a>
                             </div>
                         </div>
@@ -77,14 +77,14 @@
         <div class="span11">
             <div class="step">
                 <blockquote>
-                    <p class="muted" myapp-label data-label="mapConceptsOntoData"></p>
+                    <p class="muted" data-i18n-key="mapConceptsOntoData"></p>
                 </blockquote>
                 <div class="well well-small labelsArea">
                     <span ng-repeat="field in unmappedFields" ng-class="{true: 'label label-important', false: 'label'}[field.required]" >{{field.i18nKey | translate}}<span>
                 </div>
                 <div class="tablePreview">
                     <table class="table table-striped table-hover table-condensed">
-                        <caption myapp-label data-label="previewTable"></caption>
+                        <caption data-i18n-key="previewTable"></caption>
                         <thead>
                             <tr>
                                 <th ng-repeat="header in csvData[0]">
@@ -108,18 +108,18 @@
         <div class="span11">
             <div class="step">
                 <blockquote>
-                    <p class="muted" myapp-label data-label="processFile"></p>
+                    <p class="muted" data-i18n-key="processFile"></p>
                 </blockquote>
                 <form class="form-horizontal">  
                     <a class="btn btn-primary" ng-click="continueImport()" ng-disabled="importStarted">
                         <i class="icon-circle-arrow-right icon-white"></i>
-                        <span myapp-label data-label="continueImport"></span>
+                        <span data-i18n-key="continueImport"></span>
                     </a>
                 </form>
                 <form class="form-horizontal" ng-show="importStarted">
-                    <legend myapp-label data-label=""></legend>
+                    <legend data-i18n-key=""></legend>
                     <div class="control-group">
-                        <label class="control-label" myapp-label data-label="readingFile"></label> 
+                        <label class="control-label" data-i18n-key="readingFile"></label> 
                         <div class="controls">
                             <div ng-class="{false: 'progress progress-striped progress-success active', true: 'progress progress-success'}[fileReadingProgress == 100]">
                                 <div class="bar" style="width: {{fileReadingProgress}}%"></div>                    
@@ -127,7 +127,7 @@
                         </div>
                     </div>
                     <div class="control-group" ng-show="fileReadingProgress == 100">
-                        <label class="control-label" myapp-label data-label="savingTransactions"></label> 
+                        <label class="control-label" data-i18n-key="savingTransactions"></label> 
                         <div class="controls">
                             <div ng-class="{false: 'progress progress-striped progress-success active', true: 'progress progress-success'}[saveProgress == 100]">
                                 <div class="bar" style="width: {{saveProgress}}%"></div>                    
@@ -143,7 +143,7 @@
         <div class="span11">
             <div class="step">
                 <blockquote>
-                    <p class="muted" myapp-label data-label="successImport"></p>
+                    <p class="muted" data-i18n-key="successImport"></p>
                 </blockquote>                
             </div>
         </div>
