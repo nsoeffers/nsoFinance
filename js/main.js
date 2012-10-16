@@ -92,4 +92,6 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
                 $location.path('/unsupported');
             }
         });
+        
+        angular.bootstrap($('HTML'), ['nsoFinance']);
 });
