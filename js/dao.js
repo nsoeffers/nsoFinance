@@ -119,6 +119,28 @@ define('dao', [], function() {
 
         };
         
+        repository.findTransactions = function(callback) {
+            if ( !db ) {
+                setTimeout(function() { repository.findTransactions(callback); }, 100);
+                return;
+            }
+            var transaction = db.transaction([ 'Transaction' ], "readonly");
+            var store = transaction.objectStore('Transaction');
+            var cursorRequest = store.openCursor();
+            var results = [];
+            cursorRequest.onsuccess = function(e) {
+                if ( !e.target || !e.target.result || e.target.result === null) {
+                    callback(results);
+                    return;
+                }
+                results.push(e.target.result.value);
+                e.target.result.continue();
+            };
+            cursorRequest.onerror = function(){
+                alert('Failed to retrieve items from IndexedDB');
+            };
+        };
+        
         return repository;
     };
     

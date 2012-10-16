@@ -37,7 +37,8 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
         .controller('AccountListCtrl', controllers.AccountListCtrl)
         .controller('AccountDetailCtrl', controllers.AccountDetailCtrl)
         .controller('SettingsCtrl', controllers.SettingsCtrl)        
-        .controller('ImportCtrl', controllers.ImportCtrl)        
+        .controller('ImportCtrl', controllers.ImportCtrl)
+        .controller('AssignCtrl', controllers.AssignCtrl)
         .factory('accountRepository', dao.createAccountRepository)
         .factory('transactionRepository', dao.createTransactionRepository)
         .value('Translations', translations)
@@ -77,6 +78,9 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
             }).when('/import', {
                 templateUrl: 'import.html',
                 controller: 'ImportCtrl'
+            }).when('/assign', {
+                templateUrl: 'assign.html',
+                controller: 'AssignCtrl'                
             }).when('/settings', {
                 templateUrl: 'settings.html',
                 controller: 'SettingsCtrl'

@@ -273,6 +273,17 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         };    
     };
     
+    result.AssignCtrl = function($scope, transactionRepository) {
+        
+        $scope.transactions = [];
+        $scope.refresh = function() {
+            transactionRepository.findTransactions(function(data) {
+                    $scope.transactions = data;
+                    $scope.$apply();
+                });
+        };
+    };
+    
     result.SettingsCtrl = function($scope, $window, transactionRepository) {
         $scope.removeAllTransactions = function() {
             transactionRepository.reset(function(){ 
