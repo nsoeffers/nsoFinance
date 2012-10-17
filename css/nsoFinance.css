@@ -57,3 +57,7 @@ INPUT:focus.ng-invalid-bank-account-number {
     background-color: #DFF0D8;
     border: 2px dotted #D6E9C6;
 }
+
+#assignmentTable thead tr th:nth-child(2), #assignmentTable tbody tr td:nth-child(2) {
+    text-align: right;   
+}

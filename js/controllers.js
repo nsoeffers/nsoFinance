@@ -211,7 +211,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                             continue;
                         }
                         var row = data[rowIndex];
-                        var transaction = new domain.Transaction(Date.parseExact(row[fieldToColumnIndexMap[domain.TransactionField.DATE.fieldName]], $scope.dateFormat), 
+                        var transaction = new domain.Transaction(Date.parseExact(row[fieldToColumnIndexMap[domain.TransactionField.DATE.fieldName]], $scope.dateFormat).getTime(), 
                                                           parseFloat(row[fieldToColumnIndexMap[domain.TransactionField.AMOUNT.fieldName]]),
                                                           row[fieldToColumnIndexMap[domain.TransactionField.DESCRIPTION.fieldName]]);
                         transactionRepository.save(transaction, successCallback, errorCallback);
