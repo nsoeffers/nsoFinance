@@ -1,4 +1,5 @@
-<div class="modal">
+
+<div id="unsupportedDialog" class="modal hide fade" role="dialog">
   <div class="modal-header">
     <h3 data-i18n-key="unsupportedBrowser"></h3>
   </div>
@@ -6,3 +7,8 @@
     <p data-i18n-key="unsupportedExplanation"></p>
   </div>
 </div>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('#unsupportedDialog').modal({ show: true, keyboard: false, backdrop: "static"} );
+    });
+</script>
