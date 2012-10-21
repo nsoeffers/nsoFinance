@@ -58,6 +58,38 @@ INPUT:focus.ng-invalid-bank-account-number {
     border: 2px dotted #D6E9C6;
 }
 
-#assignmentTable thead tr th:nth-child(2), #assignmentTable tbody tr td:nth-child(2) {
+#assignmentTable .row-fluid [class*="span"]:nth-child(2) {
     text-align: right;   
 }
+
+.table-fluid .row-fluid {
+    border-bottom: 1px solid #DDD;
+}
+
+.table-fluid .row-fluid:nth-child(even) {
+    background-color: #F9F9F9;
+}
+
+.table-fluid .row-fluid.active  {
+    background-color: #08C;
+    color: #f0f0f0;
+}
+
+.table-fluid .row-fluid [class*="span"] input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#assignmentTable .tableHeader.row-fluid [class*="span"] {
+    height: auto;
+}
+
+#assignmentTable .row-fluid [class*="span"] {
+    padding: 8px;
+}
+
+.tableHeader > div { 
+    font-weight: bold;
+    line-height: 20px;
+}
+

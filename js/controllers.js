@@ -273,21 +273,98 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         };    
     };
     
-    result.AssignCtrl = function($scope, transactionRepository) {
+    result.AssignCtrl = function($scope, $window, $timeout, transactionRepository, accountRepository) {
         
         $scope.transactions = [];
-        $scope.refresh = function() {
+        $scope.accounts = "[]";
+        
+        var selectedTransaction;        
+        var creditAccountChooser;
+        var debetAccountChooser;
+        var selectedRow;
+        
+        $scope.init = function() {
+            var accountNames = [];
+            accountRepository.findAll(function(accounts) {
+                for( var index in accounts ) {
+                    accountNames.push(accounts[index].name);
+                }
+                $scope.$apply();
+            });
+            debetAccountChooser = $('#debetAccountChooser');
+            debetAccountChooser.typeahead({updater: $scope.updateDebet, source: accountNames });
+            debetAccountChooser.focus(function() { $timeout(function() { debetAccountChooser.select(); }, 0, false); } );
+            creditAccountChooser = $('#creditAccountChooser');
+            creditAccountChooser.typeahead({updater: $scope.updateCredit, source: accountNames });
+            creditAccountChooser.focus(function() { $timeout(function() { creditAccountChooser.select(); }, 0, false); } );
+            $scope.refresh();
+        };
+        
+        $scope.refresh = function() {            
             transactionRepository.findTransactions(function(data) {
                     $scope.transactions = data;
                     $scope.$apply();
                 });
         };
+        
+        $scope.selectRow = function(e){            
+            var currentTarget = $(e.currentTarget);            
+            if ( currentTarget[0] === creditAccountChooser.parents('.row-fluid')[0] ){
+                return;
+            }
+            var previousSelectedTransaction;
+            var rowIndex = parseInt(currentTarget.data('rowIndex'), 10);
+            if ( rowIndex >= 0 && rowIndex < $scope.transactions.length) {
+                previousSelectedTransaction = selectedTransaction;
+                selectedTransaction = $scope.transactions[rowIndex];
+            }
+            var creditColumn = currentTarget.children().last();
+            var debetColumn = currentTarget.children().last().prev();
+            creditAccountChooser.val(creditColumn.text());
+            debetAccountChooser.val(debetColumn.text());
+            creditColumn.text("");
+            debetColumn.text("");
+            creditAccountChooser.detach().appendTo(creditColumn).show();
+            debetAccountChooser.detach().appendTo(debetColumn).show();
+            if ( selectedRow !== undefined && selectedRow !== null ) {                
+                selectedRow.removeClass('active');
+                if ( previousSelectedTransaction !== undefined && previousSelectedTransaction !== null ) {
+                    selectedRow.children().last().text(previousSelectedTransaction.creditAccount !== undefined ? 
+                        previousSelectedTransaction.creditAccount.name : '');
+                    selectedRow.children().last().prev().text(previousSelectedTransaction.debetAccount !== undefined ? 
+                        previousSelectedTransaction.debetAccount.name : '');                        
+                }
+            }
+            currentTarget.addClass('active');
+            selectedRow = currentTarget;            
+        };
+        
+        $scope.updateDebet = function(item) {
+            $timeout(function() {debetAccountChooser.val(item)}, 0, false);
+            updateAccount(item, 'debetAccount');
+        };
+        
+        $scope.updateCredit = function(item) {
+            $timeout(function() {creditAccountChooser.val(item)}, 0, false);
+            updateAccount(item, 'creditAccount');
+        };
+        
+        var updateAccount = function(item, accountType){
+            if ( selectedTransaction !== undefined && selectedTransaction !== null ) {
+                if ( selectedTransaction[accountType] === undefined ) {
+                    selectedTransaction[accountType] = {};
+                }
+                selectedTransaction[accountType].name = item;
+                transactionRepository.save(selectedTransaction, function() { $window.alert('Succesfully saved transaction');}, function() { $window.alert('Error');});
+            }            
+        };
+
     };
     
     result.SettingsCtrl = function($scope, $window, transactionRepository) {
         $scope.removeAllTransactions = function() {
             transactionRepository.reset(function(){ 
-                
+                // TODO: Give feedback to user and issue a reload of webapp
             });
         };
     };

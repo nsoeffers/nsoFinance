@@ -73,6 +73,10 @@ define('dao', [], function() {
         repository.remove = function(key, successCallback, failureCallback){
             remove(key, successCallback, failureCallback, storeName);
         };
+        
+        repository.findAll = function(successCallback){
+            findAll(successCallback, storeName);
+        };
                 
         return repository;
     };
@@ -176,6 +180,29 @@ define('dao', [], function() {
         };
         deleteRequest.onsuccess = function() {
             successCallback();
+        };
+    };
+    
+    var findAll = function(successCallback, storeName){
+        if ( !db ) {
+            setTimeout(function() { findAll(successCallback, storeName); }, 100);
+            return;
+        }
+        var transaction = db.transaction([ storeName ], "readonly");
+        var store = transaction.objectStore(storeName);        
+        var findRequest = store.openCursor();
+            
+        findRequest.onerror = function(){
+            transaction.abort();
+        };
+        var results = [];
+        findRequest.onsuccess = function(e) {            
+            if ( !e.target || !e.target.result || e.target.result === null) {
+                successCallback(results);
+                return;
+            }
+            results.push(e.target.result.value);
+            e.target.result.continue();
         };
     };
     
