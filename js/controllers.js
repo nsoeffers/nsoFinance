@@ -295,9 +295,19 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             debetAccountChooser = $('#debetAccountChooser');
             debetAccountChooser.typeahead({updater: $scope.updateDebet, source: accountNames });
             debetAccountChooser.focus(function() { $timeout(function() { debetAccountChooser.select(); }, 0, false); } );
+            debetAccountChooser.blur(function() { 
+                if ( debetAccountChooser.val() === "" && selectedTransaction.debetAccount !== null ) { 
+                    $scope.updateDebet(undefined); 
+                }
+            });
             creditAccountChooser = $('#creditAccountChooser');
             creditAccountChooser.typeahead({updater: $scope.updateCredit, source: accountNames });
             creditAccountChooser.focus(function() { $timeout(function() { creditAccountChooser.select(); }, 0, false); } );
+            creditAccountChooser.blur(function() { 
+                if ( creditAccountChooser.val() === "" && selectedTransaction.creditAccount !== null ) { 
+                    $scope.updateCredit(undefined); 
+                } 
+            } );
             $scope.refresh();
         };
         
@@ -352,10 +362,14 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         
         var updateAccount = function(item, accountType){
             if ( selectedTransaction !== undefined && selectedTransaction !== null ) {
-                if ( selectedTransaction[accountType] === undefined ) {
+                if ( selectedTransaction[accountType] === undefined || selectedTransaction[accountType] === null) {
                     selectedTransaction[accountType] = {};
                 }
-                selectedTransaction[accountType].name = item;
+                if ( item === null || item === undefined ) {
+                    selectedTransaction[accountType] = item;
+                } else {
+                    selectedTransaction[accountType].name = item;
+                }
                 var updatedRow = selectedRow;
                 transactionRepository.save(selectedTransaction, 
                     function() { $(updatedRow).on(TRANSITION_END, function() { $(updatedRow).delay(1500).removeClass('saved')} ).addClass('saved'); }, 
