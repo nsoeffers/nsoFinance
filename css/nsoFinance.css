@@ -64,6 +64,7 @@ INPUT:focus.ng-invalid-bank-account-number {
 
 .table-fluid .row-fluid {
     border-bottom: 1px solid #DDD;
+    -webkit-transition: zoom, color, background-color 1s;
 }
 
 .table-fluid .row-fluid:nth-child(even) {
@@ -73,6 +74,13 @@ INPUT:focus.ng-invalid-bank-account-number {
 .table-fluid .row-fluid.active  {
     background-color: #08C;
     color: #f0f0f0;
+}
+
+.table-fluid .row-fluid.active.saved { 
+    background-color: #DFF0D8;
+    color: #468847;
+    border: 1px solid #D6E9C6;
+    zoom: 1.1;
 }
 
 .table-fluid .row-fluid [class*="span"] input {

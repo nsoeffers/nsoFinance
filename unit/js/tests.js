@@ -64,5 +64,28 @@ define('tests', ['domain'], function(domain) {
         equal( "Transaction", new domain.Transaction(new Date(), 10.0).className);
     });
 
+    test( "When Transaction is initialized then transaction is marked as untagged", function() {
+        equal( false, new domain.Transaction(new Date(), 10.0).tagged);
+    });
+
+    test( "When only debetAccount is set then transaction is not marked as tagged", function() {
+        var transaction = new domain.Transaction(new Date(), 10.0);
+        transaction.debetAccount = { id: 1, name: 'debetAccount' };
+        equal( false, transaction.tagged);
+    });
+    
+    test( "When only creditAccount is set then transaction is not marked as tagged", function() {
+        var transaction = new domain.Transaction(new Date(), 10.0);
+        transaction.creditAccount = { id: 1, name: 'creditAccount' };
+        equal( false, transaction.tagged);
+    });
+
+
+    test( "When debet and creditAccount are set then transaction is flagged as being tagged", function() {
+        var transaction = new domain.Transaction(new Date(), 10.0);
+        transaction.debetAccount = { id: 1, name: 'debetAccount' };
+        transaction.creditAccount = { id: 1, name: 'creditAccount' };
+        equal( true, transaction.tagged);
+    });
 
 });

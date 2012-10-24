@@ -3,6 +3,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
     
     var ACCOUNT_SELECTED_EVENT = 'accountSelected';
     var NOTIFICATION_EVENT = 'notification';
+    var TRANSITION_END = 'webkitTransitionEnd transitionend msTransitionEnd oTransitionEnd';
     var result = {};
     
     var Notification = function(type, message){
@@ -355,7 +356,10 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                     selectedTransaction[accountType] = {};
                 }
                 selectedTransaction[accountType].name = item;
-                transactionRepository.save(selectedTransaction, function() { $window.alert('Succesfully saved transaction');}, function() { $window.alert('Error');});
+                var updatedRow = selectedRow;
+                transactionRepository.save(selectedTransaction, 
+                    function() { $(updatedRow).on(TRANSITION_END, function() { $(updatedRow).delay(1500).removeClass('saved')} ).addClass('saved'); }, 
+                    function() { $window.alert('Error');});
             }            
         };
 

@@ -60,16 +60,16 @@ define('domain', [], function(){
     createTransactionFieldEnumValue('ADDRESS', 'transactionAddressField', 'address', false);
     Object.defineProperty( TransactionField, "values", {  value: transactionFieldValues,  writable: false, enumerable: true, configurable: false});
     Object.defineProperty( domain, "TransactionField", {  value: TransactionField,  writable: false, enumerable: true, configurable: false});    
-    
+        
     /* Transaction */
     var Transaction = function(date, amount, description) {
         this.date = date;
         this.amount = amount;
         this.description = description;
         Object.defineProperty( this, "className", {  value: "Transaction",  writable: false, enumerable: true, configurable: false});
-        Object.defineProperty( this, "status", {    get: function() { 
+        Object.defineProperty( this, "tagged", {    get: function() { 
                                                            return (this.debetAccount !== undefined && this.creditAccount != undefined &&
-                                                                this.debetAccount !== null && this.creditAccount != null)? "MAPPED" : "UNMAPPED";
+                                                                this.debetAccount !== null && this.creditAccount != null);
                                                         },
                                                     set: function(newValue) {
                                                         },
