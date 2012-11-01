@@ -39,6 +39,7 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
         .controller('SettingsCtrl', controllers.SettingsCtrl)        
         .controller('ImportCtrl', controllers.ImportCtrl)
         .controller('AssignCtrl', controllers.AssignCtrl)
+        .controller('RulesCtrl', controllers.RulesCtrl)
         .factory('accountRepository', dao.createAccountRepository)
         .factory('transactionRepository', dao.createTransactionRepository)
         .value('Translations', translations)
@@ -81,6 +82,9 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
             }).when('/assign', {
                 templateUrl: 'assign.html',
                 controller: 'AssignCtrl'                
+            }).when('/rules', {
+                templateUrl: 'rules.html',
+                controller: 'RulesCtrl'                
             }).when('/settings', {
                 templateUrl: 'settings.html',
                 controller: 'SettingsCtrl'

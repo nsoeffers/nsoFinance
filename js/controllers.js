@@ -379,6 +379,65 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
 
     };
     
+    result.RulesCtrl = function($scope, $timeout, $cookies, $locale, $window) {
+        
+        $scope.fields = domain.TransactionField.values.slice(0);
+        $scope.operators = domain.RuleOperator.values.slice(0);
+        var labelsToField = {};
+        var labelsToOperator = {};
+        
+        $scope.init = function() {
+            for( var fieldIndex in domain.TransactionField.values ) {
+                var field = domain.TransactionField.values[fieldIndex];
+                labelsToField[translate(field.i18nKey, $cookies, $locale)] = field; 
+            }
+            for( var operatorIndex in domain.RuleOperator.values ) {
+                var operator = domain.RuleOperator.values[operatorIndex];
+                labelsToOperator[translate(operator.i18nKey, $cookies, $locale)] = operator; 
+            }
+
+            var fieldNames = $scope.fields.map(function(field) { return translate(field.i18nKey, $cookies, $locale); });
+            $('.ruleField INPUT').typeahead({ source: fieldNames, updater: selectField });
+            
+            var operatorNames = $scope.operators.map(function(operator) { return translate(operator.i18nKey, $cookies, $locale); });
+            $('.ruleOperator INPUT').typeahead({ source: operatorNames, updater: selectOperator });
+            $timeout(refreshDragAndDropTargets, 0, false);
+        };
+        
+        var refreshDragAndDropTargets = function() {
+            $('.fieldLabels.labelsArea .label').draggable({scope: 'Field', revert: true, containment: 'window',
+                                    drag: function() {}, opacity: 0.5, cursor: "not-allowed", zIndex: 10 });
+            $('.operatorLabels.labelsArea .label').draggable({scope: 'Operator', revert: true, containment: 'window',
+                                    drag: function() {}, opacity: 0.5, cursor: "not-allowed", zIndex: 10 });                                    
+            $('#newRule .ruleField').droppable({scope: 'Field', hoverClass: 'dropFieldHover', 
+                                    drop: dropLabel}); 
+            $('#newRule .ruleOperator').droppable({scope: 'Operator', hoverClass: 'dropOperatorHover', 
+                                    drop: dropLabel}); 
+        };       
+        
+        var dropLabel = function(event, ui) {
+            var draggedElement = $(event.srcElement);
+            draggedElement.draggable('option', 'revert', false); 
+            draggedElement.detach().appendTo(event.target);
+        };
+        
+        var selectField = function(item){
+            $('.fieldLabels .label:contains("' + item + '")').detach().appendTo($('.ruleField'));
+            $scope.fields.splice($scope.fields.indexOf(labelsToField[item]), 1);
+            $scope.$apply();  
+            $('.ruleOperator INPUT').focus();
+        };
+        
+        var selectOperator = function(item){            
+            $('.operatorLabels .label:contains("' + item + '")').appendTo($('.ruleOperator'));
+            $scope.operators.splice($scope.operators.indexOf(labelsToOperator[item]), 1);            
+//            $scope.$apply();             
+            $('.ruleValue').focus();
+        };
+
+        
+    };
+    
     result.SettingsCtrl = function($scope, $window, transactionRepository) {
         $scope.removeAllTransactions = function() {
             transactionRepository.reset(function(){ 

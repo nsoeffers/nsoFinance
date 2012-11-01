@@ -1,5 +1,42 @@
 <div class="well well-small">
     <h1>        
-        <span data-i18n-key="tagging_rules_title"></span>
+        <span data-i18n-key="rules_title"></span>
     </h1>
+</div>
+<div class="container-fluid" ng-init="init()">
+    <div class="row-fluid">
+        <div class="span7 offset2 well well-small labelsArea operatorLabels">
+            <span ng-repeat="operator in operators" class="label label-inverse" >{{operator.i18nKey | translate}}<span>
+        </div>        
+    </div>
+    <div class="row-fluid">
+        <div class="span2 well well-small labelsArea fieldLabels">
+            <div class="row-fluid" ng-repeat="field in fields">
+                <span ng-class="{true: 'label label-important', false: 'label'}[field.required]" >{{field.i18nKey | translate}}<span>
+            </div>
+        </div>
+        <div class="span7" style="height: 100%">
+            <form class="form-horizontal well" id="newRule">
+                <div class="control-group">
+                    <label class="control-label" data-i18n-key="ruleWhen"></label>
+                    <div class="controls controls-row">
+                        <span class="span3 ruleField">
+                            <input type="text">
+                        </span>
+                        <span class="span4 ruleOperator">
+                            <input type="text">
+                        </span>
+                        <input type="text" class="span4 ruleValue"/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" data-i18n-key="ruleThen"></label>    
+                    <div class="controls controls-row">
+                        <span class="span6 ruleCategory">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="span3 well well-small">
+        </div>
 </div>
