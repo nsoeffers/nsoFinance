@@ -379,29 +379,42 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
 
     };
     
-    result.RulesCtrl = function($scope, $timeout, $cookies, $locale, $window) {
+    result.RulesCtrl = function($scope, $timeout, $cookies, $locale, accountRepository, $window) {
         
         $scope.fields = domain.TransactionField.values.slice(0);
         $scope.operators = domain.RuleOperator.values.slice(0);
         var labelsToField = {};
         var labelsToOperator = {};
         
+        var populateEnumMap = function(enumValues, labelToEnumMap) {
+            for( var index in enumValues ) {
+                var enumValue = domain.TransactionField.values[index];
+                labelToEnumMap[translate(enumValue.i18nKey, $cookies, $locale)] = enumValue; 
+            }
+            
+        };
+        
         $scope.init = function() {
-            for( var fieldIndex in domain.TransactionField.values ) {
-                var field = domain.TransactionField.values[fieldIndex];
-                labelsToField[translate(field.i18nKey, $cookies, $locale)] = field; 
-            }
-            for( var operatorIndex in domain.RuleOperator.values ) {
-                var operator = domain.RuleOperator.values[operatorIndex];
-                labelsToOperator[translate(operator.i18nKey, $cookies, $locale)] = operator; 
-            }
-
+            populateEnumMap(domain.TransactionField.values, labelsToField);
+            populateEnumMap(domain.RuleOperator.values, labelsToOperator);
             var fieldNames = $scope.fields.map(function(field) { return translate(field.i18nKey, $cookies, $locale); });
             $('.ruleField INPUT').typeahead({ source: fieldNames, updater: selectField });
             
             var operatorNames = $scope.operators.map(function(operator) { return translate(operator.i18nKey, $cookies, $locale); });
             $('.ruleOperator INPUT').typeahead({ source: operatorNames, updater: selectOperator });
             $timeout(refreshDragAndDropTargets, 0, false);
+            var mappingMethod = function(dbo) {
+                var account = domain.Account.createFromDBO(dbo);
+                account.toLowerCase = function() { return dbo.name.toLowerCase(); };
+                account.indexOf = function(str) { return dbo.name.toLowerCase().indexOf(str); };
+                account.replace = function() { return String.prototype.replace.apply(dbo.name, arguments); };
+                account.toString = function() { return dbo.name; };
+                return account;
+            };
+            var lazySearchItemsInDao = function(query, callback){ 
+                accountRepository.search(query, callback, mappingMethod); 
+            };
+            $('.ruleCategory INPUT').typeahead({ source: lazySearchItemsInDao });
         };
         
         var refreshDragAndDropTargets = function() {

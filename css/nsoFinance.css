@@ -128,7 +128,7 @@ INPUT:focus.ng-invalid-bank-account-number {
     border: 2px dashed #468847;
 }
 
-.ruleField INPUT, .ruleOperator INPUT {
+.ruleField INPUT, .ruleOperator INPUT, .ruleCategory INPUT {
     width: 100%;
     height: 100%;
     box-sizing: border-box;

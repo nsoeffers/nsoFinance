@@ -82,15 +82,43 @@ define('dao', [], function() {
     };
     
     dao.createAccountRepository = function() {
-        var repository = createRepository('Account');
+        var STORE_NAME = 'Account';
+        var repository = createRepository(STORE_NAME);
         repository.findAccountsByType = function(accountType, callback, mappingMethod){
             if ( !db ) {
                 setTimeout(function() { repository.findAccountsByType(accountType, callback, mappingMethod); }, 100);
                 return;
             }
-            var transaction = db.transaction([ 'Account' ], "readonly");
-            var store = transaction.objectStore('Account');
+            var transaction = db.transaction([ STORE_NAME ], "readonly");
+            var store = transaction.objectStore(STORE_NAME);
             var cursorRequest = store.index('accountType').openCursor(accountType);
+            var results = [];
+            cursorRequest.onsuccess = function(e) {
+                if ( !e.target || !e.target.result || e.target.result === null) {
+                    callback(results);
+                    return;
+                }
+                results.push(mappingMethod(e.target.result.value));
+                e.target.result.continue();
+            };
+            cursorRequest.onerror = function(){
+                alert('Failed to retrieve items from IndexedDB');
+            };
+        };
+
+        repository.search = function(query, callback, mappingMethod){
+            if ( query === undefined || query === null || query === "") {
+                callback([]);
+            }
+            if ( !db ) {
+                setTimeout(function() { repository.search(query, callback, mappingMethod); }, 100);
+                return;
+            }
+            var transaction = db.transaction([ STORE_NAME ], "readonly");
+            var store = transaction.objectStore(STORE_NAME);            
+            var lastChar = query.toUpperCase().slice(-1);
+            var queryEnd = query.toUpperCase().slice(0, -1) + String.fromCharCode(lastChar.charCodeAt(0)+1);
+            var cursorRequest = store.index('caseInsensitiveName').openCursor(IDBKeyRange.bound(query.toUpperCase(), queryEnd, false, true));
             var results = [];
             cursorRequest.onsuccess = function(e) {
                 if ( !e.target || !e.target.result || e.target.result === null) {
