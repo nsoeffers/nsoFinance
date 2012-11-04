@@ -385,36 +385,37 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         $scope.operators = domain.RuleOperator.values.slice(0);
         var labelsToField = {};
         var labelsToOperator = {};
+        var labelsToCategory = {};
         
-        var populateEnumMap = function(enumValues, labelToEnumMap) {
-            for( var index in enumValues ) {
-                var enumValue = domain.TransactionField.values[index];
-                labelToEnumMap[translate(enumValue.i18nKey, $cookies, $locale)] = enumValue; 
+        var populateLabelToObjectMap = function(objectValues, labelToObjectMap, field, needsTranslation) {
+            for( var index in objectValues ) {
+                var enumValue = objectValues[index];
+                if ( field === undefined || field === null ) {
+                    field = 'i18nKey';
+                }
+                var label = needsTranslation?  translate(enumValue[field], $cookies, $locale) : enumValue[field];
+                labelToObjectMap[label] = enumValue; 
             }
             
         };
         
         $scope.init = function() {
-            populateEnumMap(domain.TransactionField.values, labelsToField);
-            populateEnumMap(domain.RuleOperator.values, labelsToOperator);
+            populateLabelToObjectMap(domain.TransactionField.values, labelsToField);
+            populateLabelToObjectMap(domain.RuleOperator.values, labelsToOperator);
             var fieldNames = $scope.fields.map(function(field) { return translate(field.i18nKey, $cookies, $locale); });
-            $('.ruleField INPUT').typeahead({ source: fieldNames, updater: selectField });
+            $('.ruleField INPUT').typeahead({ source: fieldNames, updater: onFieldSelected });
             
             var operatorNames = $scope.operators.map(function(operator) { return translate(operator.i18nKey, $cookies, $locale); });
-            $('.ruleOperator INPUT').typeahead({ source: operatorNames, updater: selectOperator });
+            $('.ruleOperator INPUT').typeahead({ source: operatorNames, updater: onOperatorSelected });
             $timeout(refreshDragAndDropTargets, 0, false);
-            var mappingMethod = function(dbo) {
-                var account = domain.Account.createFromDBO(dbo);
-                account.toLowerCase = function() { return dbo.name.toLowerCase(); };
-                account.indexOf = function(str) { return dbo.name.toLowerCase().indexOf(str); };
-                account.replace = function() { return String.prototype.replace.apply(dbo.name, arguments); };
-                account.toString = function() { return dbo.name; };
-                return account;
-            };
             var lazySearchItemsInDao = function(query, callback){ 
-                accountRepository.search(query, callback, mappingMethod); 
+                var callbackWrapper = function(results){
+                    populateLabelToObjectMap(results, labelsToCategory, 'name', false );
+                    callback(results.map(function(category){ return category.name; }));
+                };
+                accountRepository.search(query, callbackWrapper, domain.Account.createFromDBO); 
             };
-            $('.ruleCategory INPUT').typeahead({ source: lazySearchItemsInDao });
+            $('.ruleCategory INPUT').typeahead({ source: lazySearchItemsInDao, updater: onCategorySelected });
         };
         
         var refreshDragAndDropTargets = function() {
@@ -423,32 +424,51 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             $('.operatorLabels.labelsArea .label').draggable({scope: 'Operator', revert: true, containment: 'window',
                                     drag: function() {}, opacity: 0.5, cursor: "not-allowed", zIndex: 10 });                                    
             $('#newRule .ruleField').droppable({scope: 'Field', hoverClass: 'dropFieldHover', 
-                                    drop: dropLabel}); 
+                                    drop: onLabelDropped}); 
             $('#newRule .ruleOperator').droppable({scope: 'Operator', hoverClass: 'dropOperatorHover', 
-                                    drop: dropLabel}); 
+                                    drop: onLabelDropped}); 
         };       
         
-        var dropLabel = function(event, ui) {
+        var onLabelDropped = function(event, ui) {
             var draggedElement = $(event.srcElement);
             draggedElement.draggable('option', 'revert', false); 
             draggedElement.detach().appendTo(event.target);
         };
         
-        var selectField = function(item){
+        var onFieldSelected = function(item){
             $('.fieldLabels .label:contains("' + item + '")').detach().appendTo($('.ruleField'));
             $scope.fields.splice($scope.fields.indexOf(labelsToField[item]), 1);
             $scope.$apply();  
             $('.ruleOperator INPUT').focus();
         };
         
-        var selectOperator = function(item){            
+        var onOperatorSelected = function(item){            
             $('.operatorLabels .label:contains("' + item + '")').appendTo($('.ruleOperator'));
             $scope.operators.splice($scope.operators.indexOf(labelsToOperator[item]), 1);            
 //            $scope.$apply();             
             $('.ruleValue').focus();
         };
-
         
+        var onCategorySelected = function(item){
+            $('.ruleCategory .label').addClass(calculateClassName(labelsToCategory[item])).css('display', 'block').text(item);
+//            $scope.fields.splice($scope.fields.indexOf(labelsToField[item]), 1);
+//            $scope.$apply();  
+//            $('.ruleOperator INPUT').focus();
+        };
+        
+        var calculateClassName = function(category) {
+            var className = "";
+            if ( category.accountType === domain.AccountType.ASSET ) {
+                className = 'label-info';
+            } else if ( category.accountType === domain.AccountType.LIABILITY ) {
+                className = 'label-warning';
+            } else if ( category.accountType === domain.AccountType.EXPENSE ) {
+                className = 'label-important';                
+            } else if ( category.accountType === domain.AccountType.INCOME ) {
+                className = 'label-success';                                
+            }
+            return className;            
+        };
     };
     
     result.SettingsCtrl = function($scope, $window, transactionRepository) {

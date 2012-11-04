@@ -74,8 +74,8 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
             };
         })
         .config(function($routeProvider){            
-            $routeProvider.when('/account', {
-                templateUrl: 'account.html'
+            $routeProvider.when('/category', {
+                templateUrl: 'category.html'
             }).when('/import', {
                 templateUrl: 'import.html',
                 controller: 'ImportCtrl'
@@ -91,7 +91,7 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
             }).when('/unsupported', {
                 templateUrl: 'unsupportedBrowser.html'
             }).otherwise({
-                templateUrl: 'account.html'
+                templateUrl: 'category.html'
             });
         })
         .run(function($location) {            

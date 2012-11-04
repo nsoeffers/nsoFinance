@@ -128,7 +128,7 @@ define('translations', [], function() {
         "rules_title"                   : "Regels voor het automatisch categoriseren",
         "ruleWhen"                      : "ALS het veld ",
         "ruleThen"                      : "wijs dan de verrichting toe aan categorie",
-        "operatorEquals"                : "gelijk",
+        "operatorEquals"                : "gelijk is aan",
         "operatorLike"                  : "de volgende tekst bevat",
         
         "settings"                      : "Instellingen",

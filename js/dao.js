@@ -28,14 +28,15 @@ define('dao', [], function() {
         
         dbRequest.onsuccess = function () {
             db = dbRequest.result;
-            if ( db.version === '' || db.version === '0.0') {                
+            if ( db.version === '' || db.version === '0.0') {                                
                 var versionRequest = db.setVersion( '1.1' );
                 versionRequest.onsuccess = function () {                    
-                    var accountStore = db.createObjectStore("Account", {keyPath: 'id', autoIncrement: true});
+                    var accountStore = db.createObjectStore("Category", {keyPath: 'id', autoIncrement: true});
                     accountStore.createIndex('caseInsensitiveName', 'caseInsensitiveName', {unique : true});
                     accountStore.createIndex('accountType', 'accountType', {unique : false});
                     
-                    db.createObjectStore("Transaction", {keyPath: 'id', autoIncrement: true});                    
+                    db.createObjectStore("Transaction", {keyPath: 'id', autoIncrement: true});
+                    db.createObjectStore("Rule", {keyPath: 'id', autoIncrement: true});                    
                 };
                 versionRequest.onerror = function() {
                     window.alert('Error occurred while creating indexedDb');
@@ -48,6 +49,14 @@ define('dao', [], function() {
                 versionRequest.onerror = function() {
                     window.alert('Error occurred while creating indexedDb');
                 };               
+            } else if ( db.version === '1.1'){                
+                var versionRequest = db.setVersion( '0.0' );
+                versionRequest.onsuccess = function () {                    
+                    db.deleteObjectStore("Account");                    
+                    db.deleteObjectStore("Transaction");
+//                    db.deleteObjectStore("Rule");                    
+                };
+                
             }
         };
         
@@ -82,7 +91,7 @@ define('dao', [], function() {
     };
     
     dao.createAccountRepository = function() {
-        var STORE_NAME = 'Account';
+        var STORE_NAME = 'Category';
         var repository = createRepository(STORE_NAME);
         repository.findAccountsByType = function(accountType, callback, mappingMethod){
             if ( !db ) {
