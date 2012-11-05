@@ -6,8 +6,7 @@ requirejs.config({
         'angularCookies'    : 'https://ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular-cookies.min',
         'bootstrap'         : 'https://netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/js/bootstrap.min',
         'jquery.csv'        : 'jquery.csv-0.63',
-        'modernizr'         : 'modernizr-2.6.2.min',
-        'angularUI'         : 'angular-ui.min'
+        'modernizr'         : 'modernizr-2.6.2.min'
     },
     shim: {
         'angular': {
@@ -23,14 +22,11 @@ requirejs.config({
         },
         'modernizr' : {
             exports: 'Modernizr'
-        },
-        'angularUI': {
-            deps: ['jquery', 'jqueryUI', 'angular']
         }
     }
 });
 
-require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'dao', 'domain', 'controllers', 'modernizr', 'jqueryUI', 'angularUI', 'datejs', 'domReady'], 
+require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'dao', 'domain', 'controllers', 'modernizr', 'jqueryUI',  'datejs', 'domReady'], 
         function($, angular, angularCookies, bootstrap, translations, dao, domain, controllers, Modernizr) {
     angular.module('nsoFinance', ['ngCookies'])
         .controller('RootCtrl', controllers.RootCtrl)
@@ -42,6 +38,7 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
         .controller('RulesCtrl', controllers.RulesCtrl)
         .factory('accountRepository', dao.createAccountRepository)
         .factory('transactionRepository', dao.createTransactionRepository)
+        .factory('ruleRepository', dao.createRuleRepository)
         .value('Translations', translations)
         .directive('i18nKey', function(Translations,$locale, $cookies){ 
             return function(scope, elm, attrs){

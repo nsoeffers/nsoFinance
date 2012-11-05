@@ -88,4 +88,12 @@ define('tests', ['domain'], function(domain) {
         equal( true, transaction.tagged);
     });
 
+    test( "When trying to overwrite Rule class of domain package then exception is thrown", function() {
+        try {
+            domain.Rule = function(){ window.alert('dummyRule'); };
+        } catch ( ex ) {
+            equal( "Rule", ex['arguments'][0]);
+        }
+    });
+
 });

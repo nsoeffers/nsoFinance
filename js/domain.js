@@ -84,17 +84,25 @@ define('domain', [], function(){
         Object.defineProperty( newEnumValue, "value", {  value: enumValue,  writable: false, enumerable: true, configurable: false});
         Object.defineProperty( TransactionField, enumValue, {  value: newEnumValue,  writable: false, enumerable: true, configurable: false});
         values.push(newEnumValue);
+        return newEnumValue;
     };
-    
     
     /* Rules */
     var RuleOperator = {};    
     var ruleOperatorValues = [];
 
-    createTranslatableEnumValue('EQUALS', 'operatorEquals', ruleOperatorValues);
+    createTranslatableEnumValue('EQUALS', 'operatorEquals', ruleOperatorValues);        
     createTranslatableEnumValue('LIKE', 'operatorLike', ruleOperatorValues);
     Object.defineProperty( RuleOperator, "values", {  value: ruleOperatorValues,  writable: false, enumerable: true, configurable: false});
     Object.defineProperty( domain, "RuleOperator", {  value: RuleOperator,  writable: false, enumerable: true, configurable: false});    
     
+    var Rule = function() {    
+      this.field = null;
+      this.operator = null;
+      this.value = null;
+      this.category = null;
+    };
+    
+    Object.defineProperty( domain, "Rule", {  value: Rule,  writable: false, enumerable: true, configurable: false});    
     return domain;
 });

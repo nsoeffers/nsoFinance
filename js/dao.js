@@ -49,13 +49,13 @@ define('dao', [], function() {
                 versionRequest.onerror = function() {
                     window.alert('Error occurred while creating indexedDb');
                 };               
-            } else if ( db.version === '1.1'){                
-                var versionRequest = db.setVersion( '0.0' );
-                versionRequest.onsuccess = function () {                    
-                    db.deleteObjectStore("Account");                    
-                    db.deleteObjectStore("Transaction");
+            // } else if ( db.version === '1.1'){                
+                // var versionRequest = db.setVersion( '0.0' );
+                // versionRequest.onsuccess = function () {                    
+                    // db.deleteObjectStore("Account");                    
+                    // db.deleteObjectStore("Transaction");
 //                    db.deleteObjectStore("Rule");                    
-                };
+                // };
                 
             }
         };
@@ -185,6 +185,10 @@ define('dao', [], function() {
         return repository;
     };
     
+    dao.createRuleRepository = function() {
+        var repository = createRepository('Rule');
+        return repository;
+    };
 
     var save = function (entity, successCallback, failureCallback, storeName){
         var transaction = db.transaction([ storeName ], "readwrite");
