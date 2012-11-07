@@ -6,7 +6,9 @@
 <div class="container-fluid" ng-init="init()">
     <div class="row-fluid">
         <div class="span7 offset2 well well-small labelsArea operatorLabels">
-            <span ng-repeat="operator in operators" class="label label-inverse" >{{operator.i18nKey | translate}}<span>
+            <span ng-repeat="operator in operators">
+                <span class="label label-inverse" >{{operator.i18nKey | translate}}<span>
+            </span>
         </div>        
     </div>
     <div class="row-fluid">
@@ -21,23 +23,23 @@
                     <label class="control-label" data-i18n-key="ruleWhen"></label>
                     <div class="controls controls-row">
                         <span class="span3 ruleField">
-                            <input type="text">
+                            <input type="text"></input>
                         </span>
                         <span class="span4 ruleOperator">
-                            <input type="text">
+                            <input type="text"></input>
                         </span>
-                        <input type="text" class="span4 ruleValue"/>
+                        <input type="text" class="span4 ruleValue" ng-model="rule.value"/>
                     </div>
                 </div>
                 <div class="control-group">
                     <label class="control-label" data-i18n-key="ruleThen"></label>    
                     <div class="controls controls-row">
                         <span class="span6 ruleCategory">
-                            <input type="text" ng-model="rule.value">
+                            <input type="text">
                             <span class="label" style="display:none"></span>
                         </span>
                         <span class="span3">
-                            <button type="button" class="btn btn-primary" data-i18n-key="save" ng-click="saveRule"></button>                        
+                            <button type="button" class="btn btn-primary" data-i18n-key="save" ng-click="saveRule()"></button>                        
                         </span>
                     </div>
                 </div>

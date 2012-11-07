@@ -383,10 +383,10 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         
         $scope.fields = domain.TransactionField.values.slice(0);
         $scope.operators = domain.RuleOperator.values.slice(0);
+        $scope.rule = new domain.Rule();
         var labelsToField = {};
         var labelsToOperator = {};
         var labelsToCategory = {};
-        var rule = new domain.Rule();
         
         var populateLabelToObjectMap = function(objectValues, labelToObjectMap, field, needsTranslation) {
             for( var index in objectValues ) {
@@ -420,8 +420,11 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         };
 
         $scope.saveRule = function() {
-            ruleRepository.save(rule, function() { }, function() { });
-        }
+            ruleRepository.save($scope.rule, function() {
+                    $scope.rule = new domain.Rule();
+                    $scope.$apply();
+                }, function() { });
+        };
         
         var refreshDragAndDropTargets = function() {
             $('.fieldLabels.labelsArea .label').draggable({scope: 'Field', revert: true, containment: 'window',
@@ -444,21 +447,21 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             $('.fieldLabels .label:contains("' + item + '")').detach().appendTo($('.ruleField'));
             $scope.fields.splice($scope.fields.indexOf(labelsToField[item]), 1);
             $scope.$apply();  
-            rule.field = labelsToField[item].fieldName;
+            $scope.rule.field = labelsToField[item].fieldName;
             $('.ruleOperator INPUT').focus();
         };
         
         var onOperatorSelected = function(item){            
-            $('.operatorLabels .label:contains("' + item + '")').appendTo($('.ruleOperator'));
-            $scope.operators.splice($scope.operators.indexOf(labelsToOperator[item]), 1);            
-            rule.operator  =  labelsToOperator[item];
-//            $scope.$apply();             
+            $('.operatorLabels .label:contains("' + item + '")').detach().appendTo($('.ruleOperator'));
+            $scope.operators.splice($scope.operators.indexOf(labelsToOperator[item]), 1);
+            $scope.rule.operator = labelsToOperator[item];
+            $scope.$apply();
             $('.ruleValue').focus();
         };
         
         var onCategorySelected = function(item){
             $('.ruleCategory .label').addClass(calculateClassName(labelsToCategory[item])).css('display', 'block').text(item);
-            rule.category = { id: labelsToCategory[item].id, name: labelsToCategory[item].name };
+            $scope.rule.category = { id: labelsToCategory[item].id, name: labelsToCategory[item].name };
 //            $scope.fields.splice($scope.fields.indexOf(labelsToField[item]), 1);
 //            $scope.$apply();  
 //            $('.ruleOperator INPUT').focus();
