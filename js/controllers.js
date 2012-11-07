@@ -384,6 +384,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         $scope.fields = domain.TransactionField.values.slice(0);
         $scope.operators = domain.RuleOperator.values.slice(0);
         $scope.rule = new domain.Rule();
+        $scope.rules;
         var labelsToField = {};
         var labelsToOperator = {};
         var labelsToCategory = {};
@@ -417,6 +418,10 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                 accountRepository.search(query, callbackWrapper, domain.Account.createFromDBO); 
             };
             $('.ruleCategory INPUT').typeahead({ source: lazySearchItemsInDao, updater: onCategorySelected });
+            ruleRepository.findAll(function(results) {
+                    $scope.rules = results;
+                    $scope.$apply();
+                });
         };
 
         $scope.saveRule = function() {
@@ -447,7 +452,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             $('.fieldLabels .label:contains("' + item + '")').detach().appendTo($('.ruleField'));
             $scope.fields.splice($scope.fields.indexOf(labelsToField[item]), 1);
             $scope.$apply();  
-            $scope.rule.field = labelsToField[item].fieldName;
+            $scope.rule.field = labelsToField[item];
             $('.ruleOperator INPUT').focus();
         };
         
