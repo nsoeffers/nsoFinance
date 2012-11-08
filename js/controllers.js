@@ -418,6 +418,8 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                 accountRepository.search(query, callbackWrapper, domain.Account.createFromDBO); 
             };
             $('.ruleCategory INPUT').typeahead({ source: lazySearchItemsInDao, updater: onCategorySelected });
+            
+            $('.sortable').sortable().disableSelection();
             ruleRepository.findAll(function(results) {
                     $scope.rules = results;
                     $scope.$apply();
@@ -444,13 +446,18 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         
         var onLabelDropped = function(event, ui) {
             var draggedElement = $(event.srcElement);
+            if ( draggedElement.parents('.fieldLabels').size() !== 0) {
+                onFieldSelected(draggedElement.text().trim());
+            } else if ( draggedElement.parents('.operatorLabels').size() !== 0) {
+                onOperatorSelected(draggedElement.text().trim());
+            }
             draggedElement.draggable('option', 'revert', false); 
             draggedElement.detach().appendTo(event.target);
         };
         
         var onFieldSelected = function(item){
             $('.fieldLabels .label:contains("' + item + '")').detach().appendTo($('.ruleField'));
-            $scope.fields.splice($scope.fields.indexOf(labelsToField[item]), 1);
+            //$scope.fields.splice($scope.fields.indexOf(labelsToField[item]), 1);
             $scope.$apply();  
             $scope.rule.field = labelsToField[item];
             $('.ruleOperator INPUT').focus();
@@ -458,7 +465,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         
         var onOperatorSelected = function(item){            
             $('.operatorLabels .label:contains("' + item + '")').detach().appendTo($('.ruleOperator'));
-            $scope.operators.splice($scope.operators.indexOf(labelsToOperator[item]), 1);
+            //$scope.operators.splice($scope.operators.indexOf(labelsToOperator[item]), 1);
             $scope.rule.operator = labelsToOperator[item];
             $scope.$apply();
             $('.ruleValue').focus();

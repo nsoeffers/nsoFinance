@@ -134,3 +134,26 @@ INPUT:focus.ng-invalid-bank-account-number {
     box-sizing: border-box;
     border: none;
 }
+
+.sortable { 
+    list-style-type: none; 
+    margin: 0; 
+    padding: 0; 
+}
+
+.sortable li {
+    margin: 0 3px 3px 3px; 
+    padding: 0.4em; 
+    padding-left: 1.5em; 
+   /* height: 18px;*/
+}
+
+.sortable li, .sortable li span {
+    cursor: -webkit-grab;   
+    cursor: grab;   
+}
+
+/*.sortable li > span:first { 
+    position: absolute; 
+    margin-left: -1.3em; 
+}*/

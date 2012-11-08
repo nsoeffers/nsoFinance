@@ -44,20 +44,17 @@
                     </div>
                 </div>
             </form>
-            <table class="table table-condensed table-hover table-striped">
-                <tbody>
-                    <tr ng-repeat="rule in rules">
-                        <td>
-                            <span data-i18n-key="ruleWhen"></span>
-                            <span>"{{rule.field}}"</span>
-                            <span class="label label-inverse">{{rule.operator.i18nKey | translate}}</span>
-                            <span>"{{rule.value}}"</span>
-                            <span data-i18n-key="ruleThen"></span>
-                            <span class="label">"{{rule.category.name}}"</span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <ul class="sortable unstyled">
+                <li class="well well-small" ng-repeat="rule in rules">
+                        <i class="icon-move"></i>
+                        <span data-i18n-key="ruleWhen"></span>
+                        "<span ng-class="{true: 'label label-important', false: 'label'}[rule.field.required]">{{rule.field.i18nKey | translate}}</span>"
+                        <span class="label label-inverse">{{rule.operator.i18nKey | translate}}</span>
+                        <span><b>"{{rule.value}}"</b></span>
+                        <span data-i18n-key="ruleThen"></span>
+                        <span class="label">"{{rule.category.name}}"</span>
+                </li>
+            </ul>
         </div>
         <div class="span3 well well-small">
             <form class="form-search">
