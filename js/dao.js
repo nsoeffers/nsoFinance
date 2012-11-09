@@ -21,10 +21,7 @@ define('dao', [], function() {
             alert('IndexedDB Database is not supported in your browser');
         } 
         
-        var dbRequest = window.indexedDB.open(
-          'nsoFinance',        // Database ID
-          'Finance information stored by nsoFinance app' // Database Description
-        );           
+        var dbRequest = window.indexedDB.open('nsoFinance');           
         
         dbRequest.onsuccess = function () {
             db = dbRequest.result;
