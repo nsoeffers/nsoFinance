@@ -62,6 +62,9 @@
                 <input type="text" class="span12 search-query" >
                 <button type="submit" class="btn"><i class="icon-search"></i></button>
               </div>
+              <div ng-repeat="category in categories">
+                <span class="label">{{category.name}}</span>
+              </div>
             </form>
         </div>
 </div>

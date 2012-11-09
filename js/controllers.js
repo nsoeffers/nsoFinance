@@ -385,6 +385,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         $scope.operators = domain.RuleOperator.values.slice(0);
         $scope.rule = new domain.Rule();
         $scope.rules;
+        $scope.categories;
         var labelsToField = {};
         var labelsToOperator = {};
         var labelsToCategory = {};
@@ -424,6 +425,11 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                     $scope.rules = results;
                     $scope.$apply();
                 });
+                
+            accountRepository.findAll(function(results){
+                $scope.categories = results;
+                $scope.$apply();
+            });
         };
 
         $scope.saveRule = function() {
