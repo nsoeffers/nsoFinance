@@ -28,9 +28,9 @@ define('dao', [], function() {
             if ( db.version === '' || db.version === '0.0') {                                
                 var versionRequest = db.setVersion( '1.1' );
                 versionRequest.onsuccess = function () {                    
-                    var accountStore = db.createObjectStore("Category", {keyPath: 'id', autoIncrement: true});
-                    accountStore.createIndex('caseInsensitiveName', 'caseInsensitiveName', {unique : true});
-                    accountStore.createIndex('accountType', 'accountType', {unique : false});
+                    var categoryStore = db.createObjectStore("Category", {keyPath: 'id', autoIncrement: true});
+                    categoryStore.createIndex('caseInsensitiveName', 'caseInsensitiveName', {unique : true});
+                    categoryStore.createIndex('type', 'type', {unique : false});
                     
                     db.createObjectStore("Transaction", {keyPath: 'id', autoIncrement: true});
                     db.createObjectStore("Rule", {keyPath: 'id', autoIncrement: true});                    
@@ -46,14 +46,13 @@ define('dao', [], function() {
                 versionRequest.onerror = function() {
                     window.alert('Error occurred while creating indexedDb');
                 };               
-            // } else if ( db.version === '1.1'){                
-                // var versionRequest = db.setVersion( '0.0' );
-                // versionRequest.onsuccess = function () {                    
-                    // db.deleteObjectStore("Account");                    
-                    // db.deleteObjectStore("Transaction");
+//             } else if ( db.version === '1.1'){                
+//                 var versionRequest = db.setVersion( '0.0' );
+//                 versionRequest.onsuccess = function () {                    
+//                     db.deleteObjectStore("Category");                    
+//                     db.deleteObjectStore("Transaction");
 //                    db.deleteObjectStore("Rule");                    
-                // };
-                
+//                 };
             }
         };
         
@@ -87,17 +86,17 @@ define('dao', [], function() {
         return repository;
     };
     
-    dao.createAccountRepository = function() {
+    dao.createCategoryRepository = function() {
         var STORE_NAME = 'Category';
         var repository = createRepository(STORE_NAME);
-        repository.findAccountsByType = function(accountType, callback, mappingMethod){
+        repository.findCategoriesByType = function(categoryType, callback, mappingMethod){
             if ( !db ) {
-                setTimeout(function() { repository.findAccountsByType(accountType, callback, mappingMethod); }, 100);
+                setTimeout(function() { repository.findCategoriesByType(categoryType, callback, mappingMethod); }, 100);
                 return;
             }
             var transaction = db.transaction([ STORE_NAME ], "readonly");
             var store = transaction.objectStore(STORE_NAME);
-            var cursorRequest = store.index('accountType').openCursor(accountType);
+            var cursorRequest = store.index('type').openCursor(categoryType);
             var results = [];
             cursorRequest.onsuccess = function(e) {
                 if ( !e.target || !e.target.result || e.target.result === null) {

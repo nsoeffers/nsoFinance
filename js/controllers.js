@@ -1,7 +1,7 @@
 define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', 'translations', 'jquery.csv', 'modernizr', 'jqueryUI'], 
     function($, angular, angularCookies, dao, domain, translations, jqueryCsv, Modernizr) {
     
-    var ACCOUNT_SELECTED_EVENT = 'accountSelected';
+    var CATEGORY_SELECTED_EVENT = 'categorySelected';
     var NOTIFICATION_EVENT = 'notification';
     var TRANSITION_END = 'webkitTransitionEnd transitionend msTransitionEnd oTransitionEnd';
     var result = {};
@@ -40,47 +40,46 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         });
     };
         
-    result.AccountListCtrl = function ($scope, $rootScope, $window, accountRepository) {    
-        $scope.accounts = [];
+    result.AccountListCtrl = function ($scope, $rootScope, $window, categoryRepository) {    
+        $scope.categories = [];
         $scope.errorMessage = null;
         $scope.loading = false;
         $scope.selectedAccountType = domain.AccountType.ASSET;
         
         $scope.refresh = function() {
             $scope.loading = true;
-            $window.console.log('Test:' + $scope.selectedAccountType);
-            accountRepository.findAccountsByType($scope.selectedAccountType, function(results){                
-                $window.console.log('Receiving results:' + $scope.selectedAccountType);
-                $scope.accounts = results;
+            $rootScope.$broadcast(CATEGORY_SELECTED_EVENT, null);
+            categoryRepository.findCategoriesByType($scope.selectedAccountType, function(results){                
+                $scope.categories = results;
                 $scope.loading = false;
                 $scope.$apply();
             }, domain.Account.createFromDBO);
         };
         
-        $scope.select = function(account) {
-            $rootScope.$broadcast(ACCOUNT_SELECTED_EVENT, account);
+        $scope.select = function(category) {
+            $rootScope.$broadcast(CATEGORY_SELECTED_EVENT, category);
         };
         
         $scope.add = function() {  
-            var newAccount = new domain.Account($scope.selectedAccountType, '');
-            $rootScope.$broadcast(ACCOUNT_SELECTED_EVENT, newAccount);
-            $scope.accounts.push(newAccount);
+            var newCategory = new domain.Account($scope.selectedAccountType, '');
+            $rootScope.$broadcast(CATEGORY_SELECTED_EVENT, newCategory);
+            $scope.categories.push(newCategory);
         };
         
-        $scope.remove = function(account) {
-            accountRepository.remove(account.id, function() {
-                var selectedIndex =  $scope.accounts.indexOf(account);
-                $scope.accounts.splice(selectedIndex, 1);                
-                $rootScope.$broadcast(ACCOUNT_SELECTED_EVENT, (selectedIndex-1) < $scope.accounts.length && (selectedIndex-1) >= 0? $scope.accounts[selectedIndex-1]: null);
+        $scope.remove = function(category) {
+            categoryRepository.remove(category.id, function() {
+                var selectedIndex =  $scope.categories.indexOf(category);
+                $scope.categories.splice(selectedIndex, 1);                
+                $rootScope.$broadcast(CATEGORY_SELECTED_EVENT, (selectedIndex-1) < $scope.categories.length && (selectedIndex-1) >= 0? $scope.categories[selectedIndex-1]: null);
                 $scope.$apply();
             });
         };
         
     };
     
-    result.AccountDetailCtrl = function ($scope, $rootScope, $window, $timeout, $cookies, $locale, accountRepository) {              
+    result.AccountDetailCtrl = function ($scope, $rootScope, $window, $timeout, $cookies, $locale, categoryRepository) {              
         
-        $scope.$on(ACCOUNT_SELECTED_EVENT, function(event, account) {
+        $scope.$on(CATEGORY_SELECTED_EVENT, function(event, account) {
             if ( account !== null ) {
                 $('#infoMessageForm').alert('close');
             }
@@ -92,7 +91,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         
         $scope.save = function() {     
             $scope.alreadySubmitted = true;
-            accountRepository.save($scope.account, function(){
+            categoryRepository.save($scope.account, function(){
                 $scope.showSuccessMessage = true;
                 $scope.$apply();
                 $timeout(function() {
@@ -274,7 +273,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         };    
     };
     
-    result.AssignCtrl = function($scope, $window, $timeout, transactionRepository, accountRepository) {
+    result.AssignCtrl = function($scope, $window, $timeout, transactionRepository, categoryRepository) {
         
         $scope.transactions = [];
         $scope.accounts = "[]";
@@ -286,7 +285,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         
         $scope.init = function() {
             var accountNames = [];
-            accountRepository.findAll(function(accounts) {
+            categoryRepository.findAll(function(accounts) {
                 for( var index in accounts ) {
                     accountNames.push(accounts[index].name);
                 }
@@ -379,7 +378,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
 
     };
     
-    result.RulesCtrl = function($scope, $timeout, $cookies, $locale, accountRepository, ruleRepository, $window) {
+    result.RulesCtrl = function($scope, $timeout, $cookies, $locale, categoryRepository, ruleRepository, $window) {
         
         $scope.fields = domain.TransactionField.values.slice(0);
         $scope.operators = domain.RuleOperator.values.slice(0);
@@ -416,7 +415,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                     populateLabelToObjectMap(results, labelsToCategory, 'name', false );
                     callback(results.map(function(category){ return category.name; }));
                 };
-                accountRepository.search(query, callbackWrapper, domain.Account.createFromDBO); 
+                categoryRepository.search(query, callbackWrapper, domain.Account.createFromDBO); 
             };
             $('.ruleCategory INPUT').typeahead({ source: lazySearchItemsInDao, updater: onCategorySelected });
             
@@ -426,7 +425,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                     $scope.$apply();
                 });
                 
-            accountRepository.findAll(function(results){
+            categoryRepository.findAll(function(results){
                 $scope.categories = results;
                 $scope.$apply();
             });

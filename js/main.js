@@ -36,7 +36,7 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
         .controller('ImportCtrl', controllers.ImportCtrl)
         .controller('AssignCtrl', controllers.AssignCtrl)
         .controller('RulesCtrl', controllers.RulesCtrl)
-        .factory('accountRepository', dao.createAccountRepository)
+        .factory('categoryRepository', dao.createCategoryRepository)
         .factory('transactionRepository', dao.createTransactionRepository)
         .factory('ruleRepository', dao.createRuleRepository)
         .value('Translations', translations)

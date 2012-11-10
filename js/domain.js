@@ -10,8 +10,8 @@ define('domain', [], function(){
     Object.defineProperty( domain.AccountType, "EXPENSE", {  value: "EXPENSE",  writable: false, enumerable: true, configurable: false});    
     
     /* Account */
-    var Account = function(accountType, name, bankAccountNumber, description) {
-        this.accountType = accountType;
+    var Account = function(type, name, bankAccountNumber, description) {
+        this.type = type;
         this.bankAccountNumber = bankAccountNumber;        
         this.description = description;
         var caseInsensitiveNameVar = (name !== undefined && name !== null )? name.toUpperCase() : null;
