@@ -1,6 +1,6 @@
-<div ng-controller="AccountDetailCtrl">
+<div ng-controller="CategoryDetailCtrl">
     <!-- Right side -->
-    <form name="accountForm" class="css-form" ng-submit="save()">
+    <form name="categoryForm" class="css-form" ng-submit="save()">
         <legend data-i18n-key="account_detail"></legend>
         <div class="alert alert-info fade in" id="infoMessageForm">
             <i class="icon-info-sign"></i>
@@ -11,7 +11,7 @@
             <div class="controls">
                 <div class="input-append">
                     <input type="text" id="inputAccountName" name="inputAccountName" ng-model="account.name" required="true" ng-disabled="account == null">
-                    <span class="add-on text-error" ng-show="accountForm.inputAccountName.$error.required && account != null" data-i18n-key="requiredAccountName"></span>
+                    <span class="add-on text-error" ng-show="categoryForm.inputAccountName.$error.required && account != null" data-i18n-key="requiredAccountName"></span>
                 </div>
             </div>
         </div>
@@ -21,7 +21,7 @@
                 <div class="input-append">
                     <input type="text" name="inputBankAccountNumber" ng-model="account.bankAccountNumber" 
                            ng-disabled="account == null" bank-account-number maxlength="14">
-                    <span class="add-on text-error" ng-show="accountForm.inputBankAccountNumber.$error.bankAccountNumber" data-i18n-key="invalidBankAccountNumber"></span>
+                    <span class="add-on text-error" ng-show="categoryForm.inputBankAccountNumber.$error.bankAccountNumber" data-i18n-key="invalidBankAccountNumber"></span>
                 </div>
             </div>                            
         </div>
@@ -43,7 +43,7 @@
             <strong data-i18n-key="error"></strong> <span>{{errorMessage}}</span>
         </div>
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary" data-i18n-key="save" ng-disabled="accountForm.$invalid || alreadySubmitted"></button>
+          <button type="submit" class="btn btn-primary" data-i18n-key="save" ng-disabled="categoryForm.$invalid || alreadySubmitted"></button>
         </div>
     </form>
 </div>

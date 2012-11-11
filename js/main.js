@@ -30,8 +30,8 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
         function($, angular, angularCookies, bootstrap, translations, dao, domain, controllers, Modernizr) {
     angular.module('nsoFinance', ['ngCookies'])
         .controller('RootCtrl', controllers.RootCtrl)
-        .controller('AccountListCtrl', controllers.AccountListCtrl)
-        .controller('AccountDetailCtrl', controllers.AccountDetailCtrl)
+        .controller('CategoryListCtrl', controllers.CategoryListCtrl)
+        .controller('CategoryDetailCtrl', controllers.CategoryDetailCtrl)
         .controller('SettingsCtrl', controllers.SettingsCtrl)        
         .controller('ImportCtrl', controllers.ImportCtrl)
         .controller('AssignCtrl', controllers.AssignCtrl)

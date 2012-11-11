@@ -40,16 +40,16 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         });
     };
         
-    result.AccountListCtrl = function ($scope, $rootScope, $window, categoryRepository) {    
+    result.CategoryListCtrl = function ($scope, $rootScope, $window, categoryRepository) {    
         $scope.categories = [];
         $scope.errorMessage = null;
         $scope.loading = false;
-        $scope.selectedAccountType = domain.AccountType.ASSET;
+        $scope.selectedCategoryType = domain.CategoryType.ASSET;
         
         $scope.refresh = function() {
             $scope.loading = true;
             $rootScope.$broadcast(CATEGORY_SELECTED_EVENT, null);
-            categoryRepository.findCategoriesByType($scope.selectedAccountType, function(results){                
+            categoryRepository.findCategoriesByType($scope.selectedCategoryType, function(results){                
                 $scope.categories = results;
                 $scope.loading = false;
                 $scope.$apply();
@@ -61,7 +61,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         };
         
         $scope.add = function() {  
-            var newCategory = new domain.Account($scope.selectedAccountType, '');
+            var newCategory = new domain.Account($scope.selectedCategoryType, '');
             $rootScope.$broadcast(CATEGORY_SELECTED_EVENT, newCategory);
             $scope.categories.push(newCategory);
         };
@@ -77,7 +77,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         
     };
     
-    result.AccountDetailCtrl = function ($scope, $rootScope, $window, $timeout, $cookies, $locale, categoryRepository) {              
+    result.CategoryDetailCtrl = function ($scope, $rootScope, $window, $timeout, $cookies, $locale, categoryRepository) {              
         
         $scope.$on(CATEGORY_SELECTED_EVENT, function(event, account) {
             if ( account !== null ) {
@@ -359,15 +359,15 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             updateAccount(item, 'creditAccount');
         };
         
-        var updateAccount = function(item, accountType){
+        var updateAccount = function(item, categoryType){
             if ( selectedTransaction !== undefined && selectedTransaction !== null ) {
-                if ( selectedTransaction[accountType] === undefined || selectedTransaction[accountType] === null) {
-                    selectedTransaction[accountType] = {};
+                if ( selectedTransaction[categoryType] === undefined || selectedTransaction[categoryType] === null) {
+                    selectedTransaction[categoryType] = {};
                 }
                 if ( item === null || item === undefined ) {
-                    selectedTransaction[accountType] = item;
+                    selectedTransaction[categoryType] = item;
                 } else {
-                    selectedTransaction[accountType].name = item;
+                    selectedTransaction[categoryType].name = item;
                 }
                 var updatedRow = selectedRow;
                 transactionRepository.save(selectedTransaction, 
@@ -477,22 +477,22 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         };
         
         var onCategorySelected = function(item){
-            $('.ruleCategory .label').addClass(calculateClassName(labelsToCategory[item])).css('display', 'block').text(item);
+            $('.ruleCategory .label').addClass($scope.calculateClassName(labelsToCategory[item])).css('display', 'block').text(item);
             $scope.rule.category = { id: labelsToCategory[item].id, name: labelsToCategory[item].name };
 //            $scope.fields.splice($scope.fields.indexOf(labelsToField[item]), 1);
 //            $scope.$apply();  
 //            $('.ruleOperator INPUT').focus();
         };
         
-        var calculateClassName = function(category) {
+        $scope.calculateClassName = function(category) {
             var className = "";
-            if ( category.accountType === domain.AccountType.ASSET ) {
+            if ( category.type === domain.CategoryType.ASSET ) {
                 className = 'label-info';
-            } else if ( category.accountType === domain.AccountType.LIABILITY ) {
+            } else if ( category.type === domain.CategoryType.LIABILITY ) {
                 className = 'label-warning';
-            } else if ( category.accountType === domain.AccountType.EXPENSE ) {
+            } else if ( category.type === domain.CategoryType.EXPENSE ) {
                 className = 'label-important';                
-            } else if ( category.accountType === domain.AccountType.INCOME ) {
+            } else if ( category.type === domain.CategoryType.INCOME ) {
                 className = 'label-success';                                
             }
             return className;            

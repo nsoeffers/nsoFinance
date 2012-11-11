@@ -3,11 +3,11 @@ define('domain', [], function(){
         
     
     /* Account Type */
-    domain.AccountType = {};
-    Object.defineProperty( domain.AccountType, "ASSET", {  value: "ASSET",  writable: false, enumerable: true, configurable: false});
-    Object.defineProperty( domain.AccountType, "LIABILITY", {  value: "LIABILITY",  writable: false, enumerable: true, configurable: false});
-    Object.defineProperty( domain.AccountType, "INCOME", {  value: "INCOME",  writable: false, enumerable: true, configurable: false});
-    Object.defineProperty( domain.AccountType, "EXPENSE", {  value: "EXPENSE",  writable: false, enumerable: true, configurable: false});    
+    domain.CategoryType = {};
+    Object.defineProperty( domain.CategoryType, "ASSET", {  value: "ASSET",  writable: false, enumerable: true, configurable: false});
+    Object.defineProperty( domain.CategoryType, "LIABILITY", {  value: "LIABILITY",  writable: false, enumerable: true, configurable: false});
+    Object.defineProperty( domain.CategoryType, "INCOME", {  value: "INCOME",  writable: false, enumerable: true, configurable: false});
+    Object.defineProperty( domain.CategoryType, "EXPENSE", {  value: "EXPENSE",  writable: false, enumerable: true, configurable: false});    
     
     /* Account */
     var Account = function(type, name, bankAccountNumber, description) {
@@ -34,7 +34,7 @@ define('domain', [], function(){
     };
     
     Account.createFromDBO = function(dbo){
-         var newAccount = new domain.Account(dbo.accountType, dbo.name, dbo.bankAccountNumber, dbo.description);
+         var newAccount = new domain.Account(dbo.type, dbo.name, dbo.bankAccountNumber, dbo.description);
          Object.defineProperty( newAccount, "id", {  value: dbo.id,  writable: false, enumerable: true, configurable: false});
          return newAccount;
     };
