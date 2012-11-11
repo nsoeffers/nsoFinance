@@ -148,12 +148,22 @@ define('dao', [], function() {
             var versionRequest = db.setVersion( '1.0' );
             versionRequest.onsuccess = function () {                    
                 db.deleteObjectStore('Transaction');
-                init();
             };
             versionRequest.onerror = function() {
                 window.alert('Error occurred while removing transaction store');
             };               
-
+        };
+        
+        repository.resetAll = function() {
+            var versionRequest = db.setVersion( '0.0' );
+            versionRequest.onsuccess = function () {                    
+                db.deleteObjectStore("Category");                    
+                db.deleteObjectStore("Transaction");
+                db.deleteObjectStore("Rule");                    
+            };
+            versionRequest.onerror = function() {
+                window.alert('Error occurred while removing transaction store');
+            };                           
         };
         
         repository.findTransactions = function(callback) {

@@ -61,7 +61,8 @@ define('translations', [], function() {
         "settings"                      : "Settings",
         "removeAllTransactionsDescription" : "Select this button if you want to delete all transactions. Other data like categories and rules will not be touched.",
         "removeAllTransactions"         : "Remove all transactions",
-
+        "removeAllDataDescription"      : "Select this button if you want to delete all data, you cannot undo this operation",
+        "removeAllData"                 : "Remove all data",
         
         "product_name"                  : "nsoFinance",
         "description"                   : "Description",
@@ -134,6 +135,8 @@ define('translations', [], function() {
         "settings"                      : "Instellingen",
         "removeAllTransactionsDescription" : "Selecteer onderstaande knop indien u alle verrichtingen wilt verwijderen. Andere data zoals labels en regels zullen blijven bestaan.",
         "removeAllTransactions"         : "Verwijder alle verrichtingen",
+        "removeAllDataDescription"      : "Selecteer onderstaande knop indien u alle data wilt verwijderen. Deze actie kan niet teruggedraaid worden",
+        "removeAllData"                 : "Verwijder alle data",
         
         "product_name"                  : "nsofinance",
         "description"                   : "Omschrijving",

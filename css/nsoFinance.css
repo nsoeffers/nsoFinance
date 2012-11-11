@@ -153,6 +153,10 @@ INPUT:focus.ng-invalid-bank-account-number {
     cursor: grab;   
 }
 
+.giveMeSomeRoom {
+    margin: 8px;
+}
+
 /*.sortable li > span:first { 
     position: absolute; 
     margin-left: -1.3em; 

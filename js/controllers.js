@@ -412,7 +412,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             $timeout(refreshDragAndDropTargets, 0, false);
             var lazySearchItemsInDao = function(query, callback){ 
                 var callbackWrapper = function(results){
-                    populateLabelToObjectMap(results, labelsToCategory, 'name', false );
+                    //populateLabelToObjectMap(results, labelsToCategory, 'name', false );
                     callback(results.map(function(category){ return category.name; }));
                 };
                 categoryRepository.search(query, callbackWrapper, domain.Account.createFromDBO); 
@@ -426,8 +426,13 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                 });
                 
             categoryRepository.findAll(function(results){
+                populateLabelToObjectMap(results, labelsToCategory, 'name', false );
                 $scope.categories = results;
                 $scope.$apply();
+                $('.categoryLabels.labelsArea .label').draggable({scope: 'Category', revert: true, containment: 'window',
+                                        drag: function() {}, opacity: 0.5, cursor: "not-allowed", zIndex: 10 });                                    
+                $('#newRule .ruleCategory').droppable({scope: 'Category', hoverClass: 'dropOperatorHover', 
+                                        drop: onLabelDropped});                                     
             });
         };
 
@@ -442,7 +447,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             $('.fieldLabels.labelsArea .label').draggable({scope: 'Field', revert: true, containment: 'window',
                                     drag: function() {}, opacity: 0.5, cursor: "not-allowed", zIndex: 10 });
             $('.operatorLabels.labelsArea .label').draggable({scope: 'Operator', revert: true, containment: 'window',
-                                    drag: function() {}, opacity: 0.5, cursor: "not-allowed", zIndex: 10 });                                    
+                                    drag: function() {}, opacity: 0.5, cursor: "not-allowed", zIndex: 10 });
             $('#newRule .ruleField').droppable({scope: 'Field', hoverClass: 'dropFieldHover', 
                                     drop: onLabelDropped}); 
             $('#newRule .ruleOperator').droppable({scope: 'Operator', hoverClass: 'dropOperatorHover', 
@@ -455,6 +460,8 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                 onFieldSelected(draggedElement.text().trim());
             } else if ( draggedElement.parents('.operatorLabels').size() !== 0) {
                 onOperatorSelected(draggedElement.text().trim());
+            } else if ( draggedElement.parents('.categoryLabels').size() !== 0) {
+                onCategorySelected(draggedElement.text().trim());                
             }
             draggedElement.draggable('option', 'revert', false); 
             draggedElement.detach().appendTo(event.target);
@@ -462,7 +469,6 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         
         var onFieldSelected = function(item){
             $('.fieldLabels .label:contains("' + item + '")').detach().appendTo($('.ruleField'));
-            //$scope.fields.splice($scope.fields.indexOf(labelsToField[item]), 1);
             $scope.$apply();  
             $scope.rule.field = labelsToField[item];
             $('.ruleOperator INPUT').focus();
@@ -470,17 +476,16 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         
         var onOperatorSelected = function(item){            
             $('.operatorLabels .label:contains("' + item + '")').detach().appendTo($('.ruleOperator'));
-            //$scope.operators.splice($scope.operators.indexOf(labelsToOperator[item]), 1);
             $scope.rule.operator = labelsToOperator[item];
             $scope.$apply();
             $('.ruleValue').focus();
         };
         
         var onCategorySelected = function(item){
-            $('.ruleCategory .label').addClass($scope.calculateClassName(labelsToCategory[item])).css('display', 'block').text(item);
-            $scope.rule.category = { id: labelsToCategory[item].id, name: labelsToCategory[item].name };
-//            $scope.fields.splice($scope.fields.indexOf(labelsToField[item]), 1);
-//            $scope.$apply();  
+            var selectedCategory = labelsToCategory[item];
+            $scope.rule.category = selectedCategory;
+            $('.ruleCategory .label').addClass($scope.calculateClassName(selectedCategory)).css('display', 'block').text(item);
+            $scope.$apply();  
 //            $('.ruleOperator INPUT').focus();
         };
         
@@ -503,8 +508,17 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         $scope.removeAllTransactions = function() {
             transactionRepository.reset(function(){ 
                 // TODO: Give feedback to user and issue a reload of webapp
+                $window.location.reload();
             });
         };
+        
+        $scope.removeAllData = function() {
+            transactionRepository.resetAll(function(){ 
+                // TODO: Give feedback to user and issue a reload of webapp
+                $window.location.reload();
+            });
+        };
+
     };
     
     var translate = function(key, $cookies, $locale) {

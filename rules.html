@@ -52,21 +52,19 @@
                         <span class="label label-inverse">{{rule.operator.i18nKey | translate}}</span>
                         <span><b>"{{rule.value}}"</b></span>
                         <span data-i18n-key="ruleThen"></span>
-                        <span class="label">"{{rule.category.name}}"</span>
+                        "<span class="label {{calculateClassName(rule.category)}}">{{rule.category.name}}</span>"
                 </li>
             </ul>
         </div>
-        <div class="span3 well well-small">
+        <div class="span3 well well-small categoryLabels labelsArea">
             <form class="form-search">
               <div class="input-append">
                 <input type="text" class="span12 search-query" >
                 <button type="submit" class="btn"><i class="icon-search"></i></button>
               </div>
-              <div class="row-fluid">
-                <span ng-repeat="category in categories">
-                    <span class="label {{calculateClassName(category)}}">{{category.name}}</span>
-                </span>
-              </div>
             </form>
+            <span ng-repeat="category in categories">
+                <span class="label {{calculateClassName(category)}}">{{category.name}}</span>
+            </span>
         </div>
 </div>
