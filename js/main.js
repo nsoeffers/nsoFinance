@@ -88,7 +88,8 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
             }).when('/unsupported', {
                 templateUrl: 'unsupportedBrowser.html'
             }).otherwise({
-                templateUrl: 'category.html'
+                templateUrl: 'assign.html',
+                controller: 'AssignCtrl'                
             });
         })
         .run(function($location) {            
