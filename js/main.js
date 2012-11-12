@@ -70,6 +70,31 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
                 }
             };
         })
+        .directive('previousView', function($window, $timeout) {
+            return {
+                priority: 1,
+                link: function(scope, element, attr) {
+                    scope.$on('$routeChangeSuccess', update);
+                    
+                    function populatePreviousView(){
+                        $('div[previous-view]').html('');
+                        $('div[ng-view]').contents().detach().appendTo($('div[previous-view]'));
+                        $('div[previous-view]').addClass('aboutToNavigate');
+                        $('div[ng-view]').addClass('aboutToNavigate');
+                    }
+                    
+                    function startNavigationAnimation(){
+                        $('div[previous-view]').removeClass('aboutToNavigate');
+                        $('div[ng-view]').removeClass('aboutToNavigate');                        
+                    }
+                    
+                    function update() {
+                        populatePreviousView();
+                        $timeout(startNavigationAnimation, 0, false);
+                    }
+                }
+            };
+        })
         .config(function($routeProvider){            
             $routeProvider.when('/category', {
                 templateUrl: 'category.html'

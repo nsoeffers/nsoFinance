@@ -157,6 +157,34 @@ INPUT:focus.ng-invalid-bank-account-number {
     margin: 8px;
 }
 
+div[previous-view] {
+    position: absolute;
+    left: -100%;
+    top: 41px;
+    width: 100%;
+    bottom: 0;
+    -webkit-transition: left 0.4s ease-in-out;
+}
+
+div[previous-view].aboutToNavigate {
+    left: 0%;
+    -webkit-transition: none;
+}
+
+div[ng-view]{
+    position: absolute;
+    left: 0%;
+    top: 41px;
+    width: 100%;
+    bottom: 0;
+    -webkit-transition: left 0.4s ease-in-out;    
+}
+
+div[ng-view].aboutToNavigate{
+    left: 100%;
+    -webkit-transition: none;
+}
+
 /*.sortable li > span:first { 
     position: absolute; 
     margin-left: -1.3em; 
