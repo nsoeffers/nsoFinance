@@ -221,7 +221,12 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                     $scope.fileReadingProgress = (e.loaded * 100) / e.total;  
                     $scope.$apply();
                 };
+//                fileReader.onload = function(e) {
+//                    $scope.fileReadingProgress = 100;  
+//                    $scope.$apply();                    
+//                };
                 fileReader.readAsText(file);
+                $timeout(function() { $($window.document.body).animate({ scrollTop: $window.document.body.scrollHeight+20}); }, 200);
             }            
         };
         
