@@ -1,5 +1,5 @@
-define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', 'translations', 'jquery.csv', 'modernizr', 'jqueryUI'], 
-    function($, angular, angularCookies, dao, domain, translations, jqueryCsv, Modernizr) {
+define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', 'translations', 'jquery.csv', 'modernizr', 'moment', 'jqueryUI'], 
+    function($, angular, angularCookies, dao, domain, translations, jqueryCsv, Modernizr, moment) {
     
     var CATEGORY_SELECTED_EVENT = 'categorySelected';
     var NOTIFICATION_EVENT = 'notification';
@@ -53,7 +53,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                 $scope.categories = results;
                 $scope.loading = false;
                 $scope.$apply();
-            }, domain.Account.createFromDBO);
+            }, domain.Category.createFromDBO);
         };
         
         $scope.select = function(category) {
@@ -61,7 +61,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         };
         
         $scope.add = function() {  
-            var newCategory = new domain.Account($scope.selectedCategoryType, '');
+            var newCategory = new domain.Category($scope.selectedCategoryType, '');
             $rootScope.$broadcast(CATEGORY_SELECTED_EVENT, newCategory);
             $scope.categories.push(newCategory);
         };
@@ -79,19 +79,19 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
     
     result.CategoryDetailCtrl = function ($scope, $rootScope, $window, $timeout, $cookies, $locale, categoryRepository) {              
         
-        $scope.$on(CATEGORY_SELECTED_EVENT, function(event, account) {
-            if ( account !== null ) {
+        $scope.$on(CATEGORY_SELECTED_EVENT, function(event, category) {
+            if ( category !== null ) {
                 $('#infoMessageForm').alert('close');
             }
             $scope.alreadySubmitted = false;
-            $scope.account = account;            
-            $timeout(function(){ $('#inputAccountName').focus(); }, 100);
+            $scope.category = category;            
+            $timeout(function(){ $('#inputCategoryName').focus(); }, 100);
             //$scope.$apply();
         });
         
         $scope.save = function() {     
             $scope.alreadySubmitted = true;
-            categoryRepository.save($scope.account, function(){
+            categoryRepository.save($scope.category, function(){
                 $scope.showSuccessMessage = true;
                 $scope.$apply();
                 $timeout(function() {
@@ -112,7 +112,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         
         $scope.alreadySubmitted = false;
                         
-        $scope.account = null;
+        $scope.category = null;
         
         $scope.showSuccessMessage = false;    
     };
@@ -200,7 +200,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                     var data = $.csv.toArrays(e.target.result, { separator: ';', escaper: '\\' });
                     var successCallback = function() { 
                         $scope.savedTransactionCount++; 
-                        var total = $scope.firstRowIsHeader ? data.length - 1 : data.length;
+                        var total = $scope.firstRowIsHeader ? data.length - 2 : data.length - 1;
                         $scope.saveProgress = ($scope.savedTransactionCount * 100 ) / total;
                         $window.console.log('transaction:' + $scope.savedTransactionCount + ', length: ' + total + ', percent: ' + $scope.saveProgress);
                         $scope.$apply();
@@ -281,7 +281,6 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
     result.AssignCtrl = function($scope, $window, $timeout, transactionRepository, categoryRepository) {
         
         $scope.transactions = [];
-        $scope.accounts = "[]";
         
         var selectedTransaction;        
         var creditAccountChooser;
@@ -289,15 +288,15 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         var selectedRow;
         
         $scope.init = function() {
-            var accountNames = [];
-            categoryRepository.findAll(function(accounts) {
-                for( var index in accounts ) {
-                    accountNames.push(accounts[index].name);
+            var categoryNames = [];
+            categoryRepository.findAll(function(categories) {
+                for( var index in categories ) {
+                    categoryNames.push(categories[index].name);
                 }
                 $scope.$apply();
             });
             debetAccountChooser = $('#debetAccountChooser');
-            debetAccountChooser.typeahead({updater: $scope.updateDebet, source: accountNames });
+            debetAccountChooser.typeahead({updater: $scope.updateDebet, source: categoryNames });
             debetAccountChooser.focus(function() { $timeout(function() { debetAccountChooser.select(); }, 0, false); } );
             debetAccountChooser.blur(function() { 
                 if ( debetAccountChooser.val() === "" && selectedTransaction.debetAccount !== null ) { 
@@ -305,7 +304,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                 }
             });
             creditAccountChooser = $('#creditAccountChooser');
-            creditAccountChooser.typeahead({updater: $scope.updateCredit, source: accountNames });
+            creditAccountChooser.typeahead({updater: $scope.updateCredit, source: categoryNames });
             creditAccountChooser.focus(function() { $timeout(function() { creditAccountChooser.select(); }, 0, false); } );
             creditAccountChooser.blur(function() { 
                 if ( creditAccountChooser.val() === "" && selectedTransaction.creditAccount !== null ) { 
@@ -316,7 +315,9 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         };
         
         $scope.refresh = function() {            
-            transactionRepository.findTransactions(function(data) {
+            var firstDayOfPreviousMonth = moment().startOf('month').subtract('months', 2);
+            var lastDayOfPreviousMonth = moment().startOf('month').subtract('months', 2).endOf('month');
+            transactionRepository.findUntaggedTransactions(firstDayOfPreviousMonth, lastDayOfPreviousMonth, function(data) {
                     $scope.transactions = data;
                     $scope.$apply();
                 });
@@ -420,7 +421,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                     //populateLabelToObjectMap(results, labelsToCategory, 'name', false );
                     callback(results.map(function(category){ return category.name; }));
                 };
-                categoryRepository.search(query, callbackWrapper, domain.Account.createFromDBO); 
+                categoryRepository.search(query, callbackWrapper, domain.Category.createFromDBO); 
             };
             $('.ruleCategory INPUT').typeahead({ source: lazySearchItemsInDao, updater: onCategorySelected });
             

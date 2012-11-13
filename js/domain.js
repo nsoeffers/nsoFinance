@@ -1,21 +1,20 @@
-define('domain', [], function(){
+define('domain', ['moment'], function(moment){
     var domain = {};
         
     
-    /* Account Type */
+    /* Category Type */
     domain.CategoryType = {};
     Object.defineProperty( domain.CategoryType, "ASSET", {  value: "ASSET",  writable: false, enumerable: true, configurable: false});
     Object.defineProperty( domain.CategoryType, "LIABILITY", {  value: "LIABILITY",  writable: false, enumerable: true, configurable: false});
     Object.defineProperty( domain.CategoryType, "INCOME", {  value: "INCOME",  writable: false, enumerable: true, configurable: false});
     Object.defineProperty( domain.CategoryType, "EXPENSE", {  value: "EXPENSE",  writable: false, enumerable: true, configurable: false});    
     
-    /* Account */
-    var Account = function(type, name, bankAccountNumber, description) {
+    /* Category */
+    var Category = function(type, name, description) {
         this.type = type;
-        this.bankAccountNumber = bankAccountNumber;        
         this.description = description;
         var caseInsensitiveNameVar = (name !== undefined && name !== null )? name.toUpperCase() : null;
-        Object.defineProperty( this, "className", {  value: "Account",  writable: false, enumerable: true, configurable: false});
+        Object.defineProperty( this, "className", {  value: "Category",  writable: false, enumerable: true, configurable: false});
         Object.defineProperty( this, "caseInsensitiveName", {  get: function() { 
                                                                     return caseInsensitiveNameVar;
                                                                 },
@@ -33,13 +32,13 @@ define('domain', [], function(){
                                                 
     };
     
-    Account.createFromDBO = function(dbo){
-         var newAccount = new domain.Account(dbo.type, dbo.name, dbo.bankAccountNumber, dbo.description);
-         Object.defineProperty( newAccount, "id", {  value: dbo.id,  writable: false, enumerable: true, configurable: false});
-         return newAccount;
+    Category.createFromDBO = function(dbo){
+         var newCategory = new domain.Category(dbo.type, dbo.name, dbo.description);
+         Object.defineProperty( newCategory, "id", {  value: dbo.id,  writable: false, enumerable: true, configurable: false});
+         return newCategory;
     };
     
-    Object.defineProperty( domain, "Account", {  value: Account,  writable: false, enumerable: true, configurable: false});
+    Object.defineProperty( domain, "Category", {  value: Category,  writable: false, enumerable: true, configurable: false});
     
     /* TransactionField */
     var TransactionField = {};    
@@ -74,6 +73,14 @@ define('domain', [], function(){
                                                     set: function(newValue) {
                                                         },
                                                     enumerable: true, configurable: false});
+        var that = this;
+        Object.defineProperty( this, "status",  {  get: function() { 
+                                                        return (that.tagged ? "TAGGED_" : "UNTAGGED_") + 
+                                                            (date === undefined || date === null ? "" : moment(date).format('YYYYMMDD'));
+                                                    },
+                                                    set: function(newValue) {                                                                        
+                                                    },
+                                                    enumerable: true, configurable: false});                                                    
     };
     Object.defineProperty( domain, "Transaction", {  value: Transaction,  writable: false, enumerable: true, configurable: false});    
     

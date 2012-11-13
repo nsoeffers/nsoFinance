@@ -1,7 +1,8 @@
 QUnit.config.autostart = false;
 requirejs.config({
     paths: {
-        'domain': '../../js/domain'
+        'domain': '../../js/domain',
+        'moment': '../../js/moment.min'
     }
 });
 

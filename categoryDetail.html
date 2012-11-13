@@ -7,29 +7,19 @@
             <strong data-i18n-key="choose_account_or_create_new"></strong>
         </div>
         <div class="control-group">
-            <label class="control-label" for="inputAccountName" data-i18n-key="account_name"></label>
+            <label class="control-label" for="inputCategoryName" data-i18n-key="account_name"></label>
             <div class="controls">
                 <div class="input-append">
-                    <input type="text" id="inputAccountName" name="inputAccountName" ng-model="account.name" required="true" ng-disabled="account == null">
-                    <span class="add-on text-error" ng-show="categoryForm.inputAccountName.$error.required && account != null" data-i18n-key="requiredAccountName"></span>
+                    <input type="text" id="inputCategoryName" name="inputCategoryName" ng-model="category.name" required="true" ng-disabled="category == null">
+                    <span class="add-on text-error" ng-show="categoryForm.inputCategoryName.$error.required && category != null" data-i18n-key="requiredAccountName"></span>
                 </div>
             </div>
         </div>
         <div class="control-group">
-            <label class="control-label" for="inputBankAccountNumber" data-i18n-key="bankaccount_nr"></label>
+            <label class="control-label" for="inputCategoryDescription" data-i18n-key="description"></label>
             <div class="controls">
-                <div class="input-append">
-                    <input type="text" name="inputBankAccountNumber" ng-model="account.bankAccountNumber" 
-                           ng-disabled="account == null" bank-account-number maxlength="14">
-                    <span class="add-on text-error" ng-show="categoryForm.inputBankAccountNumber.$error.bankAccountNumber" data-i18n-key="invalidBankAccountNumber"></span>
-                </div>
-            </div>                            
-        </div>
-        <div class="control-group">
-            <label class="control-label" for="inputAccountDescription" data-i18n-key="description"></label>
-            <div class="controls">
-                <textarea name="inputAccountDescription" ng-model="account.description" 
-                       ng-disabled="account == null" maxlength="500"/>                
+                <textarea name="inputCategoryDescription" ng-model="category.description" 
+                       ng-disabled="category == null" maxlength="500"/>                
             </div>                            
         </div>
         <div class="alert alert-success fade in" ng-show="showSuccessMessage">

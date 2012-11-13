@@ -6,7 +6,8 @@ requirejs.config({
         'angularCookies'    : 'https://ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular-cookies.min',
         'bootstrap'         : 'https://netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/js/bootstrap.min',
         'jquery.csv'        : 'jquery.csv-0.63',
-        'modernizr'         : 'modernizr-2.6.2.min'
+        'modernizr'         : 'modernizr-2.6.2.min',
+        'moment'            : 'moment.min'
     },
     shim: {
         'angular': {

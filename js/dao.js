@@ -1,4 +1,4 @@
-define('dao', [], function() {
+define('dao', ['moment'], function(moment) {
     
     var dao = {};
     
@@ -32,27 +32,13 @@ define('dao', [], function() {
                     categoryStore.createIndex('caseInsensitiveName', 'caseInsensitiveName', {unique : true});
                     categoryStore.createIndex('type', 'type', {unique : false});
                     
-                    db.createObjectStore("Transaction", {keyPath: 'id', autoIncrement: true});
+                    var transactionStore = db.createObjectStore("Transaction", {keyPath: 'id', autoIncrement: true});
+                    transactionStore.createIndex('status', 'status', {unique : false});
                     db.createObjectStore("Rule", {keyPath: 'id', autoIncrement: true});                    
                 };
                 versionRequest.onerror = function() {
                     window.alert('Error occurred while creating indexedDb');
-                };
-            } else if ( db.version === '1.0') {
-                var versionRequest = db.setVersion( '1.1' );
-                versionRequest.onsuccess = function () {                    
-                    db.createObjectStore("Transaction", {keyPath: 'id', autoIncrement: true});
-                };
-                versionRequest.onerror = function() {
-                    window.alert('Error occurred while creating indexedDb');
-                };               
-//             } else if ( db.version === '1.1'){                
-//                 var versionRequest = db.setVersion( '0.0' );
-//                 versionRequest.onsuccess = function () {                    
-//                     db.deleteObjectStore("Category");                    
-//                     db.deleteObjectStore("Transaction");
-//                    db.deleteObjectStore("Rule");                    
-//                 };
+                };            
             }
         };
         
@@ -166,14 +152,16 @@ define('dao', [], function() {
             };                           
         };
         
-        repository.findTransactions = function(callback) {
+        repository.findUntaggedTransactions = function(from, to, callback) {
             if ( !db ) {
-                setTimeout(function() { repository.findTransactions(callback); }, 100);
+                setTimeout(function() { repository.findUntaggedTransactions(from, to, callback); }, 100);
                 return;
             }
             var transaction = db.transaction([ 'Transaction' ], "readonly");
             var store = transaction.objectStore('Transaction');
-            var cursorRequest = store.openCursor();
+            var fromKey = "UNTAGGED_" + moment(from).format('YYYYMMDD');
+            var toKey = "UNTAGGED_" + moment(to).format('YYYYMMDD');
+            var cursorRequest = store.index('status').openCursor(IDBKeyRange.bound(fromKey, toKey, true, true), "prev");
             var results = [];
             cursorRequest.onsuccess = function(e) {
                 if ( !e.target || !e.target.result || e.target.result === null) {

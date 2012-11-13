@@ -1,34 +1,34 @@
 define('tests', ['domain'], function(domain) {         
     "use strict";
 
-    test( "When Account is initialized then caseInsensitiveName is also set", function() {
-        equal( "TESTNAME", new domain.Account('ASSETS', 'TestName').caseInsensitiveName);
+    test( "When Category is initialized then caseInsensitiveName is also set", function() {
+        equal( "TESTNAME", new domain.Category('ASSETS', 'TestName').caseInsensitiveName);
     });
     
-    test( "When Account name is changed then caseInsensitiveName is also updated", function() {
-        var account = new domain.Account('ASSETS', 'AccountName');
-        account.name = "changedAccountName";
-        equal( "CHANGEDACCOUNTNAME", account.caseInsensitiveName);
+    test( "When Category name is changed then caseInsensitiveName is also updated", function() {
+        var category = new domain.Category('ASSETS', 'AccountName');
+        category.name = "changedAccountName";
+        equal( "CHANGEDACCOUNTNAME", category.caseInsensitiveName);
     });
     
-    test( "When Account is initialized then className is set", function() {
-        equal( "Account", new domain.Account('ASSETS', 'AccountName').className);
+    test( "When Category is initialized then className is set", function() {
+        equal( "Category", new domain.Category('ASSETS', 'AccountName').className);
     });
 
-    test( "When Account className is set then exception is thrown", function() {
-        var account = new domain.Account('ASSETS', 'AccountName');
+    test( "When Category className is set then exception is thrown", function() {
+        var category = new domain.Category('ASSETS', 'AccountName');
         try {
-            account.className = 'UnexistingClass';
+            category.className = 'UnexistingClass';
         } catch ( ex ) {
             equal( "className", ex['arguments'][0]);
         }        
     });
     
-    test( "When trying to overwrite Account class of domain package then exception is thrown", function() {
+    test( "When trying to overwrite Category class of domain package then exception is thrown", function() {
         try {
-            domain.Account = function(){ window.alert('dummyAccount'); };
+            domain.Category = function(){ window.alert('dummyAccount'); };
         } catch ( ex ) {
-            equal( "Account", ex['arguments'][0]);
+            equal( "Category", ex['arguments'][0]);
         }
     });
 
@@ -67,6 +67,10 @@ define('tests', ['domain'], function(domain) {
     test( "When Transaction is initialized then transaction is marked as untagged", function() {
         equal( false, new domain.Transaction(new Date(), 10.0).tagged);
     });
+    
+    test( "When Transaction is initialized then transaction status is combination of tagged and date attribute", function() {
+        equal( "UNTAGGED_20120105", new domain.Transaction(new Date(2012, 0, 5), 10.0).status);
+    });
 
     test( "When only debetAccount is set then transaction is not marked as tagged", function() {
         var transaction = new domain.Transaction(new Date(), 10.0);
@@ -86,6 +90,13 @@ define('tests', ['domain'], function(domain) {
         transaction.debetAccount = { id: 1, name: 'debetAccount' };
         transaction.creditAccount = { id: 1, name: 'creditAccount' };
         equal( true, transaction.tagged);
+    });
+
+    test( "When debet and creditAccount are set then transaction statis is combination of tagged and date", function() {
+        var transaction = new domain.Transaction(new Date(2012, 10, 13), 10.0);
+        transaction.debetAccount = { id: 1, name: 'debetAccount' };
+        transaction.creditAccount = { id: 1, name: 'creditAccount' };
+        equal( "TAGGED_20121113", transaction.status);
     });
 
     test( "When trying to overwrite Rule class of domain package then exception is thrown", function() {
