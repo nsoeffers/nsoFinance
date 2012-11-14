@@ -2,7 +2,14 @@
     <h1 data-i18n-key="assign_title"></h1>
 </div>
 <div class="container-fluid" ng-init="init()">
-    <blockquote ng-show="transactions.length == 0">
+    <div>
+        <ul class="nav nav-pills pull-right">
+            <li class="{{isActiveGranularity('month')}}"><a ng-click="setIntervalGranularity('month')" data-i18n-key="per_month"></a></li>
+            <li class="{{isActiveGranularity('year')}}"><a ng-click="setIntervalGranularity('year')" data-i18n-key="per_year"></a></li>
+            <li class="{{isActiveGranularity('all')}}"><a ng-click="setIntervalGranularity('all')" data-i18n-key="all"></a></li>
+        </ul>
+    </div>
+    <blockquote ng-show="transactions != null && transactions.length == 0">
         <span data-i18n-key="no_unmapped_transactions"></span>
         <a href="#/import" data-i18n-key="goto_import"></a>
     </blockquote>

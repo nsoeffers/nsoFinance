@@ -89,7 +89,11 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
                         $('div[ng-view]').removeClass('aboutToNavigate');                        
                     }
                     
-                    function update() {
+                    function update(rootScope, current, previous) {
+                        if ( previous !== undefined && previous !== null 
+                                && current.locals.$template === previous.locals.$template ) {
+                            return;
+                        }
                         populatePreviousView();
                         $timeout(startNavigationAnimation, 0, false);
                     }

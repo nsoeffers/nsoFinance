@@ -49,6 +49,9 @@ define('translations', [], function() {
         
         "assign_title"                  : "Assign categories to the transactions",
         "assign"                        : "Assign",
+        "per_month"                     : "Month",
+        "per_year"                      : "Year",
+        "all"                           : "All",
         "no_unmapped_transactions"      : "Currently there are no unmapped transactions, you can use the import functionality to import new transactions",
         "goto_import"                   : "Goto the import functionality",
         
@@ -128,6 +131,9 @@ define('translations', [], function() {
         "assign"                        : "Toewijzen",
         "no_unmapped_transactions"      : "Momenteel zijn er geen verrichtingen die niet zijn toegewezen aan een categorie, de import functionaliteit kan gebruikt worden om nieuwe transacties op te laden",
         "goto_import"                   : "Ga naar de import functionaliteit",
+        "per_month"                     : "Maand",
+        "per_year"                      : "Jaar",
+        "all"                           : "Alles",
         
         "rules"                         : "Regels",
         "rules_title"                   : "Regels voor het automatisch categoriseren",

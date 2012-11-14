@@ -278,9 +278,9 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         };    
     };
     
-    result.AssignCtrl = function($scope, $window, $timeout, transactionRepository, categoryRepository) {
+    result.AssignCtrl = function($scope, $window, $timeout, $location, transactionRepository, categoryRepository) {
         
-        $scope.transactions = [];
+        $scope.transactions = null;
         
         var selectedTransaction;        
         var creditAccountChooser;
@@ -314,10 +314,27 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             $scope.refresh();
         };
         
+        $scope.isActiveGranularity = function(granularity){
+            return $location.search()[granularity] == true 
+                || ($.isEmptyObject($location.search()) && granularity === 'month')? 'active' : '';
+        };
+        
+        $scope.setIntervalGranularity = function(granularity) {
+            $location.search(granularity);
+//            $scope.refresh();
+        };
+        
         $scope.refresh = function() {            
-            var firstDayOfPreviousMonth = moment().startOf('month').subtract('months', 2);
-            var lastDayOfPreviousMonth = moment().startOf('month').subtract('months', 2).endOf('month');
-            transactionRepository.findUntaggedTransactions(firstDayOfPreviousMonth, lastDayOfPreviousMonth, function(data) {
+            var fromDate = moment().startOf('month').subtract('months', 2);
+            var toDate = moment().startOf('month').subtract('months', 2).endOf('month');
+            if ( $location.search().year === true ) {
+                fromDate = moment().startOf('year');
+                toDate = moment().endOf('year');
+            } else if ( $location.search().all === true ) {
+                fromDate = new Date(0);
+                toDate = new Date(9999, 0, 1);
+            }
+            transactionRepository.findUntaggedTransactions(fromDate, toDate, function(data) {
                     $scope.transactions = data;
                     $scope.$apply();
                 });
