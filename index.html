@@ -35,6 +35,9 @@
                         <li><a href="#/rules" data-i18n-key="rules"></a></li>
                         <li><a href="#/settings" data-i18n-key="settings"></a></li>
                     </ul>
+                    <ul class="nav nav-pills pull-right">                
+                        <li ng-repeat="language in languages" ng-class="getLanguageSelectedClass(language)"><a ng-click="setLanguage(language)">{{language}}</a></li>
+                    </ul>
                 </div>
             </div>
             <div id="feedback_area">
@@ -43,9 +46,6 @@
                     <strong data-i18n-key="{{notification.type}}"></strong> <span>{{notification.message}}</span>
                 </div>
             </div>
-            <ul class="nav nav-pills pull-right">                
-                <li ng-repeat="language in languages" ng-class="getLanguageSelectedClass(language)"><a ng-click="setLanguage(language)">{{language}}</a></li>
-            </ul>
             <div previous-view></div>
             <div ng-view></div>
         </div>
