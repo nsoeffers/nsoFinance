@@ -1,5 +1,5 @@
-define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', 'translations', 'jquery.csv', 'modernizr', 'moment', 'jqueryUI'], 
-    function($, angular, angularCookies, dao, domain, translations, jqueryCsv, Modernizr, moment) {
+define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', 'translations', 'jquery.csv', 'modernizr', 'moment', 'spin', 'jqueryUI'], 
+    function($, angular, angularCookies, dao, domain, translations, jqueryCsv, Modernizr, moment, Spinner) {
     
     var CATEGORY_SELECTED_EVENT = 'categorySelected';
     var NOTIFICATION_EVENT = 'notification';
@@ -283,9 +283,10 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         $scope.transactions = null;
         
         var selectedTransaction;        
-        var creditAccountChooser;
-        var debetAccountChooser;
+        var creditCategoryChooser;
+        var debetCategoryChooser;
         var selectedRow;
+        var spinner;
         
         $scope.init = function() {
             var categoryNames = [];
@@ -295,23 +296,24 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                 }
                 $scope.$apply();
             });
-            debetAccountChooser = $('#debetAccountChooser');
-            debetAccountChooser.typeahead({updater: $scope.updateDebet, source: categoryNames });
-            debetAccountChooser.focus(function() { $timeout(function() { debetAccountChooser.select(); }, 0, false); } );
-            debetAccountChooser.blur(function() { 
-                if ( debetAccountChooser.val() === "" && selectedTransaction.debetAccount !== null ) { 
+            debetCategoryChooser = $('#debetCategoryChooser');
+            debetCategoryChooser.typeahead({updater: $scope.updateDebet, source: categoryNames });
+            debetCategoryChooser.focus(function() { $timeout(function() { debetCategoryChooser.select(); }, 0, false); } );
+            debetCategoryChooser.blur(function() { 
+                if ( debetCategoryChooser.val() === "" && selectedTransaction.debetAccount !== null ) { 
                     $scope.updateDebet(undefined); 
                 }
             });
-            creditAccountChooser = $('#creditAccountChooser');
-            creditAccountChooser.typeahead({updater: $scope.updateCredit, source: categoryNames });
-            creditAccountChooser.focus(function() { $timeout(function() { creditAccountChooser.select(); }, 0, false); } );
-            creditAccountChooser.blur(function() { 
-                if ( creditAccountChooser.val() === "" && selectedTransaction.creditAccount !== null ) { 
+            creditCategoryChooser = $('#creditCategoryChooser');
+            creditCategoryChooser.typeahead({updater: $scope.updateCredit, source: categoryNames });
+            creditCategoryChooser.focus(function() { $timeout(function() { creditCategoryChooser.select(); }, 0, false); } );
+            creditCategoryChooser.blur(function() { 
+                if ( creditCategoryChooser.val() === "" && selectedTransaction.creditAccount !== null ) { 
                     $scope.updateCredit(undefined); 
                 } 
             } );
-            $scope.refresh();
+            
+            $scope.refresh();            
         };
         
         $scope.isActiveGranularity = function(granularity){
@@ -325,6 +327,8 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         };
         
         $scope.refresh = function() {            
+            spinner = new Spinner({lines: 10, width: 3, length: 7, hwaccel: true}).spin($('#waitForTransactions')[0]);
+            
             var fromDate = moment().startOf('month').subtract('months', 2);
             var toDate = moment().startOf('month').subtract('months', 2).endOf('month');
             if ( $location.search().year === true ) {
@@ -337,12 +341,14 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             transactionRepository.findUntaggedTransactions(fromDate, toDate, function(data) {
                     $scope.transactions = data;
                     $scope.$apply();
+                    spinner.stop();
+                    $('#waitForTransactions').hide();
                 });
         };
         
         $scope.selectRow = function(e){            
             var currentTarget = $(e.currentTarget);            
-            if ( currentTarget[0] === creditAccountChooser.parents('.row-fluid')[0] ){
+            if ( currentTarget[0] === creditCategoryChooser.parents('.row-fluid')[0] ){
                 return;
             }
             var previousSelectedTransaction;
@@ -353,12 +359,12 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             }
             var creditColumn = currentTarget.children().last();
             var debetColumn = currentTarget.children().last().prev();
-            creditAccountChooser.val(creditColumn.text());
-            debetAccountChooser.val(debetColumn.text());
+            creditCategoryChooser.val(creditColumn.text());
+            debetCategoryChooser.val(debetColumn.text());
             creditColumn.text("");
             debetColumn.text("");
-            creditAccountChooser.detach().appendTo(creditColumn).show();
-            debetAccountChooser.detach().appendTo(debetColumn).show();
+            creditCategoryChooser.detach().appendTo(creditColumn).show();
+            debetCategoryChooser.detach().appendTo(debetColumn).show();
             if ( selectedRow !== undefined && selectedRow !== null ) {                
                 selectedRow.removeClass('active');
                 if ( previousSelectedTransaction !== undefined && previousSelectedTransaction !== null ) {
@@ -373,12 +379,12 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         };
         
         $scope.updateDebet = function(item) {
-            $timeout(function() {debetAccountChooser.val(item)}, 0, false);
+            $timeout(function() {debetCategoryChooser.val(item)}, 0, false);
             updateAccount(item, 'debetAccount');
         };
         
         $scope.updateCredit = function(item) {
-            $timeout(function() {creditAccountChooser.val(item)}, 0, false);
+            $timeout(function() {creditCategoryChooser.val(item)}, 0, false);
             updateAccount(item, 'creditAccount');
         };
         

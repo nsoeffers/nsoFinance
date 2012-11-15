@@ -185,6 +185,12 @@ div[ng-view].aboutToNavigate{
     -webkit-transition: none;
 }
 
+#waitForTransactions {
+    position: relative;
+    width: 100%;
+    height: 100px;
+}
+
 /*.sortable li > span:first { 
     position: absolute; 
     margin-left: -1.3em; 

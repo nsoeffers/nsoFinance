@@ -7,7 +7,8 @@ requirejs.config({
         'bootstrap'         : 'https://netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/js/bootstrap.min',
         'jquery.csv'        : 'jquery.csv-0.63',
         'modernizr'         : 'modernizr-2.6.2.min',
-        'moment'            : 'moment.min'
+        'moment'            : 'moment.min',
+        'spin'              : 'spin.min'
     },
     shim: {
         'angular': {
