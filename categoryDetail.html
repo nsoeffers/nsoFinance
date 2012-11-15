@@ -11,7 +11,7 @@
             <div class="controls">
                 <div class="input-append">
                     <input type="text" id="inputCategoryName" name="inputCategoryName" ng-model="category.name" required="true" ng-disabled="category == null">
-                    <span class="add-on text-error" ng-show="categoryForm.inputCategoryName.$error.required && category != null" data-i18n-key="requiredAccountName"></span>
+                    <span class="add-on text-error" ng-show="categoryForm.$dirty && categoryForm.inputCategoryName.$error.required && category != null" data-i18n-key="requiredAccountName"></span>
                 </div>
             </div>
         </div>
