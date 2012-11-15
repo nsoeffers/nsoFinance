@@ -31,8 +31,8 @@
                 <div class="span2">{{transaction.date | date:'yyyy-MM-dd'}}</div>
                 <div class="span1">{{transaction.amount | number:2}}</div>
                 <div class="span5">{{transaction.description}}</div>
-                <div class="span2">{{transaction.debetAccount.name}}</div>
-                <div class="span2">{{transaction.creditAccount.name}}</div>
+                <div class="span2"><span class="label {{calculateClassName(transaction.debetAccount)}}" ng-show="transaction.debetAccount">{{transaction.debetAccount.name}}</span></div>
+                <div class="span2"><span class="label {{calculateClassName(transaction.creditAccount)}}" ng-show="transaction.creditAccount">{{transaction.creditAccount.name}}</span></div>
             </div>
         </div>
     </div>

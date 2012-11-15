@@ -287,12 +287,14 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         var debetCategoryChooser;
         var selectedRow;
         var spinner;
+        var categoryNameToItem = {};
         
         $scope.init = function() {
             var categoryNames = [];
             categoryRepository.findAll(function(categories) {
                 for( var index in categories ) {
                     categoryNames.push(categories[index].name);
+                    categoryNameToItem[categories[index].name] = categories[index];
                 }
                 $scope.$apply();
             });
@@ -368,10 +370,12 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             if ( selectedRow !== undefined && selectedRow !== null ) {                
                 selectedRow.removeClass('active');
                 if ( previousSelectedTransaction !== undefined && previousSelectedTransaction !== null ) {
-                    selectedRow.children().last().text(previousSelectedTransaction.creditAccount !== undefined ? 
-                        previousSelectedTransaction.creditAccount.name : '');
-                    selectedRow.children().last().prev().text(previousSelectedTransaction.debetAccount !== undefined ? 
-                        previousSelectedTransaction.debetAccount.name : '');                        
+                    selectedRow.children().last().html(previousSelectedTransaction.creditAccount !== undefined ? 
+                        '<span class="label ' + calculateClassNameForCategory(previousSelectedTransaction.creditAccount) + '">' 
+                        + previousSelectedTransaction.creditAccount.name + '</span>': '');
+                    selectedRow.children().last().prev().html(previousSelectedTransaction.debetAccount !== undefined ? 
+                        '<span class="label ' + calculateClassNameForCategory(previousSelectedTransaction.debetAccount) + '">' 
+                        + previousSelectedTransaction.debetAccount.name + '</span>': '');                        
                 }
             }
             currentTarget.addClass('active');
@@ -388,23 +392,27 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             updateAccount(item, 'creditAccount');
         };
         
+        $scope.calculateClassName = calculateClassNameForCategory;
+        
         var updateAccount = function(item, categoryType){
             if ( selectedTransaction !== undefined && selectedTransaction !== null ) {
                 if ( selectedTransaction[categoryType] === undefined || selectedTransaction[categoryType] === null) {
                     selectedTransaction[categoryType] = {};
                 }
-                if ( item === null || item === undefined ) {
+                if ( item === null || item === undefined || categoryNameToItem === undefined) {
                     selectedTransaction[categoryType] = item;
                 } else {
-                    selectedTransaction[categoryType].name = item;
+                    selectedTransaction[categoryType] = categoryNameToItem[item];
                 }
                 var updatedRow = selectedRow;
                 transactionRepository.save(selectedTransaction, 
-                    function() { $(updatedRow).on(TRANSITION_END, function() { $(updatedRow).delay(1500).removeClass('saved')} ).addClass('saved'); }, 
+                    function() { 
+                        $(updatedRow).on(TRANSITION_END, function() { $(updatedRow).delay(1500).removeClass('saved')} ).addClass('saved'); 
+                    }, 
                     function() { $window.alert('Error');});
             }            
         };
-
+        
     };
     
     result.RulesCtrl = function($scope, $timeout, $cookies, $locale, categoryRepository, ruleRepository, $window) {
@@ -518,19 +526,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
 //            $('.ruleOperator INPUT').focus();
         };
         
-        $scope.calculateClassName = function(category) {
-            var className = "";
-            if ( category.type === domain.CategoryType.ASSET ) {
-                className = 'label-info';
-            } else if ( category.type === domain.CategoryType.LIABILITY ) {
-                className = 'label-warning';
-            } else if ( category.type === domain.CategoryType.EXPENSE ) {
-                className = 'label-important';                
-            } else if ( category.type === domain.CategoryType.INCOME ) {
-                className = 'label-success';                                
-            }
-            return className;            
-        };
+        $scope.calculateClassName = calculateClassNameForCategory;
     };
     
     result.SettingsCtrl = function($scope, $window, transactionRepository) {
@@ -553,6 +549,20 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
     var translate = function(key, $cookies, $locale) {
         var selectedLanguage = $cookies.languagePreference !== undefined ? $cookies.languagePreference : $locale.id.substring(0,2);
         return translations[selectedLanguage][key];
+    };
+    
+    var calculateClassNameForCategory = function(category) {
+        var className = "";
+        if ( category.type === domain.CategoryType.ASSET ) {
+            className = 'label-info';
+        } else if ( category.type === domain.CategoryType.LIABILITY ) {
+            className = 'label-warning';
+        } else if ( category.type === domain.CategoryType.EXPENSE ) {
+            className = 'label-important';                
+        } else if ( category.type === domain.CategoryType.INCOME ) {
+            className = 'label-success';                                
+        }
+        return className;            
     };
     
     return result;
