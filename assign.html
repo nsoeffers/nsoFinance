@@ -14,8 +14,16 @@
         <a href="#/import" data-i18n-key="goto_import"></a>
     </blockquote>
     <div id="hiddenEditableFields" style="display: none; ">
-        <input id="debetCategoryChooser" type="text" data-provide="typeahead" />
-        <input id="creditCategoryChooser" type="text" data-provide="typeahead" />
+        <span>
+            <input id="debetCategoryChooser" type="text" data-provide="typeahead" />
+            <i class="searchCategoryIcon icon-search"></i>
+            <i class="addCategoryIcon icon-plus"></i>
+        </span>
+        <span>
+            <input id="creditCategoryChooser" type="text" data-provide="typeahead" />
+            <i class="searchCategoryIcon icon-search"></i>
+            <i class="addCategoryIcon icon-plus"></i>            
+        </span>
     </div>    
     <div class="row-fluid table-fluid" id="assignmentTable" ng-show="transactions.length != 0">
         <div class="span12">
@@ -31,8 +39,8 @@
                 <div class="span2">{{transaction.date | date:'yyyy-MM-dd'}}</div>
                 <div class="span1">{{transaction.amount | number:2}}</div>
                 <div class="span5">{{transaction.description}}</div>
-                <div class="span2"><span class="label {{calculateClassName(transaction.debetAccount)}}" ng-show="transaction.debetAccount">{{transaction.debetAccount.name}}</span></div>
-                <div class="span2"><span class="label {{calculateClassName(transaction.creditAccount)}}" ng-show="transaction.creditAccount">{{transaction.creditAccount.name}}</span></div>
+                <div class="span2" style="position: relative;"><span class="label {{calculateClassName(transaction.debetAccount)}}" ng-show="transaction.debetAccount">{{transaction.debetAccount.name}}</span></div>
+                <div class="span2" style="position: relative;"><span class="label {{calculateClassName(transaction.creditAccount)}}" ng-show="transaction.creditAccount">{{transaction.creditAccount.name}}</span></div>
             </div>
         </div>
     </div>

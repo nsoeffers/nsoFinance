@@ -299,7 +299,17 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                 $scope.$apply();
             });
             debetCategoryChooser = $('#debetCategoryChooser');
-            debetCategoryChooser.typeahead({updater: $scope.updateDebet, source: categoryNames });
+            var typeaheadCallback = function(query, callback){ 
+                var regexp = new RegExp(query.toLowerCase());
+                var results = categoryNames.filter(function(item) { return item.toLowerCase().match(regexp) != null; });
+                if ( results.length == 0 ) {
+                    $(this.$element).parent().addClass('noMatch');
+                } else {
+                    $(this.$element).parent().removeClass('noMatch');
+                }
+                callback(results);
+            };
+            debetCategoryChooser.typeahead({updater: $scope.updateDebet, source: typeaheadCallback });
             debetCategoryChooser.focus(function() { $timeout(function() { debetCategoryChooser.select(); }, 0, false); } );
             debetCategoryChooser.blur(function() { 
                 if ( debetCategoryChooser.val() === "" && selectedTransaction.debetAccount !== null ) { 
@@ -307,7 +317,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                 }
             });
             creditCategoryChooser = $('#creditCategoryChooser');
-            creditCategoryChooser.typeahead({updater: $scope.updateCredit, source: categoryNames });
+            creditCategoryChooser.typeahead({updater: $scope.updateCredit, source: typeaheadCallback });
             creditCategoryChooser.focus(function() { $timeout(function() { creditCategoryChooser.select(); }, 0, false); } );
             creditCategoryChooser.blur(function() { 
                 if ( creditCategoryChooser.val() === "" && selectedTransaction.creditAccount !== null ) { 
@@ -365,8 +375,8 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             debetCategoryChooser.val(debetColumn.text());
             creditColumn.text("");
             debetColumn.text("");
-            creditCategoryChooser.detach().appendTo(creditColumn).show();
-            debetCategoryChooser.detach().appendTo(debetColumn).show();
+            creditCategoryChooser.parent().detach().appendTo(creditColumn).show();
+            debetCategoryChooser.parent().detach().appendTo(debetColumn).show();
             if ( selectedRow !== undefined && selectedRow !== null ) {                
                 selectedRow.removeClass('active');
                 if ( previousSelectedTransaction !== undefined && previousSelectedTransaction !== null ) {
@@ -552,6 +562,9 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
     };
     
     var calculateClassNameForCategory = function(category) {
+        if ( category === null || category === undefined ) {
+            return "";
+        }
         var className = "";
         if ( category.type === domain.CategoryType.ASSET ) {
             className = 'label-info';

@@ -191,6 +191,30 @@ div[ng-view].aboutToNavigate{
     height: 100px;
 }
 
+.searchCategoryIcon, .addCategoryIcon { 
+    position: absolute;
+    top: 50%;
+    margin-top: -12px;
+    opacity: 0;
+    -webkit-transition: opacity 0.5s ease-in-out;
+}
+
+.noMatch .searchCategoryIcon, .noMatch .addCategoryIcon { 
+    opacity: 1;
+}
+
+.noMatch #creditCategoryChooser, .noMatch #debetCategoryChooser {
+    padding-right: 40px;
+}
+
+.searchCategoryIcon { 
+    right: 12px;
+}
+
+.addCategoryIcon {
+    right: 30px;
+}
+
 /*.sortable li > span:first { 
     position: absolute; 
     margin-left: -1.3em; 
