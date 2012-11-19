@@ -57,7 +57,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         };
         
         $scope.select = function(category) {
-            $rootScope.$broadcast(CATEGORY_SELECTED_EVENT, category);
+            $scope.$emit(CATEGORY_SELECTED_EVENT, category);
         };
         
         $scope.add = function() {  
@@ -79,7 +79,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
     
     result.CategoryDetailCtrl = function ($scope, $rootScope, $window, $timeout, $cookies, $locale, categoryRepository) {              
         
-        $scope.$on(CATEGORY_SELECTED_EVENT, function(event, category) {
+        $scope.$parent.$parent.$on(CATEGORY_SELECTED_EVENT, function(event, category) {
             if ( category !== null ) {
                 $('#infoMessageForm').alert('close');
             }
@@ -281,6 +281,8 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
     result.AssignCtrl = function($scope, $window, $timeout, $location, transactionRepository, categoryRepository) {
         
         $scope.transactions = null;
+        $scope.forbidCategoryAddition = true;
+        $scope.forbidCategoryRemoval = true;
         
         var selectedTransaction;        
         var creditCategoryChooser;
@@ -288,6 +290,24 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         var selectedRow;
         var spinner;
         var categoryNameToItem = {};
+        var creditSideSelected = null;
+        
+        $scope.$on(CATEGORY_SELECTED_EVENT, function(event, category) {
+            if ( creditSideSelected ){
+                $scope.updateCredit(category.name);
+            } else {
+                $scope.updateDebet(category.name);
+            }
+            $('#categoryBrowser').modal('hide');
+        });
+
+        $scope.setCreditSideSelected = function() {
+            creditSideSelected = true;
+        };
+        
+        $scope.setDebetSideSelected = function() {
+            creditSideSelected = false;
+        };
         
         $scope.init = function() {
             var categoryNames = [];

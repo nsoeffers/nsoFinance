@@ -18,7 +18,7 @@
                 <tr>
                     <th data-i18n-key="account">                        
                     </th>
-                    <th><i class="icon-plus" ng-click="add()"></i></th>
+                    <th><i class="icon-plus" ng-click="add()" ng-show="!forbidCategoryAddition"></i></th>
                 </tr>
             </thead>
             <tbody>
@@ -30,7 +30,7 @@
                 </tr>                
                 <tr ng-repeat="category in categories | orderBy:'name' | lowercase" ng-click="select(category)">
                     <td>{{category.name}}</td>
-                    <td><i class="icon-remove" ng-click="remove(category)"></i></td>
+                    <td><i class="icon-remove" ng-click="remove(category)" ng-show="!forbidCategoryRemoval"></i></td>
                 </tr>
             </tbody>
         </table>
