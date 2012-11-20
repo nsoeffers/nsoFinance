@@ -1,13 +1,23 @@
 <div ng-controller="CategoryDetailCtrl">
     <!-- Right side -->
     <form name="categoryForm" class="css-form" ng-submit="save()">
-        <legend data-i18n-key="account_detail"></legend>
-        <div class="alert alert-info fade in" id="infoMessageForm">
+        <legend data-i18n-key="category_detail" ng-show="!hideCategoryDetailTitle"></legend>
+        <div class="alert alert-info fade in" id="infoMessageForm" ng-show="!hideCategoryDetailTitle">
             <i class="icon-info-sign"></i>
-            <strong data-i18n-key="choose_account_or_create_new"></strong>
+            <strong data-i18n-key="choose_category_or_create_new"></strong>
+        </div>
+        <div class="control-group" ng-show="showCategoryTypeInDetailForm">
+            <div class="controls" >
+                <select ng-model="category.type">
+                    <option value="ASSET" selected data-i18n-key="assets"></option>
+                    <option value="LIABILITY" data-i18n-key="liabilities"></option>
+                    <option value="INCOME"  data-i18n-key="incomes"></option>
+                    <option value="EXPENSE" data-i18n-key="expenses"></option>
+                </select>
+            </div>
         </div>
         <div class="control-group">
-            <label class="control-label" for="inputCategoryName" data-i18n-key="account_name"></label>
+            <label class="control-label" for="inputCategoryName" data-i18n-key="category_name"></label>
             <div class="controls">
                 <div class="input-append">
                     <input type="text" id="inputCategoryName" name="inputCategoryName" ng-model="category.name" required="true" ng-disabled="category == null">

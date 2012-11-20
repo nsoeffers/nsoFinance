@@ -2,6 +2,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
     function($, angular, angularCookies, dao, domain, translations, jqueryCsv, Modernizr, moment, Spinner) {
     
     var CATEGORY_SELECTED_EVENT = 'categorySelected';
+    var CATEGORY_SAVED_EVENT = 'categorySaved';
     var NOTIFICATION_EVENT = 'notification';
     var TRANSITION_END = 'webkitTransitionEnd transitionend msTransitionEnd oTransitionEnd';
     var result = {};
@@ -48,7 +49,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         
         $scope.refresh = function() {
             $scope.loading = true;
-            $rootScope.$broadcast(CATEGORY_SELECTED_EVENT, null);
+            $scope.$emit(CATEGORY_SELECTED_EVENT, null);
             categoryRepository.findCategoriesByType($scope.selectedCategoryType, function(results){                
                 $scope.categories = results;
                 $scope.loading = false;
@@ -62,7 +63,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         
         $scope.add = function() {  
             var newCategory = new domain.Category($scope.selectedCategoryType, '');
-            $rootScope.$broadcast(CATEGORY_SELECTED_EVENT, newCategory);
+            $scope.$emit(CATEGORY_SELECTED_EVENT, newCategory);
             $scope.categories.push(newCategory);
         };
         
@@ -93,6 +94,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             $scope.alreadySubmitted = true;
             categoryRepository.save($scope.category, function(){
                 $scope.showSuccessMessage = true;
+                $scope.$emit(CATEGORY_SAVED_EVENT, $scope.category);                
                 $scope.$apply();
                 $timeout(function() {
                     $scope.showSuccessMessage = false;
@@ -101,7 +103,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             }, function(event) {
                 if ( event.target !== undefined && event.target !== null && event.target.errorCode === 5){
                     var selectedLanguage = $cookies.languagePreference !== undefined ? $cookies.languagePreference : $locale.id.substring(0,2);
-                    $scope.errorMessage = translations[selectedLanguage].duplicateAccountName;
+                    $scope.errorMessage = translations[selectedLanguage].duplicateCategoryName;
                 } else if ( event.target !== undefined && event.target !== null && event.target.webkitErrorMessage !== undefined) {
                     $scope.errorMessage = event.target.webkitErrorMessage;
                 }
@@ -283,6 +285,8 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         $scope.transactions = null;
         $scope.forbidCategoryAddition = true;
         $scope.forbidCategoryRemoval = true;
+        $scope.hideCategoryDetailTitle = true;
+        $scope.showCategoryTypeInDetailForm = true;
         
         var selectedTransaction;        
         var creditCategoryChooser;
@@ -292,14 +296,24 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         var categoryNameToItem = {};
         var creditSideSelected = null;
         
-        $scope.$on(CATEGORY_SELECTED_EVENT, function(event, category) {
+        var onPopupClosed = function(event, category) {
+            if ( category === null || category === undefined ) {
+                return;
+            }
+            if ( categoryNameToItem[category.name] === null || categoryNameToItem[category.name] === undefined ) {
+                categoryNameToItem[category.name] = category;
+            }
             if ( creditSideSelected ){
                 $scope.updateCredit(category.name);
             } else {
                 $scope.updateDebet(category.name);
             }
             $('#categoryBrowser').modal('hide');
-        });
+            $('#categoryCreator').modal('hide');
+        };
+        
+        $scope.$on(CATEGORY_SELECTED_EVENT, onPopupClosed);
+        $scope.$on(CATEGORY_SAVED_EVENT, onPopupClosed);
 
         $scope.setCreditSideSelected = function() {
             creditSideSelected = true;
@@ -307,6 +321,18 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         
         $scope.setDebetSideSelected = function() {
             creditSideSelected = false;
+        };
+        
+        $scope.addCreditCategory = function() {
+            $scope.setCreditSideSelected();
+            var newCategory = new domain.Category(domain.CategoryType.ASSET, creditCategoryChooser.val());
+            $scope.$broadcast(CATEGORY_SELECTED_EVENT, newCategory);
+        };
+        
+        $scope.addDebetCategory = function() {
+            $scope.setDebetSideSelected();
+            var newCategory = new domain.Category(domain.CategoryType.EXPENSE, debetCategoryChooser.val());
+            $scope.$broadcast(CATEGORY_SELECTED_EVENT, newCategory);
         };
         
         $scope.init = function() {
@@ -393,6 +419,8 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             var debetColumn = currentTarget.children().last().prev();
             creditCategoryChooser.val(creditColumn.text());
             debetCategoryChooser.val(debetColumn.text());
+            creditCategoryChooser.parent().removeClass('noMatch');
+            debetCategoryChooser.parent().removeClass('noMatch');
             creditColumn.text("");
             debetColumn.text("");
             creditCategoryChooser.parent().detach().appendTo(creditColumn).show();
@@ -409,7 +437,14 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                 }
             }
             currentTarget.addClass('active');
-            selectedRow = currentTarget;            
+            selectedRow = currentTarget;        
+            $timeout(function() { 
+                if ( selectedTransaction.debetAccount === null || selectedTransaction.debetAccount === undefined ) {
+                    debetCategoryChooser.focus();
+                } else if ( selectedTransaction.creditAccount === null || selectedTransaction.creditAccount === undefined ) {
+                    creditCategoryChooser.focus();
+                }
+            }, 0);
         };
         
         $scope.updateDebet = function(item) {
