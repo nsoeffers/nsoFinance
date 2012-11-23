@@ -404,6 +404,17 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                 });
         };
         
+        $scope.toggleRuleForm = function() {
+            var ruleForm = $('#ruleForm');
+            if ( ruleForm.parents('#hiddenEditableFields').size() === 1){
+                ruleForm.detach().appendTo(selectedRow);    
+                $timeout(function() { selectedRow.addClass("expanded");}, 0, false);
+            } else {
+                selectedRow.removeClass("expanded");
+                $timeout(function() { ruleForm.detach().appendTo($('#hiddenEditableFields'));}, 500, false);
+            }
+        };
+        
         $scope.selectRow = function(e){            
             var currentTarget = $(e.currentTarget);            
             if ( currentTarget[0] === creditCategoryChooser.parents('.row-fluid')[0] ){
@@ -415,8 +426,8 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                 previousSelectedTransaction = selectedTransaction;
                 selectedTransaction = $scope.transactions[rowIndex];
             }
-            var creditColumn = currentTarget.children().last();
-            var debetColumn = currentTarget.children().last().prev();
+            var creditColumn = currentTarget.children().last().prev();
+            var debetColumn = currentTarget.children().last().prev().prev();
             creditCategoryChooser.val(creditColumn.text());
             debetCategoryChooser.val(debetColumn.text());
             creditCategoryChooser.parent().removeClass('noMatch');
@@ -427,11 +438,12 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             debetCategoryChooser.parent().detach().appendTo(debetColumn).show();
             if ( selectedRow !== undefined && selectedRow !== null ) {                
                 selectedRow.removeClass('active');
+                selectedRow.removeClass('expanded');
                 if ( previousSelectedTransaction !== undefined && previousSelectedTransaction !== null ) {
-                    selectedRow.children().last().html(previousSelectedTransaction.creditAccount !== undefined ? 
+                    selectedRow.children().last().prev().html(previousSelectedTransaction.creditAccount !== undefined ? 
                         '<span class="label ' + calculateClassNameForCategory(previousSelectedTransaction.creditAccount) + '">' 
                         + previousSelectedTransaction.creditAccount.name + '</span>': '');
-                    selectedRow.children().last().prev().html(previousSelectedTransaction.debetAccount !== undefined ? 
+                    selectedRow.children().last().prev().prev().html(previousSelectedTransaction.debetAccount !== undefined ? 
                         '<span class="label ' + calculateClassNameForCategory(previousSelectedTransaction.debetAccount) + '">' 
                         + previousSelectedTransaction.debetAccount.name + '</span>': '');                        
                 }
@@ -533,7 +545,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                 $scope.$apply();
                 $('.categoryLabels.labelsArea .label').draggable({scope: 'Category', revert: true, containment: 'window',
                                         drag: function() {}, opacity: 0.5, cursor: "not-allowed", zIndex: 10 });                                    
-                $('#newRule .ruleCategory').droppable({scope: 'Category', hoverClass: 'dropOperatorHover', 
+                $('#newRule .ruleCategory').droppable({scope: 'Category', hoverClass: 'dropCategoryHover', 
                                         drop: onLabelDropped});                                     
             });
         };
@@ -570,14 +582,14 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         };
         
         var onFieldSelected = function(item){
-            $('.fieldLabels .label:contains("' + item + '")').detach().appendTo($('.ruleField'));
+            $('.ruleField').append('<span class="label label-important">' + item + '</span');
             $scope.$apply();  
             $scope.rule.field = labelsToField[item];
             $('.ruleOperator INPUT').focus();
         };
         
         var onOperatorSelected = function(item){            
-            $('.operatorLabels .label:contains("' + item + '")').detach().appendTo($('.ruleOperator'));
+            $('.ruleOperator').append('<span class="label label-inverse">' + item + '<span>');
             $scope.rule.operator = labelsToOperator[item];
             $scope.$apply();
             $('.ruleValue').focus();
@@ -586,7 +598,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         var onCategorySelected = function(item){
             var selectedCategory = labelsToCategory[item];
             $scope.rule.category = selectedCategory;
-            $('.ruleCategory .label').addClass($scope.calculateClassName(selectedCategory)).css('display', 'block').text(item);
+            $('.ruleCategory').append('<span class="label ' + $scope.calculateClassName(selectedCategory) + '">' + item + '</span>');
             $scope.$apply();  
 //            $('.ruleOperator INPUT').focus();
         };

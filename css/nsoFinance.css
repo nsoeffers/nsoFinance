@@ -83,9 +83,11 @@ INPUT:focus.ng-invalid-bank-account-number {
     zoom: 1.1;
 }
 
-.table-fluid .row-fluid [class*="span"] input {
+.table-fluid .row-fluid.active INPUT {
     width: 100%;
     box-sizing: border-box;
+    height: 2em;
+    /*margin-top: -2px;*/
 }
 
 #assignmentTable .tableHeader.row-fluid [class*="span"] {
@@ -111,6 +113,12 @@ INPUT:focus.ng-invalid-bank-account-number {
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
 }
 
+#assignmentTable .row-fluid [class*="span"].ruleField,
+#assignmentTable .row-fluid [class*="span"].ruleOperator,
+#assignmentTable .row-fluid [class*="span"].ruleCategory {
+    padding: 0;
+}
+
 .ruleField .label, .ruleOperator .label, .ruleCategory .label { 
     position: absolute !important;
     width: 100%;
@@ -124,7 +132,7 @@ INPUT:focus.ng-invalid-bank-account-number {
     zIndex: 10;
 }
 
-.dropFieldHover.ruleField, .dropOperatorHover.ruleOperator {
+.dropFieldHover.ruleField, .dropOperatorHover.ruleOperator, .dropCategoryHover.ruleCategory {
     border: 2px dashed #468847;
 }
 
@@ -133,6 +141,7 @@ INPUT:focus.ng-invalid-bank-account-number {
     height: 100%;
     box-sizing: border-box;
     border: none;
+    margin-bottom: 0;
 }
 
 .sortable { 
@@ -194,7 +203,7 @@ div[ng-view].aboutToNavigate{
 .searchCategoryIcon, .addCategoryIcon { 
     position: absolute;
     top: 50%;
-    margin-top: -1em;
+    margin-top: -17px;
     opacity: 0;
     -webkit-transition: opacity 0.5s ease-in-out;
 }
@@ -218,6 +227,50 @@ div[ng-view].aboutToNavigate{
 #categoryBrowser .modal-body {
     min-height: 250px;
 }
+
+.row-fluid .actionButton { 
+    opacity: 0;
+    -webkit-transition: opacity 0.4s;
+}
+
+.row-fluid.active .actionButton { 
+    opacity: 1;
+}
+
+#assignmentTable .row-fluid {
+    max-height: 40px;
+    -webkit-transition: height 0.4s ease 0.2s;
+}
+
+#assignmentTable .row-fluid.active.expanded {
+    max-height: 300px;
+    -webkit-transition: max-height 0.4s ease 0s;
+}
+
+#assignmentTable .row-fluid.active.expanded #ruleForm {
+    opacity: 1;    
+    -webkit-transition: opacity 0.3s ease-in-out 0.3s;
+    padding: 4px;
+}
+
+#ruleForm .ruleCategory, 
+#ruleForm .ruleOperator, 
+#ruleForm .ruleField {
+    margin-top: 8px;
+}
+
+#ruleForm {
+    opacity: 0;
+    -webkit-transition: opacity 0.3s ease-in-out 0s;
+    background: white;
+    color: #333;
+    border-radius: 8px;
+    margin-bottom: 3px;
+    margin-top: -2px;
+    margin-left: 2%;
+    width: 96%;    
+}
+
 
 /*.sortable li > span:first { 
     position: absolute; 
