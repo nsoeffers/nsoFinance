@@ -3,6 +3,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
     
     var CATEGORY_SELECTED_EVENT = 'categorySelected';
     var CATEGORY_SAVED_EVENT = 'categorySaved';
+    var FIELD_SELECTED_EVENT = 'fieldSelected';
     var NOTIFICATION_EVENT = 'notification';
     var TRANSITION_END = 'webkitTransitionEnd transitionend msTransitionEnd oTransitionEnd';
     var result = {};
@@ -294,7 +295,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         var selectedRow;
         var spinner;
         var categoryNameToItem = {};
-        var creditSideSelected = null;
+        var creditSideSelected = null;                
         
         var onPopupClosed = function(event, category) {
             if ( category === null || category === undefined ) {
@@ -314,6 +315,12 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         
         $scope.$on(CATEGORY_SELECTED_EVENT, onPopupClosed);
         $scope.$on(CATEGORY_SAVED_EVENT, onPopupClosed);
+        $scope.$on(FIELD_SELECTED_EVENT, function(event, selectedField) {
+            if ( selectedTransaction !== undefined && selectedTransaction !== null 
+                    || selectedField !== undefined && selectedField !== null ) {  
+                $('INPUT.ruleValue').val(selectedTransaction[selectedField.fieldName]);
+            }
+        });
 
         $scope.setCreditSideSelected = function() {
             creditSideSelected = true;
@@ -344,7 +351,6 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                 }
                 $scope.$apply();
             });
-            debetCategoryChooser = $('#debetCategoryChooser');
             var typeaheadCallback = function(query, callback){ 
                 var regexp = new RegExp(query.toLowerCase());
                 var results = categoryNames.filter(function(item) { return item.toLowerCase().match(regexp) != null; });
@@ -355,13 +361,14 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                 }
                 callback(results);
             };
+            /*debetCategoryChooser = $('#debetCategoryChooser');
             debetCategoryChooser.typeahead({updater: $scope.updateDebet, source: typeaheadCallback });
             debetCategoryChooser.focus(function() { $timeout(function() { debetCategoryChooser.select(); }, 0, false); } );
             debetCategoryChooser.blur(function() { 
                 if ( debetCategoryChooser.val() === "" && selectedTransaction.debetAccount !== null ) { 
                     $scope.updateDebet(undefined); 
                 }
-            });
+            });*/
             creditCategoryChooser = $('#creditCategoryChooser');
             creditCategoryChooser.typeahead({updater: $scope.updateCredit, source: typeaheadCallback });
             creditCategoryChooser.focus(function() { $timeout(function() { creditCategoryChooser.select(); }, 0, false); } );
@@ -420,6 +427,11 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             if ( currentTarget[0] === creditCategoryChooser.parents('.row-fluid')[0] ){
                 return;
             }
+            if ( $('#hiddenEditableFields #ruleForm').size() === 0 ) {
+                $('#ruleForm').detach().appendTo($('#hiddenEditableFields'));
+                $('#ruleForm INPUT').val('').html(null);
+                $('#ruleForm .ruleField .label, #ruleForm .ruleOperator .label, #ruleForm .ruleCategory .label').detach();
+            }
             var previousSelectedTransaction;
             var rowIndex = parseInt(currentTarget.data('rowIndex'), 10);
             if ( rowIndex >= 0 && rowIndex < $scope.transactions.length) {
@@ -427,15 +439,15 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                 selectedTransaction = $scope.transactions[rowIndex];
             }
             var creditColumn = currentTarget.children().last().prev();
-            var debetColumn = currentTarget.children().last().prev().prev();
+            //var debetColumn = currentTarget.children().last().prev().prev();
             creditCategoryChooser.val(creditColumn.text());
-            debetCategoryChooser.val(debetColumn.text());
+            //debetCategoryChooser.val(debetColumn.text());
             creditCategoryChooser.parent().removeClass('noMatch');
-            debetCategoryChooser.parent().removeClass('noMatch');
+            //debetCategoryChooser.parent().removeClass('noMatch');
             creditColumn.text("");
-            debetColumn.text("");
+            //debetColumn.text("");
             creditCategoryChooser.parent().detach().appendTo(creditColumn).show();
-            debetCategoryChooser.parent().detach().appendTo(debetColumn).show();
+            //debetCategoryChooser.parent().detach().appendTo(debetColumn).show();
             if ( selectedRow !== undefined && selectedRow !== null ) {                
                 selectedRow.removeClass('active');
                 selectedRow.removeClass('expanded');
@@ -443,17 +455,17 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                     selectedRow.children().last().prev().html(previousSelectedTransaction.creditAccount !== undefined ? 
                         '<span class="label ' + calculateClassNameForCategory(previousSelectedTransaction.creditAccount) + '">' 
                         + previousSelectedTransaction.creditAccount.name + '</span>': '');
-                    selectedRow.children().last().prev().prev().html(previousSelectedTransaction.debetAccount !== undefined ? 
+                    /*selectedRow.children().last().prev().prev().html(previousSelectedTransaction.debetAccount !== undefined ? 
                         '<span class="label ' + calculateClassNameForCategory(previousSelectedTransaction.debetAccount) + '">' 
-                        + previousSelectedTransaction.debetAccount.name + '</span>': '');                        
+                        + previousSelectedTransaction.debetAccount.name + '</span>': '');*/
                 }
             }
             currentTarget.addClass('active');
             selectedRow = currentTarget;        
             $timeout(function() { 
-                if ( selectedTransaction.debetAccount === null || selectedTransaction.debetAccount === undefined ) {
+                /*if ( selectedTransaction.debetAccount === null || selectedTransaction.debetAccount === undefined ) {
                     debetCategoryChooser.focus();
-                } else if ( selectedTransaction.creditAccount === null || selectedTransaction.creditAccount === undefined ) {
+                } else*/ if ( selectedTransaction.creditAccount === null || selectedTransaction.creditAccount === undefined ) {
                     creditCategoryChooser.focus();
                 }
             }, 0);
@@ -586,6 +598,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             $scope.$apply();  
             $scope.rule.field = labelsToField[item];
             $('.ruleOperator INPUT').focus();
+            $scope.$emit(FIELD_SELECTED_EVENT, $scope.rule.field);
         };
         
         var onOperatorSelected = function(item){            

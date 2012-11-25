@@ -87,7 +87,7 @@ INPUT:focus.ng-invalid-bank-account-number {
     width: 100%;
     box-sizing: border-box;
     height: 2em;
-    /*margin-top: -2px;*/
+    margin-bottom: 0;
 }
 
 #assignmentTable .tableHeader.row-fluid [class*="span"] {
@@ -203,7 +203,7 @@ div[ng-view].aboutToNavigate{
 .searchCategoryIcon, .addCategoryIcon { 
     position: absolute;
     top: 50%;
-    margin-top: -17px;
+    margin-top: -10px;
     opacity: 0;
     -webkit-transition: opacity 0.5s ease-in-out;
 }
