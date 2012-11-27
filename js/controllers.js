@@ -504,7 +504,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         
     };
     
-    result.RulesCtrl = function($scope, $timeout, $cookies, $locale, categoryRepository, ruleRepository, $window) {
+    result.RulesCtrl = function($scope, $timeout, $cookies, $locale, categoryRepository, ruleRepository, transactionRepository, $window) {
         
         $scope.fields = domain.TransactionField.values.slice(0);
         $scope.operators = domain.RuleOperator.values.slice(0);
@@ -563,10 +563,29 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         };
 
         $scope.saveRule = function() {
+            var process = $scope.rule.process;
+            var compare = $scope.rule.operator.compare;
+            delete $scope.rule.process;
+            delete $scope.rule.operator.compare;
             ruleRepository.save($scope.rule, function() {
+                    $scope.rule.process = process;
+                    $scope.rule.operator.compare = compare;
+                    $scope.ruleToProcess = $scope.rule;
+                    $scope.rules.push($scope.rule);
                     $scope.rule = new domain.Rule();
                     $scope.$apply();
-                }, function() { });
+                }, function() { });        
+            $timeout(processUnmappedTransactions, 0, false);
+        };
+        
+        var processUnmappedTransactions = function() {
+            transactionRepository.findUntaggedTransactions(new Date(0), new Date(2999, 0, 1), function(data){
+                for(var i = data.length - 1; i >= 0; i--){
+                    if ( $scope.ruleToProcess.process(data[i]) === true ) {
+                        transactionRepository.save(data[i]);
+                    }
+                }
+            });
         };
         
         var refreshDragAndDropTargets = function() {

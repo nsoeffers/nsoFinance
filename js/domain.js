@@ -85,11 +85,11 @@ define('domain', ['moment'], function(moment){
     Object.defineProperty( domain, "Transaction", {  value: Transaction,  writable: false, enumerable: true, configurable: false});    
     
     /* General utils */
-    var createTranslatableEnumValue = function(enumValue, i18nKey, values){
+    var createTranslatableEnumValue = function(enumValue, i18nKey, enumClass, values){
         var newEnumValue = {};
         Object.defineProperty( newEnumValue, "i18nKey", {  value: i18nKey,  writable: false, enumerable: true, configurable: false});
         Object.defineProperty( newEnumValue, "value", {  value: enumValue,  writable: false, enumerable: true, configurable: false});
-        Object.defineProperty( TransactionField, enumValue, {  value: newEnumValue,  writable: false, enumerable: true, configurable: false});
+        Object.defineProperty( enumClass , enumValue, {  value: newEnumValue,  writable: false, enumerable: true, configurable: false});
         values.push(newEnumValue);
         return newEnumValue;
     };
@@ -97,9 +97,26 @@ define('domain', ['moment'], function(moment){
     /* Rules */
     var RuleOperator = {};    
     var ruleOperatorValues = [];
+    
+    var createRuleOperatorEnumValue = function(enumValue, i18nKey, values, compareToFunction) {
+        var self = createTranslatableEnumValue(enumValue, i18nKey, RuleOperator, values);
+        self.compare = compareToFunction;
+        return self;
+    };
 
-    createTranslatableEnumValue('EQUALS', 'operatorEquals', ruleOperatorValues);        
-    createTranslatableEnumValue('LIKE', 'operatorLike', ruleOperatorValues);
+    createRuleOperatorEnumValue('EQUALS', 'operatorEquals', ruleOperatorValues, function(fieldValue, ruleValue) { 
+        var safeFieldValue = fieldValue === null || fieldValue === undefined ? fieldValue : fieldValue.toLowerCase();
+        var safeRuleValue = ruleValue === null || ruleValue === undefined ? ruleValue : ruleValue.toLowerCase();
+        return safeFieldValue === safeRuleValue;
+    });        
+    createRuleOperatorEnumValue('LIKE', 'operatorLike', ruleOperatorValues, function(fieldValue, ruleValue) { 
+        if ( fieldValue === null || fieldValue === undefined ) {
+            return false;
+        } 
+        var safeFieldValue = fieldValue === null || fieldValue === undefined ? fieldValue : fieldValue.toLowerCase();
+        var safeRuleValue = ruleValue === null || ruleValue === undefined ? ruleValue : ruleValue.toLowerCase();
+        return safeFieldValue.indexOf(safeRuleValue) != -1; 
+    });
     Object.defineProperty( RuleOperator, "values", {  value: ruleOperatorValues,  writable: false, enumerable: true, configurable: false});
     Object.defineProperty( domain, "RuleOperator", {  value: RuleOperator,  writable: false, enumerable: true, configurable: false});    
     
@@ -108,6 +125,19 @@ define('domain', ['moment'], function(moment){
       this.operator = null;
       this.value = null;
       this.category = null;
+    };
+    
+    Rule.prototype.process = function(transaction) {
+        if ( transaction === null || transaction === undefined || this.field === null 
+                || this.operator === null || this.value === null){
+            return false;
+        }
+        var fieldValue = transaction[this.field.fieldName];
+        var ruleAppliesOnTransaction = this.operator.compare(fieldValue, this.value);
+        if ( ruleAppliesOnTransaction === true ){
+            transaction.creditAccount = this.category;
+        }
+        return ruleAppliesOnTransaction;
     };
     
     Object.defineProperty( domain, "Rule", {  value: Rule,  writable: false, enumerable: true, configurable: false});    

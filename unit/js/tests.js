@@ -1,6 +1,6 @@
 define('tests', ['domain'], function(domain) {         
     "use strict";
-
+    
     test( "When Category is initialized then caseInsensitiveName is also set", function() {
         equal( "TESTNAME", new domain.Category('ASSETS', 'TestName').caseInsensitiveName);
     });
@@ -106,5 +106,94 @@ define('tests', ['domain'], function(domain) {
             equal( "Rule", ex['arguments'][0]);
         }
     });
+    
+    test( "When Rule processes a null transaction then false is returned ", function() {
+        var rule = new domain.Rule();
+        rule.field = domain.TransactionField.DESCRIPTION;
+        rule.operator = domain.RuleOperator.EQUALS;
+        rule.value = 'test';
+        equal(false, rule.process(null));
+    });
+    
+    test( "When Rule processes a transaction which applies then return true and category is set on transaction", function() {
+        var rule = new domain.Rule();
+        rule.field = domain.TransactionField.DESCRIPTION;
+        rule.operator = domain.RuleOperator.EQUALS;
+        rule.value = 'test';
+        rule.category = new domain.Category();
+        rule.category.name = 'Fees';
+        
+        var transaction = new domain.Transaction();
+        transaction.description = 'test';
+        equal(true, rule.process(transaction));
+        equal(rule.category, transaction.creditAccount);
+    });    
 
+    test( "When Rule processes a transaction which does not apply then return false and no category is set on transaction", function() {
+        var rule = new domain.Rule();
+        rule.field = domain.TransactionField.DESCRIPTION;
+        rule.operator = domain.RuleOperator.EQUALS;
+        rule.value = 'test';
+        rule.category = new domain.Category();
+        rule.category.name = 'Fees';
+        
+        var transaction = new domain.Transaction();
+        transaction.description = 'blabla';
+        equal(false, rule.process(transaction));
+        strictEqual(undefined, transaction.creditAccount);
+    });    
+    
+    test( "When EQUALS ruleOperator is passed two null values then return true", function() {
+        equal(true, domain.RuleOperator.EQUALS.compare(null, null));
+    });
+    
+    test( "When EQUALS ruleOperator is passed one null value and one non-null value then return false", function() {
+        equal(false, domain.RuleOperator.EQUALS.compare(null, "value"));
+        equal(false, domain.RuleOperator.EQUALS.compare("value", null));
+    });
+    
+    test( "When EQUALS ruleOperator is passed two different values then return false", function() {
+        equal(false, domain.RuleOperator.EQUALS.compare("blabla", "testeke"));
+    });
+
+    test( "When EQUALS ruleOperator is passed equal values then return true", function() {
+        equal(true, domain.RuleOperator.EQUALS.compare("testeke", "testeke"));
+    });
+    
+    test( "When EQUALS ruleOperator is passed case insensitive equal values then return true", function() {
+        equal(true, domain.RuleOperator.EQUALS.compare("TestekE", "tesTeke"));
+    });
+
+    test( "When LIKE ruleOperator is passed null values", function() {
+        equal(false, domain.RuleOperator.LIKE.compare(null, null));
+    });
+
+    test( "When LIKE ruleOperator is passed one null value and one non-null values", function() {
+        equal(false, domain.RuleOperator.LIKE.compare(null, 'value'));
+    });
+
+    test( "When LIKE ruleOperator is passed one null value and one non-null values", function() {
+        equal(false, domain.RuleOperator.LIKE.compare('value', null));
+    });
+
+    test( "When LIKE ruleOperator is passed one value which contains the other value at the end", function() {
+        equal(true, domain.RuleOperator.LIKE.compare('valueTest', 'Test'));
+    });
+    
+    test( "When LIKE ruleOperator is passed one value which contains the other value in the beginning", function() {
+        equal(true, domain.RuleOperator.LIKE.compare('Testvalue', 'Test'));
+    });
+
+    test( "When LIKE ruleOperator is passed one value which contains the other value in the middle", function() {
+        equal(true, domain.RuleOperator.LIKE.compare('valueTestvalue', 'Test'));
+    });
+    
+    test( "When LIKE ruleOperator is passed two equal values", function() {
+        equal(true, domain.RuleOperator.LIKE.compare('Test', 'Test'));
+    });    
+
+    test( "When LIKE ruleOperator is passed one value which contains the other value case insensitive ", function() {
+        equal(true, domain.RuleOperator.LIKE.compare('valueTestvalue', 'TesT'));
+    });
+    
 });
