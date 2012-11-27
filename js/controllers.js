@@ -125,6 +125,8 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         $scope.delimiter = ';';
         $scope.escaper = '\\';
         $scope.dateFormat = 'dd/MM/yyyy';
+        $scope.thousandsSeparator = '.';
+        $scope.decimalSeparator = ',';
         $scope.selectedFile = null;
         $scope.csvData = null;
         $scope.unmappedFields = domain.TransactionField.values;
@@ -214,8 +216,11 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                             continue;
                         }
                         var row = data[rowIndex];
+                        var amount = row[fieldToColumnIndexMap[domain.TransactionField.AMOUNT.fieldName]];
+                        amount = amount.replace($scope.thousandsSeparator, '');
+                        amount = amount.replace($scope.decimalSeparator, '.');
                         var transaction = new domain.Transaction(Date.parseExact(row[fieldToColumnIndexMap[domain.TransactionField.DATE.fieldName]], $scope.dateFormat).getTime(), 
-                                                          parseFloat(row[fieldToColumnIndexMap[domain.TransactionField.AMOUNT.fieldName]]),
+                                                          parseFloat(amount),
                                                           row[fieldToColumnIndexMap[domain.TransactionField.DESCRIPTION.fieldName]]);
                         transactionRepository.save(transaction, successCallback, errorCallback);
                     }
