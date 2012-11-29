@@ -42,17 +42,17 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
         .factory('transactionRepository', dao.createTransactionRepository)
         .factory('ruleRepository', dao.createRuleRepository)
         .value('Translations', translations)
-        .directive('i18nKey', function(Translations,$locale, $cookies){ 
-            return function(scope, elm, attrs){
-                var language = $cookies.languagePreference !== undefined ? $cookies.languagePreference : $locale.id;
-                elm.text(Translations[language][attrs.i18nKey]);
-            }; 
-        })
         .filter('translate', function(Translations, $locale, $cookies) {
             return function(input) {
                 var language = $cookies.languagePreference !== undefined ? $cookies.languagePreference : $locale.id;
                 return Translations[language][input];
             };
+        })
+        .directive('i18nKey', function(Translations,$locale, $cookies){ 
+            return function(scope, elm, attrs){
+                var language = $cookies.languagePreference !== undefined ? $cookies.languagePreference : $locale.id;
+                elm.text(Translations[language][attrs.i18nKey]);
+            }; 
         })
         .directive('bankAccountNumber', function(){
             var BANK_ACCOUNT_NUMBER_REGEXP = /^(\d{3})-(\d{7})-(\d{2})$/;
@@ -70,6 +70,11 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
                     }
                   });
                 }
+            };
+        })
+        .directive('typeaheadSource', function() {
+            return function(scope, element, attrs){                
+                $(element).typeahead({source: scope[attrs.typeaheadSource], updater: scope[attrs.typeaheadUpdater]});
             };
         })
         .directive('previousView', function($window, $timeout) {

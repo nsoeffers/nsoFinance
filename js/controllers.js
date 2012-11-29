@@ -293,6 +293,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         $scope.forbidCategoryRemoval = true;
         $scope.hideCategoryDetailTitle = true;
         $scope.showCategoryTypeInDetailForm = true;
+        $scope.categoryNames = [];
         
         var selectedTransaction;        
         var creditCategoryChooser;
@@ -319,11 +320,15 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         };
         
         $scope.$on(CATEGORY_SELECTED_EVENT, onPopupClosed);
-        $scope.$on(CATEGORY_SAVED_EVENT, onPopupClosed);
+        $scope.$on(CATEGORY_SAVED_EVENT, function(event, category) { 
+            onPopupClosed(event, category);
+            //$scope.$broadcast(CATEGORY_SAVED_EVENT, category);
+        });
         $scope.$on(FIELD_SELECTED_EVENT, function(event, selectedField) {
             if ( selectedTransaction !== undefined && selectedTransaction !== null 
                     || selectedField !== undefined && selectedField !== null ) {  
-                $('INPUT.ruleValue').val(selectedTransaction[selectedField.fieldName]);
+                $('INPUT.ruleValue').val(selectedTransaction[selectedField.fieldName]).trigger('input');
+                $scope.$apply();
             }
         });
 
@@ -347,25 +352,25 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             $scope.$broadcast(CATEGORY_SELECTED_EVENT, newCategory);
         };
         
+        $scope.searchCategories = function(query, callback){ 
+            var regexp = new RegExp(query.toLowerCase());
+            var results = $scope.categoryNames.filter(function(item) { return item.toLowerCase().match(regexp) !== null; });
+            if ( results.length === 0 ) {
+                $(this.$element).parent().addClass('noMatch');
+            } else {
+                $(this.$element).parent().removeClass('noMatch');
+            }
+            callback(results);
+        };
+        
         $scope.init = function() {
-            var categoryNames = [];
             categoryRepository.findAll(function(categories) {
                 for( var index in categories ) {
-                    categoryNames.push(categories[index].name);
+                    $scope.categoryNames.push(categories[index].name);
                     categoryNameToItem[categories[index].name] = categories[index];
                 }
                 $scope.$apply();
             });
-            var typeaheadCallback = function(query, callback){ 
-                var regexp = new RegExp(query.toLowerCase());
-                var results = categoryNames.filter(function(item) { return item.toLowerCase().match(regexp) != null; });
-                if ( results.length == 0 ) {
-                    $(this.$element).parent().addClass('noMatch');
-                } else {
-                    $(this.$element).parent().removeClass('noMatch');
-                }
-                callback(results);
-            };
             /*debetCategoryChooser = $('#debetCategoryChooser');
             debetCategoryChooser.typeahead({updater: $scope.updateDebet, source: typeaheadCallback });
             debetCategoryChooser.focus(function() { $timeout(function() { debetCategoryChooser.select(); }, 0, false); } );
@@ -375,7 +380,6 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                 }
             });*/
             creditCategoryChooser = $('#creditCategoryChooser');
-            creditCategoryChooser.typeahead({updater: $scope.updateCredit, source: typeaheadCallback });
             creditCategoryChooser.focus(function() { $timeout(function() { creditCategoryChooser.select(); }, 0, false); } );
             creditCategoryChooser.blur(function() { 
                 if ( creditCategoryChooser.val() === "" && selectedTransaction.creditAccount !== null ) { 
@@ -516,6 +520,9 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         $scope.rule = new domain.Rule();
         $scope.rules;
         $scope.categories;
+        $scope.fieldNames = [];
+        $scope.operatorNames = [];
+        
         var labelsToField = {};
         var labelsToOperator = {};
         var labelsToCategory = {};
@@ -535,36 +542,25 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         $scope.init = function() {
             populateLabelToObjectMap(domain.TransactionField.values, labelsToField);
             populateLabelToObjectMap(domain.RuleOperator.values, labelsToOperator);
-            var fieldNames = $scope.fields.map(function(field) { return translate(field.i18nKey, $cookies, $locale); });
-            $('.ruleField INPUT').typeahead({ source: fieldNames, updater: onFieldSelected });
-            
-            var operatorNames = $scope.operators.map(function(operator) { return translate(operator.i18nKey, $cookies, $locale); });
-            $('.ruleOperator INPUT').typeahead({ source: operatorNames, updater: onOperatorSelected });
+            $scope.fieldNames = $scope.fields.map(function(field) { return translate(field.i18nKey, $cookies, $locale); });            
+            $scope.operatorNames = $scope.operators.map(function(operator) { return translate(operator.i18nKey, $cookies, $locale); });
+
             $timeout(refreshDragAndDropTargets, 0, false);
-            var lazySearchItemsInDao = function(query, callback){ 
-                var callbackWrapper = function(results){
-                    //populateLabelToObjectMap(results, labelsToCategory, 'name', false );
-                    callback(results.map(function(category){ return category.name; }));
-                };
-                categoryRepository.search(query, callbackWrapper, domain.Category.createFromDBO); 
-            };
-            $('.ruleCategory INPUT').typeahead({ source: lazySearchItemsInDao, updater: onCategorySelected });
             
             $('.sortable').sortable().disableSelection();
             ruleRepository.findAll(function(results) {
                     $scope.rules = results;
                     $scope.$apply();
-                });
-                
-            categoryRepository.findAll(function(results){
-                populateLabelToObjectMap(results, labelsToCategory, 'name', false );
-                $scope.categories = results;
-                $scope.$apply();
-                $('.categoryLabels.labelsArea .label').draggable({scope: 'Category', revert: true, containment: 'window',
-                                        drag: function() {}, opacity: 0.5, cursor: "not-allowed", zIndex: 10 });                                    
-                $('#newRule .ruleCategory').droppable({scope: 'Category', hoverClass: 'dropCategoryHover', 
-                                        drop: onLabelDropped});                                     
-            });
+                });  
+            refreshCategories();
+        };
+        
+        $scope.searchCategories = function(query, callback){ 
+            var callbackWrapper = function(results){
+                //populateLabelToObjectMap(results, labelsToCategory, 'name', false );
+                callback(results.map(function(category){ return category.name; }));
+            };
+            categoryRepository.search(query, callbackWrapper, domain.Category.createFromDBO); 
         };
 
         $scope.saveRule = function() {
@@ -583,11 +579,23 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             $timeout(processUnmappedTransactions, 0, false);
         };
         
+        var refreshCategories = function() {
+            categoryRepository.findAll(function(results){
+                populateLabelToObjectMap(results, labelsToCategory, 'name', false );
+                $scope.categories = results;
+                $scope.$apply();
+                $('.categoryLabels.labelsArea .label').draggable({scope: 'Category', revert: true, containment: 'window',
+                                        drag: function() {}, opacity: 0.5, cursor: "not-allowed", zIndex: 10 });                                    
+                $('#newRule .ruleCategory').droppable({scope: 'Category', hoverClass: 'dropCategoryHover', 
+                                        drop: onLabelDropped});                                     
+            });            
+        };
+        
         var processUnmappedTransactions = function() {
             transactionRepository.findUntaggedTransactions(new Date(0), new Date(2999, 0, 1), function(data){
                 for(var i = data.length - 1; i >= 0; i--){
                     if ( $scope.ruleToProcess.process(data[i]) === true ) {
-                        transactionRepository.save(data[i]);
+                        transactionRepository.save(data[i], function(entity) { $window.console.log('Saved transaction' + JSON.stringify(entity)) });
                     }
                 }
             });
@@ -607,17 +615,17 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         var onLabelDropped = function(event, ui) {
             var draggedElement = $(event.srcElement);
             if ( draggedElement.parents('.fieldLabels').size() !== 0) {
-                onFieldSelected(draggedElement.text().trim());
+                $scope.onFieldSelected(draggedElement.text().trim());
             } else if ( draggedElement.parents('.operatorLabels').size() !== 0) {
-                onOperatorSelected(draggedElement.text().trim());
+                $scope.onOperatorSelected(draggedElement.text().trim());
             } else if ( draggedElement.parents('.categoryLabels').size() !== 0) {
-                onCategorySelected(draggedElement.text().trim());                
+                $scope.onCategorySelected(draggedElement.text().trim());                
             }
             draggedElement.draggable('option', 'revert', false); 
             draggedElement.detach().appendTo(event.target);
         };
         
-        var onFieldSelected = function(item){
+        $scope.onFieldSelected = function(item){
             $('.ruleField').append('<span class="label label-important">' + item + '</span');
             $scope.$apply();  
             $scope.rule.field = labelsToField[item];
@@ -625,14 +633,14 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             $scope.$emit(FIELD_SELECTED_EVENT, $scope.rule.field);
         };
         
-        var onOperatorSelected = function(item){            
+        $scope.onOperatorSelected = function(item){            
             $('.ruleOperator').append('<span class="label label-inverse">' + item + '<span>');
             $scope.rule.operator = labelsToOperator[item];
             $scope.$apply();
             $('.ruleValue').focus();
         };
         
-        var onCategorySelected = function(item){
+        $scope.onCategorySelected = function(item){
             var selectedCategory = labelsToCategory[item];
             $scope.rule.category = selectedCategory;
             $('.ruleCategory').append('<span class="label ' + $scope.calculateClassName(selectedCategory) + '">' + item + '</span>');

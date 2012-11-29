@@ -189,7 +189,9 @@ define('dao', ['moment'], function(moment) {
         var store = transaction.objectStore(storeName);        
         if ( entity !== null && entity.id !== undefined && entity.id !== null ) {
             var getRequest = store.put(entity);
-            getRequest.onsuccess = successCallback;
+            getRequest.onsuccess = function() {
+                successCallback(entity);
+            };
             getRequest.onerror = failureCallback;
         } else {
             var saveRequest = store.add(entity);
@@ -199,7 +201,10 @@ define('dao', ['moment'], function(moment) {
                 failureCallback('Entry with description "' + entity.description + '" already exists');
             };
             saveRequest.onsuccess = function() {
-                successCallback(entity);
+                var getRequest = store.get(this.result);
+                getRequest.onsuccess = function() {
+                    successCallback(this.result);                    
+                };
             };
         }
     };
