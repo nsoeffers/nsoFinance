@@ -23,10 +23,16 @@
                     <label class="control-label" data-i18n-key="ruleWhen"></label>
                     <div class="controls controls-row">
                         <span class="span3 ruleField">
-                            <input type="text" data-typeahead-source="fieldNames" data-typeahead-updater="onFieldSelected"></input>
+                            <input type="text" 
+                                   data-typeahead-source="fields" 
+                                   data-typeahead-updater="onFieldSelected"
+                                   data-mapper="mapEnumToLabel"></input>
                         </span>
                         <span class="span4 ruleOperator">
-                            <input type="text" data-typeahead-source="operatorNames" data-typeahead-updater="onOperatorSelected"></input>
+                            <input type="text" 
+                                   data-typeahead-source="operators" 
+                                   data-typeahead-updater="onOperatorSelected"
+                                   data-mapper="mapEnumToLabel"></input>
                         </span>
                         <input type="text" class="span4 ruleValue" ng-model="rule.value"/>
                     </div>
@@ -35,7 +41,10 @@
                     <label class="control-label" data-i18n-key="ruleThen"></label>    
                     <div class="controls controls-row">
                         <span class="span6 ruleCategory">
-                            <input type="text" data-typeahead-source="searchCategories" data-typeahead-updater="onCategorySelected">                            
+                            <input type="text" 
+                                   data-typeahead-source="categories" 
+                                   data-typeahead-updater="onCategorySelected"
+                                   data-mapper="mapCategoryToLabel">                            
                         </span>
                         <span class="span3">
                             <button type="button" class="btn btn-primary" data-i18n-key="save" ng-click="saveRule()"></button>                        

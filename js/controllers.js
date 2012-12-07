@@ -3,6 +3,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
     
     var CATEGORY_SELECTED_EVENT = 'categorySelected';
     var CATEGORY_SAVED_EVENT = 'categorySaved';
+    var RULE_SAVED_EVENT = 'ruleSaved';
     var FIELD_SELECTED_EVENT = 'fieldSelected';
     var NOTIFICATION_EVENT = 'notification';
     var TRANSITION_END = 'webkitTransitionEnd transitionend msTransitionEnd oTransitionEnd';
@@ -13,17 +14,29 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         this.message = message;    
     };
     
-    result.RootCtrl = function($scope, $rootScope, $locale, $cookies, $window){
+    result.RootCtrl = function($scope, $rootScope, $locale, $cookies, $window, categoryRepository){
                 
         $scope.languages = [];
         $scope.notifications = [];
+        $rootScope.categories = [];
+        
+        $rootScope.mapCategoryToLabel = function(category) {
+            if ( category === undefined || category === null ){
+                return "";
+            }
+            return category.name;
+        };        
+
            
-        $scope.populateLanguages = function() {
+        $scope.init = function() {
             for(var key in translations){
                 if ( key.length === 2){
                     $scope.languages.push(key);
                 }
             }
+            categoryRepository.findAll(function(categories){
+                $rootScope.categories = categories;
+            });            
         };
         
         $scope.getLanguageSelectedClass = function(language){
@@ -93,9 +106,10 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         
         $scope.save = function() {     
             $scope.alreadySubmitted = true;
-            categoryRepository.save($scope.category, function(){
+            categoryRepository.save($scope.category, function(savedCategory){
+                $rootScope.categories.push(savedCategory);
                 $scope.showSuccessMessage = true;
-                $scope.$emit(CATEGORY_SAVED_EVENT, $scope.category);                
+                $scope.$emit(CATEGORY_SAVED_EVENT, savedCategory);                
                 $scope.$apply();
                 $timeout(function() {
                     $scope.showSuccessMessage = false;
@@ -207,6 +221,9 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                         $scope.savedTransactionCount++; 
                         var total = $scope.firstRowIsHeader ? data.length - 2 : data.length - 1;
                         $scope.saveProgress = ($scope.savedTransactionCount * 100 ) / total;
+                        if ( $scope.saveProgress === 100 ){
+                            $timeout(function() { $($window.document.body).animate({ scrollTop: $window.document.body.scrollHeight+20}); }, 200);
+                        }
                         $window.console.log('transaction:' + $scope.savedTransactionCount + ', length: ' + total + ', percent: ' + $scope.saveProgress);
                         $scope.$apply();
                     };
@@ -286,34 +303,39 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         };    
     };
     
-    result.AssignCtrl = function($scope, $window, $timeout, $location, transactionRepository, categoryRepository) {
+    result.AssignCtrl = function($scope, $window, $timeout, $location, transactionRepository, categoryRepository, $rootScope) {
         
         $scope.transactions = null;
+        
+        // Configure sub views/presenters that are used in this view
         $scope.forbidCategoryAddition = true;
         $scope.forbidCategoryRemoval = true;
         $scope.hideCategoryDetailTitle = true;
         $scope.showCategoryTypeInDetailForm = true;
-        $scope.categoryNames = [];
         
-        var selectedTransaction;        
+        var selectedTransaction;
         var creditCategoryChooser;
         var debetCategoryChooser;
         var selectedRow;
         var spinner;
-        var categoryNameToItem = {};
-        var creditSideSelected = null;                
+        var creditSideSelected = null;    
+        
+        var hideRuleForm = function() {
+            if ( $('#hiddenEditableFields #ruleForm').size() === 0 ) {
+                $('#ruleForm').detach().appendTo($('#hiddenEditableFields'));
+                $('#ruleForm INPUT').val('').html(null);
+                $('#ruleForm .ruleField .label, #ruleForm .ruleOperator .label, #ruleForm .ruleCategory .label').detach();
+            }        
+        };
         
         var onPopupClosed = function(event, category) {
             if ( category === null || category === undefined ) {
                 return;
             }
-            if ( categoryNameToItem[category.name] === null || categoryNameToItem[category.name] === undefined ) {
-                categoryNameToItem[category.name] = category;
-            }
             if ( creditSideSelected ){
-                $scope.updateCredit(category.name);
+                $scope.updateCredit(category);
             } else {
-                $scope.updateDebet(category.name);
+                $scope.updateDebet(category);
             }
             $('#categoryBrowser').modal('hide');
             $('#categoryCreator').modal('hide');
@@ -322,13 +344,16 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         $scope.$on(CATEGORY_SELECTED_EVENT, onPopupClosed);
         $scope.$on(CATEGORY_SAVED_EVENT, function(event, category) { 
             onPopupClosed(event, category);
-            //$scope.$broadcast(CATEGORY_SAVED_EVENT, category);
         });
-        $scope.$on(FIELD_SELECTED_EVENT, function(event, selectedField) {
+        $scope.$on(RULE_SAVED_EVENT, function(event, rule) { 
+            hideRuleForm();
+            $scope.refresh();
+        });
+
+        $scope.$on(FIELD_SELECTED_EVENT, function(event, selectedField, selectedRule) {
             if ( selectedTransaction !== undefined && selectedTransaction !== null 
                     || selectedField !== undefined && selectedField !== null ) {  
-                $('INPUT.ruleValue').val(selectedTransaction[selectedField.fieldName]).trigger('input');
-                $scope.$apply();
+                selectedRule.value = selectedTransaction[selectedField.fieldName];
             }
         });
 
@@ -342,7 +367,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         
         $scope.addCreditCategory = function() {
             $scope.setCreditSideSelected();
-            var newCategory = new domain.Category(domain.CategoryType.ASSET, creditCategoryChooser.val());
+            var newCategory = new domain.Category(domain.CategoryType.EXPENSE, creditCategoryChooser.val());
             $scope.$broadcast(CATEGORY_SELECTED_EVENT, newCategory);
         };
         
@@ -351,28 +376,9 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             var newCategory = new domain.Category(domain.CategoryType.EXPENSE, debetCategoryChooser.val());
             $scope.$broadcast(CATEGORY_SELECTED_EVENT, newCategory);
         };
-        
-        $scope.searchCategories = function(query, callback){ 
-            var regexp = new RegExp(query.toLowerCase());
-            var results = $scope.categoryNames.filter(function(item) { return item.toLowerCase().match(regexp) !== null; });
-            if ( results.length === 0 ) {
-                $(this.$element).parent().addClass('noMatch');
-            } else {
-                $(this.$element).parent().removeClass('noMatch');
-            }
-            callback(results);
-        };
-        
+                
         $scope.init = function() {
-            categoryRepository.findAll(function(categories) {
-                for( var index in categories ) {
-                    $scope.categoryNames.push(categories[index].name);
-                    categoryNameToItem[categories[index].name] = categories[index];
-                }
-                $scope.$apply();
-            });
             /*debetCategoryChooser = $('#debetCategoryChooser');
-            debetCategoryChooser.typeahead({updater: $scope.updateDebet, source: typeaheadCallback });
             debetCategoryChooser.focus(function() { $timeout(function() { debetCategoryChooser.select(); }, 0, false); } );
             debetCategoryChooser.blur(function() { 
                 if ( debetCategoryChooser.val() === "" && selectedTransaction.debetAccount !== null ) { 
@@ -414,7 +420,6 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             }
             transactionRepository.findUntaggedTransactions(fromDate, toDate, function(data) {
                     $scope.transactions = data;
-                    $scope.$apply();
                     spinner.stop();
                     $('#waitForTransactions').hide();
                 });
@@ -436,11 +441,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             if ( currentTarget[0] === creditCategoryChooser.parents('.row-fluid')[0] ){
                 return;
             }
-            if ( $('#hiddenEditableFields #ruleForm').size() === 0 ) {
-                $('#ruleForm').detach().appendTo($('#hiddenEditableFields'));
-                $('#ruleForm INPUT').val('').html(null);
-                $('#ruleForm .ruleField .label, #ruleForm .ruleOperator .label, #ruleForm .ruleCategory .label').detach();
-            }
+            hideRuleForm();
             var previousSelectedTransaction;
             var rowIndex = parseInt(currentTarget.data('rowIndex'), 10);
             if ( rowIndex >= 0 && rowIndex < $scope.transactions.length) {
@@ -481,27 +482,22 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         };
         
         $scope.updateDebet = function(item) {
-            $timeout(function() {debetCategoryChooser.val(item)}, 0, false);
-            updateAccount(item, 'debetAccount');
+            updateAccount(item, 'debetAccount', debetCategoryChooser);
         };
         
-        $scope.updateCredit = function(item) {
-            $timeout(function() {creditCategoryChooser.val(item)}, 0, false);
-            updateAccount(item, 'creditAccount');
+        $scope.updateCredit = function(category) {
+            updateAccount(category, 'creditAccount', creditCategoryChooser);
         };
         
         $scope.calculateClassName = calculateClassNameForCategory;
         
-        var updateAccount = function(item, categoryType){
+        var updateAccount = function(item, categoryType, field){
+            $timeout(function() {field.val($rootScope.mapCategoryToLabel(item))}, 0, false);
             if ( selectedTransaction !== undefined && selectedTransaction !== null ) {
                 if ( selectedTransaction[categoryType] === undefined || selectedTransaction[categoryType] === null) {
                     selectedTransaction[categoryType] = {};
                 }
-                if ( item === null || item === undefined || categoryNameToItem === undefined) {
-                    selectedTransaction[categoryType] = item;
-                } else {
-                    selectedTransaction[categoryType] = categoryNameToItem[item];
-                }
+                selectedTransaction[categoryType] = item;
                 var updatedRow = selectedRow;
                 transactionRepository.save(selectedTransaction, 
                     function() { 
@@ -513,38 +509,14 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         
     };
     
-    result.RulesCtrl = function($scope, $timeout, $cookies, $locale, categoryRepository, ruleRepository, transactionRepository, $window) {
+    result.RulesCtrl = function($scope, $timeout, $cookies, $locale, ruleRepository, transactionRepository, $window) {
         
         $scope.fields = domain.TransactionField.values.slice(0);
         $scope.operators = domain.RuleOperator.values.slice(0);
         $scope.rule = new domain.Rule();
-        $scope.rules;
-        $scope.categories;
-        $scope.fieldNames = [];
-        $scope.operatorNames = [];
-        
-        var labelsToField = {};
-        var labelsToOperator = {};
-        var labelsToCategory = {};
-        
-        var populateLabelToObjectMap = function(objectValues, labelToObjectMap, field, needsTranslation) {
-            for( var index in objectValues ) {
-                var enumValue = objectValues[index];
-                if ( field === undefined || field === null ) {
-                    field = 'i18nKey';
-                }
-                var label = needsTranslation === undefined || needsTranslation === true ?  translate(enumValue[field], $cookies, $locale) : enumValue[field];
-                labelToObjectMap[label] = enumValue; 
-            }
-            
-        };
+        $scope.rules = [];
         
         $scope.init = function() {
-            populateLabelToObjectMap(domain.TransactionField.values, labelsToField);
-            populateLabelToObjectMap(domain.RuleOperator.values, labelsToOperator);
-            $scope.fieldNames = $scope.fields.map(function(field) { return translate(field.i18nKey, $cookies, $locale); });            
-            $scope.operatorNames = $scope.operators.map(function(operator) { return translate(operator.i18nKey, $cookies, $locale); });
-
             $timeout(refreshDragAndDropTargets, 0, false);
             
             $('.sortable').sortable().disableSelection();
@@ -552,45 +524,41 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                     $scope.rules = results;
                     $scope.$apply();
                 });  
-            refreshCategories();
+            $timeout(function(){
+                $('.categoryLabels.labelsArea .label').draggable({scope: 'Category', revert: true, containment: 'window',
+                    drag: function() {}, opacity: 0.5, cursor: "not-allowed", zIndex: 10 });                                    
+                $('#newRule .ruleCategory').droppable({scope: 'Category', hoverClass: 'dropCategoryHover', 
+                    drop: onLabelDropped});
+            }, 0 );
         };
         
-        $scope.searchCategories = function(query, callback){ 
-            var callbackWrapper = function(results){
-                //populateLabelToObjectMap(results, labelsToCategory, 'name', false );
-                callback(results.map(function(category){ return category.name; }));
-            };
-            categoryRepository.search(query, callbackWrapper, domain.Category.createFromDBO); 
+        $scope.mapEnumToLabel = function(enumValue) {
+            if ( enumValue === undefined || enumValue === null ) {
+                return undefined;
+            }
+            if ( enumValue.i18nKey !== undefined || enumValue.i18nKey !== null ) {
+                return translate(enumValue.i18nKey, $cookies, $locale);
+            }            
+            return enumValue;
         };
-
+                
         $scope.saveRule = function() {
             var process = $scope.rule.process;
             var compare = $scope.rule.operator.compare;
             delete $scope.rule.process;
             delete $scope.rule.operator.compare;
-            ruleRepository.save($scope.rule, function() {
-                    $scope.rule.process = process;
-                    $scope.rule.operator.compare = compare;
-                    $scope.ruleToProcess = $scope.rule;
-                    $scope.rules.push($scope.rule);
+            ruleRepository.save($scope.rule, function(savedRule) {
+                    savedRule.process = process;
+                    savedRule.operator.compare = compare;                    
+                    $scope.$emit(RULE_SAVED_EVENT, savedRule);
+                    $scope.ruleToProcess = savedRule;
+                    $scope.rules.push(savedRule);
                     $scope.rule = new domain.Rule();
                     $scope.$apply();
                 }, function() { });        
             $timeout(processUnmappedTransactions, 0, false);
         };
-        
-        var refreshCategories = function() {
-            categoryRepository.findAll(function(results){
-                populateLabelToObjectMap(results, labelsToCategory, 'name', false );
-                $scope.categories = results;
-                $scope.$apply();
-                $('.categoryLabels.labelsArea .label').draggable({scope: 'Category', revert: true, containment: 'window',
-                                        drag: function() {}, opacity: 0.5, cursor: "not-allowed", zIndex: 10 });                                    
-                $('#newRule .ruleCategory').droppable({scope: 'Category', hoverClass: 'dropCategoryHover', 
-                                        drop: onLabelDropped});                                     
-            });            
-        };
-        
+                
         var processUnmappedTransactions = function() {
             transactionRepository.findUntaggedTransactions(new Date(0), new Date(2999, 0, 1), function(data){
                 for(var i = data.length - 1; i >= 0; i--){
@@ -625,27 +593,22 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             draggedElement.detach().appendTo(event.target);
         };
         
-        $scope.onFieldSelected = function(item){
-            $('.ruleField').append('<span class="label label-important">' + item + '</span');
-            $scope.$apply();  
-            $scope.rule.field = labelsToField[item];
+        $scope.onFieldSelected = function(field){
+            $('.ruleField').append('<span class="label label-important">' + $scope.mapEnumToLabel(field) + '</span');
+            $scope.rule.field = field;
             $('.ruleOperator INPUT').focus();
-            $scope.$emit(FIELD_SELECTED_EVENT, $scope.rule.field);
+            $scope.$emit(FIELD_SELECTED_EVENT, $scope.rule.field, $scope.rule);
         };
         
-        $scope.onOperatorSelected = function(item){            
-            $('.ruleOperator').append('<span class="label label-inverse">' + item + '<span>');
-            $scope.rule.operator = labelsToOperator[item];
-            $scope.$apply();
+        $scope.onOperatorSelected = function(operator){            
+            $('.ruleOperator').append('<span class="label label-inverse">' + $scope.mapEnumToLabel(operator) + '<span>');
+            $scope.rule.operator = operator;
             $('.ruleValue').focus();
         };
         
-        $scope.onCategorySelected = function(item){
-            var selectedCategory = labelsToCategory[item];
+        $scope.onCategorySelected = function(selectedCategory){
             $scope.rule.category = selectedCategory;
-            $('.ruleCategory').append('<span class="label ' + $scope.calculateClassName(selectedCategory) + '">' + item + '</span>');
-            $scope.$apply();  
-//            $('.ruleOperator INPUT').focus();
+            $('.ruleCategory').append('<span class="label ' + $scope.calculateClassName(selectedCategory) + '">' + $scope.mapCategoryToLabel(selectedCategory) + '</span>');
         };
         
         $scope.calculateClassName = calculateClassNameForCategory;

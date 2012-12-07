@@ -15,24 +15,37 @@
     </blockquote>
     <div id="hiddenEditableFields" style="display: none; ">
         <span>
-            <input id="creditCategoryChooser" type="text" data-provide="typeahead" data-typeahead-source="searchCategories" data-typeahead-updater="updateCredit"/>
+            <input id="creditCategoryChooser" type="text" 
+                   data-provide="typeahead" 
+                   data-typeahead-source="categories" 
+                   data-typeahead-updater="updateCredit"
+                   data-mapper="mapCategoryToLabel"/>
             <a href="#categoryBrowser" class="searchCategoryIcon" data-toggle="modal" ng-click="setCreditSideSelected()"><i class="icon-search"></i></a>
             <a href="#categoryCreator" class="addCategoryIcon" data-toggle="modal" ng-click="addCreditCategory()"><i class="icon-plus"></i></a>
         </span>
         <div id="ruleForm" class="span10" ng-controller="RulesCtrl" ng-init="init()">
                 <span data-i18n-key="ruleWhen" class="span1"></span>
                 <span class="span2 ruleField">
-                    <input type="text" data-typeahead-source="fieldNames" data-typeahead-updater="onFieldSelected"></input>                    
+                    <input type="text" 
+                           data-typeahead-source="fields" 
+                           data-typeahead-updater="onFieldSelected"
+                           data-mapper="mapEnumToLabel"></input>
                 </span>
                 <span class="span2 ruleOperator">
-                    <input type="text" data-typeahead-source="operatorNames" data-typeahead-updater="onOperatorSelected"></input>
+                    <input type="text" 
+                           data-typeahead-source="operators" 
+                           data-typeahead-updater="onOperatorSelected"
+                           data-mapper="mapEnumToLabel"></input>
                 </span>
                 <span class="span2">
                     <input type="text" class="ruleValue"  ng-model="rule.value">
                 </span>
                 <span class="span2" data-i18n-key="ruleThen"></span>    
                 <span class="span2 ruleCategory">
-                    <input type="text" data-typeahead-source="searchCategories" data-typeahead-updater="onCategorySelected">
+                    <input type="text" 
+                           data-typeahead-source="categories" 
+                           data-typeahead-updater="onCategorySelected"
+                           data-mapper="mapCategoryToLabel"></input>
                 </span>
                 <span class="span1">
                     <button type="button" class="btn btn-primary" ng-click="saveRule()"><i class="icon-ok icon-white"></i></button>                    

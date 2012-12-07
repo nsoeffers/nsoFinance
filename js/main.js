@@ -73,8 +73,34 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
             };
         })
         .directive('typeaheadSource', function() {
-            return function(scope, element, attrs){                
-                $(element).typeahead({source: scope[attrs.typeaheadSource], updater: scope[attrs.typeaheadUpdater]});
+            return function(scope, element, attrs){
+                scope.$watch(attrs.typeaheadSource, function () {
+                    var items = scope[attrs.typeaheadSource];
+                    var callback = scope[attrs.typeaheadUpdater];
+                    if ( attrs.mapper !== undefined && attrs.mapper !== null 
+                            && scope[attrs.mapper] !== undefined && scope[attrs.mapper] !== null){
+                        var labelToItemMap = {};
+                        items = items.map(function(item) {
+                            var label = scope[attrs.mapper](item);
+                            labelToItemMap[label] = item;
+                            return label;
+                        });
+                        callback = function(selectedLabel) {
+                            scope.$apply(function() { scope[attrs.typeaheadUpdater](labelToItemMap[selectedLabel]); });
+                        };
+                    }
+                    var enhancedSource = function(query, callback){                    
+                        var typeahead = callback(items);
+                        if ( typeahead.shown === false ) {
+                            $(this.$element).parent().addClass('noMatch');
+                        } else {
+                            $(this.$element).parent().removeClass('noMatch');
+                        }
+                    };
+                    var typeahead = $(element).typeahead();
+                    typeahead.data('typeahead').source = enhancedSource;
+                    typeahead.data('typeahead').updater = callback;
+                }, true);
             };
         })
         .directive('previousView', function($window, $timeout) {
