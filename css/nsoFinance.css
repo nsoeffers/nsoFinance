@@ -1,3 +1,8 @@
+h1 {
+    font-weight: 200;
+    color: #666;
+}
+
 #feedback_area{
     position: absolute;
     top: 2em;
@@ -276,3 +281,24 @@ div[ng-view].aboutToNavigate{
     position: absolute; 
     margin-left: -1.3em; 
 }*/
+
+.status {
+    border-radius: 6px;
+    padding: 3px 6px;
+}
+
+.status label {
+    font-size: 0.9em;
+}
+
+.status label:after { 
+    content: ':';
+}
+
+.status input {
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+    color: #3A87AD;
+    font-size: 0.9em;
+}

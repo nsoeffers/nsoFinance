@@ -9,6 +9,12 @@
             <li class="{{isActiveGranularity('all')}}"><a ng-click="setIntervalGranularity('all')" data-i18n-key="all"></a></li>
         </ul>
     </div>
+    <form class="form-inline status pull-left alert alert-info" ng-show="transactions.length != 0">
+        <label data-i18n-key="total" class="text-info"></label>
+        <input type="text" readonly value="{{statistics.total}}" class="input-mini"/>            
+        <label class="control-label text-info" data-i18n-key="tagged"></label>
+        <input type="text" readonly value="{{statistics.tagged}}" class="input-mini"/>
+    </form>
     <blockquote ng-show="transactions != null && transactions.length == 0">
         <span data-i18n-key="no_unmapped_transactions"></span>
         <a href="#/import" data-i18n-key="goto_import"></a>

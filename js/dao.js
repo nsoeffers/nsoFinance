@@ -1,4 +1,4 @@
-define('dao', ['moment'], function(moment) {
+define('dao', ['domain', 'moment'], function(domain, moment) {
     
     var dao = {};
     
@@ -168,7 +168,35 @@ define('dao', ['moment'], function(moment) {
                     callback(results);
                     return;
                 }
-                results.push(e.target.result.value);
+                results.push(domain.Transaction.createFromDBO(e.target.result.value));
+                e.target.result.continue();
+            };
+            cursorRequest.onerror = function(){
+                alert('Failed to retrieve items from IndexedDB');
+            };
+        };
+        
+        repository.getStatistics = function(callback){
+            if ( !db ) {
+                setTimeout(function() { repository.getStatistics(callback); }, 100);
+                return;
+            }
+            var statistics = {
+                total: 0,
+                tagged: 0
+            };
+            var transaction = db.transaction([ 'Transaction' ], "readonly");
+            var store = transaction.objectStore('Transaction');
+            var cursorRequest = store.openCursor();
+            cursorRequest.onsuccess = function(e) {
+                if ( !e.target || !e.target.result || e.target.result === null) {
+                    callback(statistics);
+                    return;
+                }
+                statistics.total++;
+                if (e.target.result.value.tagged) {
+                    statistics.tagged++;
+                }
                 e.target.result.continue();
             };
             cursorRequest.onerror = function(){

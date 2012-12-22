@@ -67,8 +67,8 @@ define('domain', ['moment'], function(moment){
         this.description = description;
         Object.defineProperty( this, "className", {  value: "Transaction",  writable: false, enumerable: true, configurable: false});
         Object.defineProperty( this, "tagged", {    get: function() { 
-                                                           return (this.debetAccount !== undefined && this.creditAccount != undefined &&
-                                                                this.debetAccount !== null && this.creditAccount != null);
+                                                           return (/*this.debetAccount !== undefined &&*/ this.creditAccount != undefined &&
+                                                                /*this.debetAccount !== null &&*/ this.creditAccount != null);
                                                         },
                                                     set: function(newValue) {
                                                         },
@@ -81,6 +81,14 @@ define('domain', ['moment'], function(moment){
                                                     set: function(newValue) {                                                                        
                                                     },
                                                     enumerable: true, configurable: false});                                                    
+    };
+    
+    Transaction.createFromDBO = function(dbo){
+        var transaction = new Transaction(dbo.date, dbo.amount, dbo.description);
+        Object.defineProperty( transaction, "id", {  value: dbo.id,  writable: false, enumerable: true, configurable: false});
+        transaction.creditAccount = dbo.creditAccount;
+        transaction.debetAccount = dbo.debetAccount;
+        return transaction;
     };
     Object.defineProperty( domain, "Transaction", {  value: Transaction,  writable: false, enumerable: true, configurable: false});    
     

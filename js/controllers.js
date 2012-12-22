@@ -4,6 +4,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
     var CATEGORY_SELECTED_EVENT = 'categorySelected';
     var CATEGORY_SAVED_EVENT = 'categorySaved';
     var RULE_SAVED_EVENT = 'ruleSaved';
+    var TRANSACTIONS_MAPPED = "transactionsMapped";
     var FIELD_SELECTED_EVENT = 'fieldSelected';
     var NOTIFICATION_EVENT = 'notification';
     var TRANSITION_END = 'webkitTransitionEnd transitionend msTransitionEnd oTransitionEnd';
@@ -346,8 +347,12 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             onPopupClosed(event, category);
         });
         $scope.$on(RULE_SAVED_EVENT, function(event, rule) { 
-            hideRuleForm();
-            $scope.refresh();
+            hideRuleForm();            
+        });
+        $scope.$on(TRANSACTIONS_MAPPED, function(event){
+             refreshStatistics();
+             $('#creditCategoryChooser').parent().detach().appendTo($('#hiddenEditableFields'));
+             $scope.refresh();
         });
 
         $scope.$on(FIELD_SELECTED_EVENT, function(event, selectedField, selectedRule) {
@@ -393,6 +398,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                 } 
             } );
             
+            refreshStatistics();
             $scope.refresh();            
         };
         
@@ -403,7 +409,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         
         $scope.setIntervalGranularity = function(granularity) {
             $location.search(granularity);
-//            $scope.refresh();
+            $scope.refresh();
         };
         
         $scope.refresh = function() {            
@@ -419,10 +425,11 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                 toDate = new Date(9999, 0, 1);
             }
             transactionRepository.findUntaggedTransactions(fromDate, toDate, function(data) {
+                $scope.$apply(function(){
                     $scope.transactions = data;
                     spinner.stop();
                     $('#waitForTransactions').hide();
-                });
+                })});
         };
         
         $scope.toggleRuleForm = function() {
@@ -490,6 +497,14 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         };
         
         $scope.calculateClassName = calculateClassNameForCategory;
+        
+        var refreshStatistics = function() {
+            transactionRepository.getStatistics(function(statistics) {
+               $scope.$apply(function() { 
+                   $scope.statistics = statistics;
+               });
+            });
+        };
         
         var updateAccount = function(item, categoryType, field){
             $timeout(function() {field.val($rootScope.mapCategoryToLabel(item))}, 0, false);
@@ -561,11 +576,25 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                 
         var processUnmappedTransactions = function() {
             transactionRepository.findUntaggedTransactions(new Date(0), new Date(2999, 0, 1), function(data){
-                for(var i = data.length - 1; i >= 0; i--){
+                var mappedTransactionCount = 0;
+                for(var i = data.length - 1; i >= 0; i--){                    
                     if ( $scope.ruleToProcess.process(data[i]) === true ) {
-                        transactionRepository.save(data[i], function(entity) { $window.console.log('Saved transaction' + JSON.stringify(entity)) });
+                        mappedTransactionCount++;
+                        transactionRepository.save(data[i], function(entity) { 
+                            mappedTransactionCount--;
+                            $window.console.log('Saved transaction' + JSON.stringify(entity)) 
+                        });
                     }
                 }
+                var checkNewlyMappedTransactions = function() {
+                    if ( mappedTransactionCount === 0 ) {
+                        $scope.$emit(TRANSACTIONS_MAPPED);
+                    } else {
+                        $timeout(checkNewlyMappedTransactions, 0, false);
+                    }
+                };
+                $timeout(checkNewlyMappedTransactions, 0, false);
+                
             });
         };
         

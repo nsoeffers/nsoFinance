@@ -56,6 +56,8 @@ define('translations', [], function() {
         "goto_import"                   : "Goto the import functionality",
         "browse_categories"             : "Browse categories",
         "add_category"                  : "Add category",
+        "total"                         : "Total",
+        "tagged"                        : "Tagged",
         
         "rules"                         : "Rules",
         "rules_title"                   : "Rules for automatic labelling",
@@ -138,6 +140,9 @@ define('translations', [], function() {
         "goto_import"                   : "Ga naar de import functionaliteit",
         "browse_categories"             : "Opzoeken van categorie",
         "add_category"                  : "Categorie toevoegen",
+        "total"                         : "Totaal",
+        "tagged"                        : "Toegewezen",
+
         
         "rules"                         : "Regels",
         "rules_title"                   : "Regels voor het automatisch categoriseren",
