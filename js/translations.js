@@ -45,7 +45,7 @@ define('translations', [], function() {
         "savingTransactions"            : "Saving Transactions",
         "file"                          : "File",
         "advancedSettings"              : "Advanced Settings",
-        "successImport"                 : "Successfully imported transactions",
+        "successImport"                 : "Successfully imported {{savedTransactionCount}} transactions",
         
         "assign_title"                  : "Assign categories to the transactions",
         "assign"                        : "Assign",
@@ -129,7 +129,7 @@ define('translations', [], function() {
         "savingTransactions"            : "Transacties opslaan",
         "file"                          : "Bestand",
         "advancedSettings"              : "Geavanceerde Instellingen",
-        "successImport"                 : "De verrichtingen zijn succesvol geimporteerd",
+        "successImport"                 : "Er zijn {{savedTransactionCount}} verrichtingen succesvol geimporteerd",
         
         "assign_title"                  : "Toewijzen van categorieën aan verrichtingen",
         "assign"                        : "Toewijzen",

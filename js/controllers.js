@@ -135,7 +135,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         $scope.showSuccessMessage = false;    
     };
     
-    result.ImportCtrl = function($scope, $locale, $cookies, $timeout, transactionRepository, ruleRepository, $window) {
+    result.ImportCtrl = function($scope, $locale, $cookies, $timeout, transactionRepository, ruleRepository, $window, $rootScope) {
         
         $scope.delimiter = ';';
         $scope.escaper = '\\';

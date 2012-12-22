@@ -1,10 +1,13 @@
 define('directives', function() {
     var directives = {};
     
-    directives.i18nKey = function(Translations,$locale, $cookies){ 
-        return function(scope, elm, attrs){
-            var language = $cookies.languagePreference !== undefined ? $cookies.languagePreference : $locale.id;
-            elm.text(Translations[language][attrs.i18nKey]);
+    directives.i18nKey = function(Translations,$locale, $cookies, $interpolate, $window){ 
+        return { 
+            
+            compile: function(elm, attrs){
+                var language = $cookies.languagePreference !== undefined ? $cookies.languagePreference : $locale.id;
+                elm.text(Translations[language][attrs.i18nKey]);
+            }
         }; 
     };
     
