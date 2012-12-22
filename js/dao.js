@@ -50,7 +50,7 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
         
     };
     
-    var createRepository = function(storeName) {
+    var createRepository = function(storeName, mappingFunction) {
         var repository = {};
         
         if ( !isInitialized ) {
@@ -66,7 +66,7 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
         };
         
         repository.findAll = function(successCallback){
-            findAll(successCallback, storeName);
+            findAll(successCallback, storeName, mappingFunction);
         };
                 
         return repository;
@@ -74,7 +74,7 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
     
     dao.createCategoryRepository = function() {
         var STORE_NAME = 'Category';
-        var repository = createRepository(STORE_NAME);
+        var repository = createRepository(STORE_NAME, domain.Category.createFromDBO);
         repository.findCategoriesByType = function(categoryType, callback, mappingMethod){
             if ( !db ) {
                 setTimeout(function() { repository.findCategoriesByType(categoryType, callback, mappingMethod); }, 100);
@@ -128,7 +128,7 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
     };
 
     dao.createTransactionRepository = function() {
-        var repository = createRepository('Transaction');
+        var repository = createRepository('Transaction', domain.Transaction.createFromDBO);
         
         repository.reset = function() {
             var versionRequest = db.setVersion( '1.0' );
@@ -208,7 +208,7 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
     };
     
     dao.createRuleRepository = function() {
-        var repository = createRepository('Rule');
+        var repository = createRepository('Rule', domain.Rule.createFromDBO);
         return repository;
     };
 
@@ -251,9 +251,9 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
         };
     };
     
-    var findAll = function(successCallback, storeName){
+    var findAll = function(successCallback, storeName, mappingFunction){
         if ( !db ) {
-            setTimeout(function() { findAll(successCallback, storeName); }, 100);
+            setTimeout(function() { findAll(successCallback, storeName, mappingFunction); }, 100);
             return;
         }
         var transaction = db.transaction([ storeName ], "readonly");
@@ -269,7 +269,8 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
                 successCallback(results);
                 return;
             }
-            results.push(e.target.result.value);
+            results.push(mappingFunction === undefined || mappingFunction === null ? 
+                e.target.result.value : mappingFunction(e.target.result.value));
             e.target.result.continue();
         };
     };

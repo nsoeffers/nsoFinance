@@ -148,6 +148,15 @@ define('domain', ['moment'], function(moment){
         return ruleAppliesOnTransaction;
     };
     
+    Rule.createFromDBO = function(dbo) {
+        var rule = new Rule();
+        rule.field = dbo.field;
+        rule.operator = RuleOperator[dbo.operator.value];
+        rule.value = dbo.value;
+        rule.category = dbo.category;
+        return rule;
+    };
+    
     Object.defineProperty( domain, "Rule", {  value: Rule,  writable: false, enumerable: true, configurable: false});    
     return domain;
 });

@@ -135,7 +135,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         $scope.showSuccessMessage = false;    
     };
     
-    result.ImportCtrl = function($scope, $locale, $cookies, $timeout, transactionRepository, $window) {
+    result.ImportCtrl = function($scope, $locale, $cookies, $timeout, transactionRepository, ruleRepository, $window) {
         
         $scope.delimiter = ';';
         $scope.escaper = '\\';
@@ -153,6 +153,13 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         $scope.firstRowIsHeader = true;
         
         var file = null;
+        var rules = [];
+        
+        $scope.init = function() {
+            ruleRepository.findAll(function(result){
+                rules = result;
+            });
+        };
                         
         $scope.chooseFile = function() {
             $('input[id=csvFile]')[0].addEventListener('change', $scope.onFileSelected, false);
@@ -240,6 +247,9 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                         var transaction = new domain.Transaction(Date.parseExact(row[fieldToColumnIndexMap[domain.TransactionField.DATE.fieldName]], $scope.dateFormat).getTime(), 
                                                           parseFloat(amount),
                                                           row[fieldToColumnIndexMap[domain.TransactionField.DESCRIPTION.fieldName]]);
+                        for(index in rules){
+                            rules[index].process(transaction);
+                        }
                         transactionRepository.save(transaction, successCallback, errorCallback);
                     }
                 };
