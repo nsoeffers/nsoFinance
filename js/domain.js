@@ -144,12 +144,14 @@ define('domain', ['moment'], function(moment){
         var ruleAppliesOnTransaction = this.operator.compare(fieldValue, this.value);
         if ( ruleAppliesOnTransaction === true ){
             transaction.creditAccount = this.category;
+            transaction.assignedBy = { type : 'RULE', ruleId: this.id };
         }
         return ruleAppliesOnTransaction;
     };
     
     Rule.createFromDBO = function(dbo) {
         var rule = new Rule();
+        Object.defineProperty( rule, "id", {  value: dbo.id,  writable: false, enumerable: true, configurable: false});
         rule.field = dbo.field;
         rule.operator = RuleOperator[dbo.operator.value];
         rule.value = dbo.value;

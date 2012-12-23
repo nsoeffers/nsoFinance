@@ -78,11 +78,11 @@ define('tests', ['domain'], function(domain) {
         equal( false, transaction.tagged);
     });
     
-    test( "When only creditAccount is set then transaction is not marked as tagged", function() {
-        var transaction = new domain.Transaction(new Date(), 10.0);
-        transaction.creditAccount = { id: 1, name: 'creditAccount' };
-        equal( false, transaction.tagged);
-    });
+    //test( "When only creditAccount is set then transaction is not marked as tagged", function() {
+    //    var transaction = new domain.Transaction(new Date(), 10.0);
+    //    transaction.creditAccount = { id: 1, name: 'creditAccount' };
+    //    equal( false, transaction.tagged);
+    //});
 
 
     test( "When debet and creditAccount are set then transaction is flagged as being tagged", function() {
@@ -117,6 +117,7 @@ define('tests', ['domain'], function(domain) {
     
     test( "When Rule processes a transaction which applies then return true and category is set on transaction", function() {
         var rule = new domain.Rule();
+        rule.id = 1;
         rule.field = domain.TransactionField.DESCRIPTION;
         rule.operator = domain.RuleOperator.EQUALS;
         rule.value = 'test';
@@ -127,6 +128,9 @@ define('tests', ['domain'], function(domain) {
         transaction.description = 'test';
         equal(true, rule.process(transaction));
         equal(rule.category, transaction.creditAccount);
+        equal('RULE', transaction.assignedBy.type);
+        equal(1, transaction.assignedBy.ruleId);
+        
     });    
 
     test( "When Rule processes a transaction which does not apply then return false and no category is set on transaction", function() {
