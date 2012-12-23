@@ -1,5 +1,6 @@
 define('dao', ['domain', 'moment'], function(domain, moment) {
     
+    var DB_NAME = 'nsoFinance'
     var dao = {};
     
     var db;
@@ -21,29 +22,25 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
             alert('IndexedDB Database is not supported in your browser');
         } 
         
-        var dbRequest = window.indexedDB.open('nsoFinance');           
+        var dbRequest = window.indexedDB.open(DB_NAME, 2);           
+        
+        dbRequest.onupgradeneeded = function() {
+            db = dbRequest.result;
+            var categoryStore = db.createObjectStore("Category", {keyPath: 'id', autoIncrement: true});
+            categoryStore.createIndex('caseInsensitiveName', 'caseInsensitiveName', {unique : true});
+            categoryStore.createIndex('type', 'type', {unique : false});
+            
+            var transactionStore = db.createObjectStore("Transaction", {keyPath: 'id', autoIncrement: true});
+            transactionStore.createIndex('status', 'status', {unique : false});
+            db.createObjectStore("Rule", {keyPath: 'id', autoIncrement: true});                    
+        };
         
         dbRequest.onsuccess = function () {
             db = dbRequest.result;
-            if ( db.version === '' || db.version === '0.0') {                                
-                var versionRequest = db.setVersion( '1.1' );
-                versionRequest.onsuccess = function () {                    
-                    var categoryStore = db.createObjectStore("Category", {keyPath: 'id', autoIncrement: true});
-                    categoryStore.createIndex('caseInsensitiveName', 'caseInsensitiveName', {unique : true});
-                    categoryStore.createIndex('type', 'type', {unique : false});
-                    
-                    var transactionStore = db.createObjectStore("Transaction", {keyPath: 'id', autoIncrement: true});
-                    transactionStore.createIndex('status', 'status', {unique : false});
-                    db.createObjectStore("Rule", {keyPath: 'id', autoIncrement: true});                    
-                };
-                versionRequest.onerror = function() {
-                    window.alert('Error occurred while creating indexedDb');
-                };            
-            }
         };
         
-        dbRequest.onerror = function() {
-            alert('Error occurred while opening indexedDb');
+        dbRequest.onerror = function(e) {
+            alert('Error occurred while opening indexedDb' + JSON.stringify(e));
         };
         
         return dao;
@@ -141,15 +138,14 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
         };
         
         repository.resetAll = function() {
-            var versionRequest = db.setVersion( '0.0' );
-            versionRequest.onsuccess = function () {                    
-                db.deleteObjectStore("Category");                    
-                db.deleteObjectStore("Transaction");
-                db.deleteObjectStore("Rule");                    
+            var deleteRequest = window.indexedDB.deleteDatabase(DB_NAME);
+            deleteRequest.onsuccess = function() {
+                init();
             };
-            versionRequest.onerror = function() {
-                window.alert('Error occurred while removing transaction store');
-            };                           
+            
+            deleteRequest.onerror = function () {
+                window.alert('Error while deleting database')
+            };
         };
         
         repository.findUntaggedTransactions = function(from, to, callback) {
