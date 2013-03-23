@@ -52,17 +52,26 @@
                     </div>
                 </div>
             </form>
-            <ul class="sortable unstyled">
-                <li class="well well-small" ng-repeat="rule in rules">
-                        <i class="icon-move"></i>
-                        <span data-i18n-key="ruleWhen"></span>
-                        "<span ng-class="{true: 'label label-important', false: 'label'}[rule.field.required]">{{rule.field.i18nKey | translate}}</span>"
-                        <span class="label label-inverse">{{rule.operator.i18nKey | translate}}</span>
-                        <span><b>"{{rule.value}}"</b></span>
-                        <span data-i18n-key="ruleThen"></span>
-                        "<span class="label {{calculateClassName(rule.category)}}">{{rule.category.name}}</span>"
-                </li>
-            </ul>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <th data-i18n-key="field"></th>
+                    <th data-i18n-key="operator"></th>
+                    <th data-i18n-key="value"></th>
+                    <th data-i18n-key="category"></th>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="rule in rules">
+                        <td><span ng-class="{true: 'label label-important', false: 'label'}[rule.field.required]">{{rule.field.i18nKey | translate}}</span></td>
+                        <td><span class="label label-inverse">{{rule.operator.i18nKey | translate}}</span></td>
+                        <td><span>"{{rule.value}}"</span></td>
+                        <td>"<span class="label {{calculateClassName(rule.category)}}">{{rule.category.name}}</span>"</td>
+                        <td>
+                            <i class="icon-remove" ng-click="removeRule(rule)"></i>
+                        </td>
+                    </tr>
+                    
+                </tbody>
+            </table>
         </div>
         <div class="span3 well well-small categoryLabels labelsArea">
             <form class="form-search">

@@ -650,6 +650,16 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             $('.ruleCategory').append('<span class="label ' + $scope.calculateClassName(selectedCategory) + '">' + $scope.mapCategoryToLabel(selectedCategory) + '</span>');
         };
         
+        $scope.removeRule = function(rule){
+            ruleRepository.remove(rule.id, 
+                function() {
+                    var selectedIndex =  $scope.rules.indexOf(rule);
+                    $scope.rules.splice(selectedIndex, 1);
+                    $scope.$apply();
+                }, 
+                function() {/* TODO: Error handling*/});              
+        };
+        
         $scope.calculateClassName = calculateClassNameForCategory;
     };
     

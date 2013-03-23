@@ -63,6 +63,10 @@ define('translations', [], function() {
         "rules_title"                   : "Rules for automatic labelling",
         "ruleWhen"                      : "When transaction field: ",
         "ruleThen"                      : "then categorize transaction into category:",
+        "field"                         : "Field",
+        "value"                         : "Value",
+        "category"                      : "Category",
+        "operator"                      : "Operator",
         "operatorEquals"                : "is equal to",
         "operatorLike"                  : "contains the text",
 
@@ -148,6 +152,10 @@ define('translations', [], function() {
         "rules_title"                   : "Regels voor het automatisch categoriseren",
         "ruleWhen"                      : "ALS het veld ",
         "ruleThen"                      : "wijs dan de verrichting toe aan categorie",
+        "field"                         : "Veld",
+        "value"                         : "Waarde",
+        "category"                      : "Categorie",
+        "operator"                      : "Vergelijking",        
         "operatorEquals"                : "gelijk is aan",
         "operatorLike"                  : "de volgende tekst bevat",
         
