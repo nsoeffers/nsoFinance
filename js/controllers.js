@@ -574,14 +574,14 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             delete $scope.rule.operator.compare;
             ruleRepository.save($scope.rule, function(savedRule) {
                     savedRule.process = process;
-                    savedRule.operator.compare = compare;                    
+                    savedRule.operator.compare = compare;
                     $scope.$emit(RULE_SAVED_EVENT, savedRule);
                     $scope.ruleToProcess = savedRule;
                     $scope.rules.push(savedRule);
                     $scope.rule = new domain.Rule();
                     $scope.$apply();
-                }, function() { });        
-            $timeout(processUnmappedTransactions, 0, false);
+                    $timeout(processUnmappedTransactions, 0, false);
+                }, function() { });
         };
                 
         var processUnmappedTransactions = function() {
@@ -641,7 +641,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         
         $scope.onOperatorSelected = function(operator){            
             $('.ruleOperator').append('<span class="label label-inverse">' + $scope.mapEnumToLabel(operator) + '<span>');
-            $scope.rule.operator = operator;
+            $scope.rule.operator = angular.copy(operator);
             $('.ruleValue').focus();
         };
         
