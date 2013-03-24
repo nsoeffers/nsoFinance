@@ -20,7 +20,7 @@ define('tests', ['domain'], function(domain) {
         try {
             category.className = 'UnexistingClass';
         } catch ( ex ) {
-            equal( "className", ex['arguments'][0]);
+            equal( "Cannot assign to read only property 'className' of [object Object]", ex.message);
         }        
     });
     
@@ -28,7 +28,7 @@ define('tests', ['domain'], function(domain) {
         try {
             domain.Category = function(){ window.alert('dummyAccount'); };
         } catch ( ex ) {
-            equal( "Category", ex['arguments'][0]);
+            equal( "Cannot assign to read only property 'Category' of #<Object>", ex.message);
         }
     });
 
@@ -36,7 +36,7 @@ define('tests', ['domain'], function(domain) {
         try {
             domain.TransactionField = {};
         } catch ( ex ) {
-            equal( "TransactionField", ex['arguments'][0]);
+            equal( "Cannot assign to read only property 'TransactionField' of #<Object>", ex.message );
         }
     });
     
@@ -44,7 +44,7 @@ define('tests', ['domain'], function(domain) {
         try {
             domain.TransactionField.DATE = {};
         } catch ( ex ) {
-            equal( "DATE", ex['arguments'][0]);
+            equal( "Cannot assign to read only property 'DATE' of #<Object>", ex.message);
         }
     });
 
@@ -52,7 +52,7 @@ define('tests', ['domain'], function(domain) {
         try {
             domain.TransactionField.DATE.required = false;
         } catch ( ex ) {
-            equal( "required", ex['arguments'][0]);
+            equal( "Cannot assign to read only property 'required' of #<Object>", ex.message);
         }
     });
     
@@ -103,7 +103,7 @@ define('tests', ['domain'], function(domain) {
         try {
             domain.Rule = function(){ window.alert('dummyRule'); };
         } catch ( ex ) {
-            equal( "Rule", ex['arguments'][0]);
+            equal( "Cannot assign to read only property 'Rule' of #<Object>", ex.message);
         }
     });
     
