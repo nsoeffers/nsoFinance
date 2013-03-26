@@ -69,7 +69,10 @@ define('translations', [], function() {
         "operator"                      : "Operator",
         "operatorEquals"                : "is equal to",
         "operatorLike"                  : "contains the text",
-
+        "onlyRemoveRule"                : "Only rule",
+        "removeRuleAndAssignments"      : "Rule and assignments",
+        "ruleRemovalConfirmation"       : "Are you sure you want to remove the rule?",
+        "ruleRemovalChoice"             : "Please choose if you only want to delete the rule or also all the assignments done with this rule. If you choose to delete the assignments then all transactions assigned using this rule will need to be reassigned. Be it manually, or by creating another rule.",
         
         "settings"                      : "Settings",
         "removeAllTransactionsDescription" : "Select this button if you want to delete all transactions. Other data like categories and rules will not be touched.",
@@ -158,6 +161,10 @@ define('translations', [], function() {
         "operator"                      : "Vergelijking",        
         "operatorEquals"                : "gelijk is aan",
         "operatorLike"                  : "de volgende tekst bevat",
+        "onlyRemoveRule"                : "Enkel regel",
+        "removeRuleAndAssignments"      : "Regel en toewijzingen",        
+        "ruleRemovalConfirmation"       : "Bent u zeker dat u deze regel wilt verwijderen?",
+        "ruleRemovalChoice"             : "Gelieve te kiezen of u enkel de regel wilt verwijderen of ook alle toewijzingen die zijn gebeurt met deze regel. Indien u kiest om ook de toewijzingen te verwijderen zal u de transacties die automatisch zijn toegewezen door deze regel opnieuw moeten toewijzen. Hetzij manueel, hetzij door een andere regel aan te maken.",
         
         "settings"                      : "Instellingen",
         "removeAllTransactionsDescription" : "Selecteer onderstaande knop indien u alle verrichtingen wilt verwijderen. Andere data zoals labels en regels zullen blijven bestaan.",

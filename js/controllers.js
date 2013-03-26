@@ -650,14 +650,24 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
             $('.ruleCategory').append('<span class="label ' + $scope.calculateClassName(selectedCategory) + '">' + $scope.mapCategoryToLabel(selectedCategory) + '</span>');
         };
         
-        $scope.removeRule = function(rule){
-            ruleRepository.remove(rule.id, 
+        $scope.removeRule = function(){
+            ruleRepository.remove(selectedRule.id, 
                 function() {
-                    var selectedIndex =  $scope.rules.indexOf(rule);
+                    var selectedIndex =  $scope.rules.indexOf(selectedRule);
                     $scope.rules.splice(selectedIndex, 1);
                     $scope.$apply();
                 }, 
                 function() {/* TODO: Error handling*/});              
+        };
+        
+        $scope.removeRuleAndAssignments = function(){
+            transactionRepository.unassignAllTransactionsMappedBy(selectedRule, $scope.removeRule);
+        };
+        
+        var selectedRule = null;
+        
+        $scope.selectRule = function(rule) {
+            selectedRule = rule;
         };
         
         $scope.calculateClassName = calculateClassNameForCategory;

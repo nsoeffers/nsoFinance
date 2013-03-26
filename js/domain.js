@@ -80,7 +80,12 @@ define('domain', ['moment'], function(moment){
                                                     },
                                                     set: function(newValue) {                                                                        
                                                     },
-                                                    enumerable: true, configurable: false});                                                    
+                                                    enumerable: true, configurable: false});
+    };
+    
+    Transaction.prototype.unassign = function() {
+        this.creditAccount = null;
+        this.debetAccount = null;
     };
     
     Transaction.createFromDBO = function(dbo){
@@ -144,7 +149,7 @@ define('domain', ['moment'], function(moment){
         var ruleAppliesOnTransaction = this.operator.compare(fieldValue, this.value);
         if ( ruleAppliesOnTransaction === true ){
             transaction.creditAccount = this.category;
-            transaction.assignedBy = { type : 'RULE', ruleId: this.id };
+            transaction.assignedBy = 'RULE_' + this.id;
         }
         return ruleAppliesOnTransaction;
     };

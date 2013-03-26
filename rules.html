@@ -66,7 +66,7 @@
                         <td><span>"{{rule.value}}"</span></td>
                         <td>"<span class="label {{calculateClassName(rule.category)}}">{{rule.category.name}}</span>"</td>
                         <td>
-                            <i class="icon-remove" ng-click="removeRule(rule)"></i>
+                            <a href="#confirmRuleRemoval" role="button" data-toggle="modal" ng-click="selectRule(rule)"><i class="icon-remove"></i></a>
                         </td>
                     </tr>
                     
@@ -83,5 +83,19 @@
             <span ng-repeat="category in categories">
                 <span class="label {{calculateClassName(category)}}">{{category.name}}</span>
             </span>
+        </div>
+        <div id="confirmRuleRemoval" class="modal hide fade">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3 data-i18n-key="ruleRemovalConfirmation"></h3>
+            </div>
+            <div class="modal-body">
+                <p data-i18n-key="ruleRemovalChoice"></p>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn" data-dismiss="modal" data-i18n-key="cancel"></a>
+                <a class="btn" data-dismiss="modal" ng-click="removeRule()" data-i18n-key="onlyRemoveRule"></a>
+                <a class="btn" data-dismiss="modal" ng-click="removeRuleAndAssignments()" data-i18n-key="removeRuleAndAssignments"></a>
+            </div>
         </div>
 </div>

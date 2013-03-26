@@ -32,6 +32,8 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
             
             var transactionStore = db.createObjectStore("Transaction", {keyPath: 'id', autoIncrement: true});
             transactionStore.createIndex('status', 'status', {unique : false});
+            transactionStore.createIndex('assignedBy', 'assignedBy', {unique : false});
+            
             db.createObjectStore("Rule", {keyPath: 'id', autoIncrement: true});                    
         };
         
@@ -170,6 +172,35 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
             cursorRequest.onerror = function(){
                 alert('Failed to retrieve items from IndexedDB');
             };
+        };
+        
+        repository.unassignAllTransactionsMappedBy = function(rule, successCallback){
+            if ( !db ) {
+                setTimeout(function() { repository.unassignAllTransactionsMappedBy(rule, successCallback); }, 100);
+                return;
+            }
+            var transaction = db.transaction([ 'Transaction' ], "readwrite");
+            var store = transaction.objectStore('Transaction');
+            var cursorRequest = store.index('assignedBy').openCursor(IDBKeyRange.only('RULE_' + rule.id));
+            cursorRequest.onsuccess = function(e) {
+                if ( !e.target || !e.target.result || e.target.result === null) {
+                    successCallback();
+                    return;
+                }
+                var entity = domain.Transaction.createFromDBO(e.target.result.value);
+                entity.unassign();
+                var updateRequest = e.target.result.update(entity);
+                updateRequest.onsuccess = function(updateEvent){
+                    window.console.log('Succesfully updated: ' + JSON.stringify(entity));
+                };
+                updateRequest.onerror = function() {
+                    alert('Failed to update transaction:' + JSON.stringify(entity));
+                };
+                e.target.result.continue();
+            };
+            cursorRequest.onerror = function(){
+                alert('Failed to retrieve items from IndexedDB');
+            };            
         };
         
         repository.getStatistics = function(callback){

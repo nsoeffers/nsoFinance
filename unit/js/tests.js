@@ -77,6 +77,18 @@ define('tests', ['domain'], function(domain) {
         transaction.debetAccount = { id: 1, name: 'debetAccount' };
         equal( false, transaction.tagged);
     });
+
+    test( "When unassign then transaction is not marked as tagged", function() {
+        var transaction = new domain.Transaction(new Date(2012, 0, 5), 10.0);
+        transaction.debetAccount = { id: 1, name: 'debetAccount' };
+        transaction.creditAccount = { id: 2, name: 'creditAccount' };
+        transaction.unassign();
+        
+        equal( false, transaction.tagged);
+        equal( "UNTAGGED_20120105", transaction.status)
+        equal( null, transaction.debetAccount );
+        equal( null, transaction.creditAccount );
+    });
     
     //test( "When only creditAccount is set then transaction is not marked as tagged", function() {
     //    var transaction = new domain.Transaction(new Date(), 10.0);
@@ -88,7 +100,7 @@ define('tests', ['domain'], function(domain) {
     test( "When debet and creditAccount are set then transaction is flagged as being tagged", function() {
         var transaction = new domain.Transaction(new Date(), 10.0);
         transaction.debetAccount = { id: 1, name: 'debetAccount' };
-        transaction.creditAccount = { id: 1, name: 'creditAccount' };
+        transaction.creditAccount = { id: 2, name: 'creditAccount' };
         equal( true, transaction.tagged);
     });
 
@@ -128,9 +140,7 @@ define('tests', ['domain'], function(domain) {
         transaction.description = 'test';
         equal(true, rule.process(transaction));
         equal(rule.category, transaction.creditAccount);
-        equal('RULE', transaction.assignedBy.type);
-        equal(1, transaction.assignedBy.ruleId);
-        
+        equal('RULE_1', transaction.assignedBy);        
     });    
 
     test( "When Rule processes a transaction which does not apply then return false and no category is set on transaction", function() {
