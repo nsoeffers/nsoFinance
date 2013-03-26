@@ -39,6 +39,7 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
         .controller('ImportCtrl', controllers.ImportCtrl)
         .controller('AssignCtrl', controllers.AssignCtrl)
         .controller('RulesCtrl', controllers.RulesCtrl)
+        .controller('MonthlyOverviewCtrl', controllers.MonthlyOverviewCtrl)
         .factory('categoryRepository', dao.createCategoryRepository)
         .factory('transactionRepository', dao.createTransactionRepository)
         .factory('ruleRepository', dao.createRuleRepository)
@@ -65,6 +66,9 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
             }).when('/rules', {
                 templateUrl: 'rules.html',
                 controller: 'RulesCtrl'                
+            }).when('/monthlyOverview', {
+                templateUrl: 'monthlyOverview.html',
+                controller: 'MonthlyOverviewCtrl'                
             }).when('/settings', {
                 templateUrl: 'settings.html',
                 controller: 'SettingsCtrl'

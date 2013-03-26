@@ -592,7 +592,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                         mappedTransactionCount++;
                         transactionRepository.save(data[i], function(entity) { 
                             mappedTransactionCount--;
-                            $window.console.log('Saved transaction' + JSON.stringify(entity)) 
+                            $window.console.log('Saved transaction' + JSON.stringify(entity));
                         });
                     }
                 }
@@ -671,6 +671,16 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         };
         
         $scope.calculateClassName = calculateClassNameForCategory;
+    };
+    
+    result.MonthlyOverviewCtrl = function($scope, transactionRepository){
+        
+        $scope.init = function() {
+            transactionRepository.getMonthlyStatistics(2012, 9, function(result) {
+                $scope.overview = result;
+                $scope.$apply();
+            });
+        };
     };
     
     result.SettingsCtrl = function($scope, $window, transactionRepository) {

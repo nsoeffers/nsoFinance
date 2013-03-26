@@ -146,7 +146,7 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
             };
             
             deleteRequest.onerror = function () {
-                window.alert('Error while deleting database')
+                window.alert('Error while deleting database');
             };
         };
         
@@ -173,7 +173,35 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
                 alert('Failed to retrieve items from IndexedDB');
             };
         };
-        
+
+        repository.getMonthlyStatistics = function(year, month, callback) {
+            if ( !db ) {
+                setTimeout(function() { repository.getMonthlyStatistics(year, month, callback); }, 100);
+                return;
+            }
+            var transaction = db.transaction([ 'Transaction' ], "readonly");
+            var store = transaction.objectStore('Transaction');
+            var fromKey = "TAGGED_" + moment(new Date(year, month-1, 1)).format('YYYYMM');
+            var toKey = "TAGGED_" + moment(new Date(year, month, 1)).format('YYYYMM');
+            var cursorRequest = store.index('status').openCursor(IDBKeyRange.bound(fromKey, toKey, true, false));
+            var result = {};
+            cursorRequest.onsuccess = function(e) {
+                if ( !e.target || !e.target.result || e.target.result === null) {
+                    callback(result);
+                    return;
+                }
+                var entity = domain.Transaction.createFromDBO(e.target.result.value);
+                if ( result[entity.creditAccount.name] === undefined ) {
+                    result[entity.creditAccount.name] = 0;
+                }
+                result[entity.creditAccount.name] += entity.amount;
+                e.target.result.continue();
+            };
+            cursorRequest.onerror = function(){
+                alert('Failed to retrieve items from IndexedDB');
+            };
+        };
+
         repository.unassignAllTransactionsMappedBy = function(rule, successCallback){
             if ( !db ) {
                 setTimeout(function() { repository.unassignAllTransactionsMappedBy(rule, successCallback); }, 100);
