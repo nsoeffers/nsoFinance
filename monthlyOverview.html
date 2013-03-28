@@ -1,0 +1,21 @@
+<div class="well well-small">
+    <h1>        
+        <span data-i18n-key="monthly_overview_title"></span>
+    </h1>
+</div>
+<div class="container-fluid" ng-init="init()">
+    <div class="row-fluid">
+        <table class="table table-striped">
+            <thead>
+                <th data-i18n-key="category_name"></th>
+                <th ng-repeat="label in periods">{{label}}</th>
+            </thead>
+            <tbody>
+                <tr ng-repeat="name in categories">
+                    <td>{{name}}</td>
+                    <td ng-repeat="label in periods">{{statisticsPerPeriod[label][name] | number:2}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -74,6 +74,7 @@ define('translations', [], function() {
         "ruleRemovalConfirmation"       : "Are you sure you want to remove the rule?",
         "ruleRemovalChoice"             : "Please choose if you only want to delete the rule or also all the assignments done with this rule. If you choose to delete the assignments then all transactions assigned using this rule will need to be reassigned. Be it manually, or by creating another rule.",
         
+        "reports"                       : "Reports",
         "monthly_overview_title"        : "Monthly overview",
         
         "settings"                      : "Settings",
@@ -168,6 +169,7 @@ define('translations', [], function() {
         "ruleRemovalConfirmation"       : "Bent u zeker dat u deze regel wilt verwijderen?",
         "ruleRemovalChoice"             : "Gelieve te kiezen of u enkel de regel wilt verwijderen of ook alle toewijzingen die zijn gebeurt met deze regel. Indien u kiest om ook de toewijzingen te verwijderen zal u de transacties die automatisch zijn toegewezen door deze regel opnieuw moeten toewijzen. Hetzij manueel, hetzij door een andere regel aan te maken.",
         
+        "reports"                       : "Rapporten",
         "monthly_overview_title"        : "Maand overzicht",
         
         "settings"                      : "Instellingen",
