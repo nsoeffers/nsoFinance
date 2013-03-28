@@ -181,13 +181,13 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
             }
             var transaction = db.transaction([ 'Transaction' ], "readonly");
             var store = transaction.objectStore('Transaction');
-            var fromKey = "TAGGED_" + moment(new Date(year, month-1, 1)).format('YYYYMM');
-            var toKey = "TAGGED_" + moment(new Date(year, month, 1)).format('YYYYMM');
+            var fromKey = "TAGGED_" + moment(new Date(year, month, 1)).format('YYYYMM');
+            var toKey = "TAGGED_" + moment(new Date(year, month+1, 1)).format('YYYYMM');
             var cursorRequest = store.index('status').openCursor(IDBKeyRange.bound(fromKey, toKey, true, false));
             var result = {};
             cursorRequest.onsuccess = function(e) {
                 if ( !e.target || !e.target.result || e.target.result === null) {
-                    callback(result);
+                    callback(result, year, month);
                     return;
                 }
                 var entity = domain.Transaction.createFromDBO(e.target.result.value);

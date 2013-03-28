@@ -675,11 +675,25 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
     
     result.MonthlyOverviewCtrl = function($scope, transactionRepository){
         
+        $scope.categories = {};
+        $scope.periods = [];
+        $scope.statisticsPerPeriod = {};
+        
         $scope.init = function() {
-            transactionRepository.getMonthlyStatistics(2012, 9, function(result) {
-                $scope.overview = result;
+            var period = moment(new Date(2012, 9, 1));
+            var processStatistics = function(result, year, month) {
+                $scope.statisticsPerPeriod[moment([year, month]).format('MM-YYYY')] = result;
+                for(var category in result){
+                    $scope.categories[category] = category;
+                }
                 $scope.$apply();
-            });
+            };
+            for ( var i = 0; i < 6; i++ ){
+                period = period.subtract('months', 1);
+                var periodLabel = period.format('MM-YYYY');
+                $scope.periods.push(periodLabel);
+                transactionRepository.getMonthlyStatistics(period.year(), period.month(), processStatistics);
+            }
         };
     };
     
