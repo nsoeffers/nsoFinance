@@ -76,6 +76,7 @@ define('translations', [], function() {
         
         "reports"                       : "Reports",
         "monthly_overview_title"        : "Monthly overview",
+        "category_evolution_chart_title": "Category evolution: ",
         
         "settings"                      : "Settings",
         "removeAllTransactionsDescription" : "Select this button if you want to delete all transactions. Other data like categories and rules will not be touched.",
@@ -171,6 +172,7 @@ define('translations', [], function() {
         
         "reports"                       : "Rapporten",
         "monthly_overview_title"        : "Maand overzicht",
+        "category_evolution_chart_title": "Categorie evolutie: ",
         
         "settings"                      : "Instellingen",
         "removeAllTransactionsDescription" : "Selecteer onderstaande knop indien u alle verrichtingen wilt verwijderen. Andere data zoals labels en regels zullen blijven bestaan.",

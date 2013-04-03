@@ -247,7 +247,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                         var transaction = new domain.Transaction(Date.parseExact(row[fieldToColumnIndexMap[domain.TransactionField.DATE.fieldName]], $scope.dateFormat).getTime(), 
                                                           parseFloat(amount),
                                                           row[fieldToColumnIndexMap[domain.TransactionField.DESCRIPTION.fieldName]]);
-                        for(index in rules){
+                        for(var index in rules){
                             rules[index].process(transaction);
                         }
                         transactionRepository.save(transaction, successCallback, errorCallback);
@@ -544,7 +544,6 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         $scope.init = function() {
             $timeout(refreshDragAndDropTargets, 0, false);
             
-            $('.sortable').sortable().disableSelection();
             ruleRepository.findAll(function(results) {
                     $scope.rules = results;
                     $scope.$apply();
@@ -673,11 +672,12 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         $scope.calculateClassName = calculateClassNameForCategory;
     };
     
-    result.MonthlyOverviewCtrl = function($scope, transactionRepository){
+    result.MonthlyOverviewCtrl = function($scope, $cookies, $locale, transactionRepository){
         
         $scope.categories = {};
         $scope.periods = [];
         $scope.statisticsPerPeriod = {};
+        $scope.chartData = [];
         
         $scope.init = function() {
             var period = moment(new Date(2012, 9, 1));
@@ -693,6 +693,18 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
                 var periodLabel = period.format('MM-YYYY');
                 $scope.periods.push(periodLabel);
                 transactionRepository.getMonthlyStatistics(period.year(), period.month(), processStatistics);
+            }
+        };
+        
+        $scope.selectCategory = function(categoryName){
+            $scope.chartData = [];
+            $scope.chartTitle = translate('category_evolution_chart_title', $cookies, $locale) + categoryName;
+            for(var periodIndex in $scope.periods){
+                var period = $scope.periods[periodIndex];
+                var value = $scope.statisticsPerPeriod[period][categoryName];
+                if ( value !== undefined){
+                    $scope.chartData.push([period, Math.abs(value)]);
+                }
             }
         };
     };

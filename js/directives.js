@@ -29,6 +29,41 @@ define('directives', function() {
             }
         };
     };
+    
+    directives.barchart = function() {
+        var drawChart = function(element, chartData, title){
+            if ( chartData === undefined || chartData === null || chartData.length === 0 ){
+                return;
+            }
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Topping');
+            data.addColumn('number', 'Slices');
+            data.addRows(chartData);
+    
+            var width = element[0].offsetWidth;
+            // Set chart options
+            var options = {'title': title,
+                           'width':width,
+                           'height':300, 
+                           'legend': {position: 'none'},
+                           'vAxis': {minValue: 0}};
+    
+            // Instantiate and draw our chart, passing in some options.
+            var chart = new google.visualization.ColumnChart(element[0]);
+            chart.draw(data, options);
+        };
+        
+        return { 
+            restrict: 'E',
+            replace: true,
+            template: '<div></div>',
+            link: function(scope, element, attrs){
+                scope.$watch(attrs.chartData, function() {
+                    drawChart(element, scope[attrs.chartData], scope[attrs.chartTitle]);
+                });
+            }
+        };
+    };
    
     directives.typeaheadSource = function() {
         return function(scope, element, attrs){

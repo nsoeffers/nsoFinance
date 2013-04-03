@@ -8,7 +8,8 @@ requirejs.config({
         'jquery.csv'        : 'jquery.csv-0.63',
         'modernizr'         : 'modernizr-2.6.2.min',
         'moment'            : 'moment.min',
-        'spin'              : 'spin.min'
+        'spin'              : 'spin.min',
+        'google'            : 'https://www.google.com/jsapi?ext'
     },
     shim: {
         'angular': {
@@ -22,15 +23,22 @@ requirejs.config({
             deps: ['jquery'],
             exports: 'bootstrap'
         },
+        'jqueryUI': {
+            deps: ['jquery']
+        },
         'modernizr' : {
             exports: 'Modernizr'
+        },
+        'google' : {
+            exports: 'google'
         }
     }
 });
 
 require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'dao', 'domain', 'controllers', 
-          'directives', 'modernizr', 'jqueryUI',  'datejs', 'domReady'], 
-        function($, angular, angularCookies, bootstrap, translations, dao, domain, controllers, directives, Modernizr) {
+          'directives', 'modernizr', 'goog!visualization,1,packages:[corechart]', 'jqueryUI',  'datejs', 'domReady'], 
+        function($, angular, angularCookies, bootstrap, translations, dao, domain, controllers, directives, Modernizr, 
+                 google) {
     angular.module('nsoFinance', ['ngCookies'])
         .controller('RootCtrl', controllers.RootCtrl)
         .controller('CategoryListCtrl', controllers.CategoryListCtrl)
@@ -54,6 +62,7 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
         .directive('bankAccountNumber', directives.bankAccountNumber)
         .directive('typeaheadSource', directives.typeaheadSource)
         .directive('previousView', directives.previousView)
+        .directive('barchart', directives.barchart)
         .config(function($routeProvider){            
             $routeProvider.when('/category', {
                 templateUrl: 'category.html'
@@ -79,10 +88,10 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
                 controller: 'AssignCtrl'                
             });
         })
-        .run(function($location) {            
-            $('.loadingPanel').hide();
-            if ( !Modernizr.indexeddb ){
-                $location.path('/unsupported');
+        .run(function($location){
+            $('.loadingPanel').hide();                                                                                                                                                                     
+            if ( !Modernizr.indexeddb ){                                                                                                                                                                   
+                $location.path('/unsupported');                                                                                                                                                            
             }
         });
         

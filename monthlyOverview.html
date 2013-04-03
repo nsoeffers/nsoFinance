@@ -12,10 +12,13 @@
             </thead>
             <tbody>
                 <tr ng-repeat="name in categories">
-                    <td>{{name}}</td>
+                    <td><a class="btn btn-link" ng-click="selectCategory(name)">{{name}}</a></td>
                     <td ng-repeat="label in periods">{{statisticsPerPeriod[label][name] | number:2}}</td>
                 </tr>
             </tbody>
         </table>
+    </div>
+    <div class="row-fluid">
+        <barchart data-chart-data="chartData" data-chart-title="chartTitle"/>
     </div>
 </div>
