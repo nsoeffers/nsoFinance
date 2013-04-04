@@ -679,6 +679,10 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         $scope.statisticsPerPeriod = {};
         $scope.chartData = [];
         
+        $scope.categories = {};
+        $scope.periods = [];
+        $scope.statisticsPerPeriod = {};
+        
         $scope.init = function() {
             var period = moment(new Date(2012, 9, 1));
             var processStatistics = function(result, year, month) {
