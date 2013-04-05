@@ -8,17 +8,18 @@
         <table class="table table-striped">
             <thead>
                 <th data-i18n-key="category_name"></th>
-                <th ng-repeat="label in periods">{{label}}</th>
+                <th ng-repeat="period in periods"><a class="btn btn-link" ng-click="selectPeriod(period)">{{period}}</a></th>
             </thead>
             <tbody>
                 <tr ng-repeat="name in categories">
                     <td><a class="btn btn-link" ng-click="selectCategory(name)">{{name}}</a></td>
-                    <td ng-repeat="label in periods">{{statisticsPerPeriod[label][name] | number:2}}</td>
+                    <td ng-repeat="period in periods">{{statisticsPerPeriod[period][name] | number:2}}</td>
                 </tr>
             </tbody>
         </table>
     </div>
     <div class="row-fluid">
-        <barchart data-chart-data="chartData" data-chart-title="chartTitle"/>
+        <barchart data-chart-data="chartData" data-chart-title="chartTitle" ng-show="showBarChart"/>
+        <piechart data-chart-data="chartData" data-chart-title="chartTitle" ng-hide="showBarChart"/>
     </div>
 </div>

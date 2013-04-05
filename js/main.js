@@ -28,17 +28,13 @@ requirejs.config({
         },
         'modernizr' : {
             exports: 'Modernizr'
-        },
-        'google' : {
-            exports: 'google'
         }
     }
 });
 
 require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'dao', 'domain', 'controllers', 
-          'directives', 'modernizr', 'goog!visualization,1,packages:[corechart]', 'jqueryUI',  'datejs', 'domReady'], 
-        function($, angular, angularCookies, bootstrap, translations, dao, domain, controllers, directives, Modernizr, 
-                 google) {
+          'directives', 'modernizr', 'jqueryUI',  'datejs', 'domReady'], 
+        function($, angular, angularCookies, bootstrap, translations, dao, domain, controllers, directives, Modernizr) {
     angular.module('nsoFinance', ['ngCookies'])
         .controller('RootCtrl', controllers.RootCtrl)
         .controller('CategoryListCtrl', controllers.CategoryListCtrl)
@@ -63,6 +59,7 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
         .directive('typeaheadSource', directives.typeaheadSource)
         .directive('previousView', directives.previousView)
         .directive('barchart', directives.barchart)
+        .directive('piechart', directives.piechart)
         .config(function($routeProvider){            
             $routeProvider.when('/category', {
                 templateUrl: 'category.html'

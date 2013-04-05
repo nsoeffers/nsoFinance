@@ -701,15 +701,31 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         };
         
         $scope.selectCategory = function(categoryName){
-            $scope.chartData = [];
+            var newChartData = [];
             $scope.chartTitle = translate('category_evolution_chart_title', $cookies, $locale) + categoryName;
             for(var periodIndex in $scope.periods){
                 var period = $scope.periods[periodIndex];
                 var value = $scope.statisticsPerPeriod[period][categoryName];
                 if ( value !== undefined){
-                    $scope.chartData.push([period, Math.abs(value)]);
+                    newChartData.push([period, Math.abs(value)]);
                 }
             }
+            $scope.chartData = newChartData;
+            $scope.showBarChart = true;
+        };
+        
+        $scope.selectPeriod = function(period){
+            var newChartData = [];
+            $scope.chartTitle = translate('category_evolution_chart_title', $cookies, $locale) + categoryName;
+            if ( $scope.statisticsPerPeriod[period]){
+                for(var categoryIndex in $scope.categories ){
+                    var categoryName = $scope.categories[categoryIndex];
+                    var value = $scope.statisticsPerPeriod[period][categoryName];
+                    newChartData.push([categoryName, Math.abs(value)]);
+                }
+            }
+            $scope.chartData = newChartData;
+            $scope.showBarChart = false;
         };
     };
     
