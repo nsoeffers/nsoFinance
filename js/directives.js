@@ -1,4 +1,4 @@
-define('directives', ['goog!visualization,1,packages:[corechart]'], function(g) {
+define(['goog!visualization,1,packages:[corechart]'], function(g) {
     var directives = {};
     
     var drawChart = function(element, chart, chartData, title){

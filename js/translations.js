@@ -1,4 +1,4 @@
-define('translations', [], function() {
+define(function() {
     var translations = {};
     
     translations['en-us'] = {        

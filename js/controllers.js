@@ -1,4 +1,4 @@
-define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', 'translations', 'jquery.csv', 'modernizr', 'moment', 'spin', 'jqueryUI'], 
+define(['jquery', 'angular', 'angularCookies', 'dao', 'domain', 'translations', 'jquery.csv', 'modernizr', 'moment', 'spin', 'jqueryUI'], 
     function($, angular, angularCookies, dao, domain, translations, jqueryCsv, Modernizr, moment, Spinner) {
     
     var CATEGORY_SELECTED_EVENT = 'categorySelected';
@@ -15,7 +15,7 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         this.message = message;    
     };
     
-    result.RootCtrl = function($scope, $rootScope, $locale, $cookies, $window, categoryRepository){
+    result.RootCtrl = function($scope, $rootScope, $locale, $cookies, $window, categoryRepository, syncManager){
                 
         $scope.languages = [];
         $scope.notifications = [];
@@ -48,6 +48,10 @@ define('controllers', ['jquery', 'angular', 'angularCookies', 'dao', 'domain', '
         $scope.setLanguage = function(language){
             $cookies.languagePreference = language;
             $window.location.reload();
+        };
+        
+        $scope.sync = function() {
+            syncManager.sync();  
         };
         
         $scope.$on(NOTIFICATION_EVENT, function(event, notification){

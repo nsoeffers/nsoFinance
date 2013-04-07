@@ -1,4 +1,4 @@
-define('domain', ['moment'], function(moment){
+define(['moment'], function(moment){
     var domain = {};
         
     
