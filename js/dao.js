@@ -32,6 +32,7 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
             
             var transactionStore = db.createObjectStore("Transaction", {keyPath: 'id', autoIncrement: true});
             transactionStore.createIndex('status', 'status', {unique : false});
+            transactionStore.createIndex('modifiedOn', 'modifiedOn', {unique : false});
             transactionStore.createIndex('assignedBy', 'assignedBy', {unique : false});
             
             db.createObjectStore("Rule", {keyPath: 'id', autoIncrement: true});                    
@@ -126,7 +127,7 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
         return repository;
     };
 
-    dao.createTransactionRepository = function() {
+    function createTransactionRepository() {
         var repository = createRepository('Transaction', domain.Transaction.createFromDBO);
         
         repository.reset = function() {
@@ -160,6 +161,28 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
             var fromKey = "UNTAGGED_" + moment(from).format('YYYYMMDD');
             var toKey = "UNTAGGED_" + moment(to).format('YYYYMMDD');
             var cursorRequest = store.index('status').openCursor(IDBKeyRange.bound(fromKey, toKey, true, true), "prev");
+            var results = [];
+            cursorRequest.onsuccess = function(e) {
+                if ( !e.target || !e.target.result || e.target.result === null) {
+                    callback(results);
+                    return;
+                }
+                results.push(domain.Transaction.createFromDBO(e.target.result.value));
+                e.target.result.continue();
+            };
+            cursorRequest.onerror = function(){
+                alert('Failed to retrieve items from IndexedDB');
+            };
+        };
+
+        repository.findModifiedTransactions = function(since, callback) {
+            if ( !db ) {
+                setTimeout(function() { repository.findModifiedTransactions(since, callback); }, 100);
+                return;
+            }
+            var transaction = db.transaction([ 'Transaction' ], "readonly");
+            var store = transaction.objectStore('Transaction');
+            var cursorRequest = store.index('status').openCursor(IDBKeyRange.lowerBound(since, true), "prev");
             var results = [];
             cursorRequest.onsuccess = function(e) {
                 if ( !e.target || !e.target.result || e.target.result === null) {
@@ -260,7 +283,7 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
         };
         
         return repository;
-    };
+    }
     
     dao.createRuleRepository = function() {
         var repository = createRepository('Rule', domain.Rule.createFromDBO);
@@ -269,7 +292,8 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
 
     var save = function (entity, successCallback, failureCallback, storeName){
         var transaction = db.transaction([ storeName ], "readwrite");
-        var store = transaction.objectStore(storeName);        
+        var store = transaction.objectStore(storeName);
+        entity.modifiedOn = moment().format('YYYYMMDDHHmmssSSS');
         if ( entity !== null && entity.id !== undefined && entity.id !== null ) {
             var getRequest = store.put(entity);
             getRequest.onsuccess = function() {
@@ -330,6 +354,7 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
         };
     };
     
+    dao.transactionRepository = createTransactionRepository();
     
     return dao;
 });

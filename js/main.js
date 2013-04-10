@@ -45,7 +45,7 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
         .controller('RulesCtrl', controllers.RulesCtrl)
         .controller('MonthlyOverviewCtrl', controllers.MonthlyOverviewCtrl)
         .factory('categoryRepository', dao.createCategoryRepository)
-        .factory('transactionRepository', dao.createTransactionRepository)
+        .factory('transactionRepository', function() { return dao.transactionRepository; })
         .factory('ruleRepository', dao.createRuleRepository)
         .factory('syncManager', function() { return new SyncManager(); })
         .value('Translations', translations)
