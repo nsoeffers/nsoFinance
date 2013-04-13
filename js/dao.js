@@ -182,7 +182,7 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
             }
             var transaction = db.transaction([ 'Transaction' ], "readonly");
             var store = transaction.objectStore('Transaction');
-            var cursorRequest = store.index('status').openCursor(IDBKeyRange.lowerBound(since, true), "prev");
+            var cursorRequest = store.index('modifiedOn').openCursor(IDBKeyRange.lowerBound(since, true), "prev");
             var results = [];
             cursorRequest.onsuccess = function(e) {
                 if ( !e.target || !e.target.result || e.target.result === null) {
