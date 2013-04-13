@@ -302,3 +302,16 @@ div[ng-view].aboutToNavigate{
     color: #3A87AD;
     font-size: 0.9em;
 }
+
+@-webkit-keyframes rotateAnimation /* Safari and Chrome */
+{
+    from {-webkit-transform: rotate(0deg);}
+    to {-webkit-transform: rotate(360deg);}
+}
+
+.syncing .icon-refresh {
+    -webkit-animation: 1s rotateAnimation;   
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-delay: 0s;
+    -webkit-animation-timing-function: linear;    
+}

@@ -51,7 +51,12 @@ define(['jquery', 'angular', 'angularCookies', 'dao', 'domain', 'translations', 
         };
         
         $scope.sync = function() {
-            syncManager.sync();  
+            $scope.syncing = true;
+            syncManager.sync(function() {
+                $scope.$apply(function() {
+                    $scope.syncing = false;
+                });
+            });  
         };
         
         $scope.$on(NOTIFICATION_EVENT, function(event, notification){
