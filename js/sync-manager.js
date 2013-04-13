@@ -1,4 +1,4 @@
-define(['gapi!fusiontables,v1!drive,v2', 'dao'], function(gapi, dao) {
+define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment'], function(gapi, dao, moment) {
         
     var SyncManager = function(){
     };
@@ -18,25 +18,58 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao'], function(gapi, dao) {
             callback();
         });
     };
+    
+    var BATCH_SIZE = 500;
+    var tableId = !!window.localStorage && !!window.localStorage.fusionTableId? window.localStorage.fusionTableId: null;
         
-    function sync() {
-        if ( !!window.localStorage && !!window.localStorage.fusionTableId ) {
-            var tableId = window.localStorage.fusionTableId;
-            var since = !!window.localStorage && !!window.localStorage.lastSync? window.localStorage.lastSync : '0';
-            dao.transactionRepository.findModifiedTransactions(since, function(transactions) {
-                var sqlQuery = "";
-                for(var i = 0; i < 100; i++){
-                    var t = transactions[i];
-                    sqlQuery += 'INSERT INTO ' + tableId + '(date, amount, description) VALUES (\'' + moment(t.date).format('YYYY.MM.DD') + '\',' + t.amount + ', \'' + t.description.replace("'", "\\'") + '\');';
-                }
-                var sqlRequest = gapi.client.fusiontables.query.sql({sql: sqlQuery});
-                sqlRequest.execute(function(sqlResponse) {
-                    window.console.log(JSON.stringify(sqlResponse));
-                });
-            });
-        } else {
+    function sync(callback) {
+        if ( tableId === null || tableId === undefined) {
             createFusionTable();
         }
+        var now = new Date();
+        var since = !!window.localStorage && !!window.localStorage.lastSync? window.localStorage.lastSync : '0';
+        dao.transactionRepository.findModifiedTransactions(since, function(transactions) { 
+            var wrapperCallback = function() {
+                window.localStorage.lastSync = moment(now).format('YYYYMMDDHHmmssSSS');
+                callback();
+            };
+            if ( !transactions || transactions.length === 0){
+                wrapperCallback(0);
+            } else {
+                saveTransactionsInCloud(transactions, wrapperCallback);
+            }
+        });
+    }
+    
+    function saveTransactionsInCloud(transactions, callback) {
+        window.setTimeout(saveTransactionBatchInCloud, 100, transactions, 0, callback);
+    }
+    
+    function saveTransactionBatchInCloud(transactions, batchIndex, callback){
+        var totalTransactionCount = transactions.length;
+        var sqlQuery = "";
+        var endOfBatch = ((batchIndex+1)*BATCH_SIZE) > totalTransactionCount? (totalTransactionCount % BATCH_SIZE) : BATCH_SIZE;
+        for(var i = 0; i < endOfBatch; i++){
+            sqlQuery += createInsertQuery(transactions[i+(batchIndex*BATCH_SIZE)]);
+        }
+        var sqlRequest = gapi.client.fusiontables.query.sql({sql: sqlQuery});
+        sqlRequest.execute(function(sqlResponse) {
+            window.console.log(!!sqlResponse.rows? 'Succesfully saved:' + sqlResponse.rows.length + ' rows' : sqlResponse);
+            if ( (batchIndex+1) < totalTransactionCount/BATCH_SIZE){
+                window.setTimeout(saveTransactionBatchInCloud, 550, transactions, batchIndex+1, callback);
+            } else {
+                callback(transactions.length);
+            }
+        });        
+    }
+    
+    function createInsertQuery(t){
+        return 'INSERT INTO ' + tableId + '(date, amount, description, creditAccountType, creditAccountName) VALUES (\''
+            + moment(t.date).format('YYYY.MM.DD') + '\',' 
+            + t.amount + ', \'' 
+            + t.description.replace("'", "\\'") + '\', \'' 
+            + (t.creditAccount === null || t.creditAccount === undefined ? '' : t.creditAccount.type) + '\', \'' 
+            + (t.creditAccount === null || t.creditAccount === undefined ? '' : t.creditAccount.name)  + '\');';
     }
     
     function createFusionTable() {
@@ -56,11 +89,13 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao'], function(gapi, dao) {
         });
     }
     
-    SyncManager.prototype.sync = function() {
+    SyncManager.prototype.sync = function(callback) {
         if ( isAuthenticated ){
-            sync();
+            sync(callback);
         } else {
-            login(sync);
+            login(function() {
+                sync(callback);
+            });
         }
     };
     
