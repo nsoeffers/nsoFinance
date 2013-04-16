@@ -34,7 +34,7 @@ requirejs.config({
 
 require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'dao', 'domain', 'controllers', 
           'directives', 'modernizr', 'sync-manager', 'jqueryUI',  'datejs', 'domReady'], 
-        function($, angular, angularCookies, bootstrap, translations, dao, domain, controllers, directives, Modernizr, SyncManager) {
+        function($, angular, angularCookies, bootstrap, translations, dao, domain, controllers, directives, Modernizr, syncManager) {
     angular.module('nsoFinance', ['ngCookies'])
         .controller('RootCtrl', controllers.RootCtrl)
         .controller('CategoryListCtrl', controllers.CategoryListCtrl)
@@ -47,7 +47,7 @@ require([ 'jquery', 'angular', 'angularCookies', 'bootstrap', 'translations', 'd
         .factory('categoryRepository', dao.createCategoryRepository)
         .factory('transactionRepository', function() { return dao.transactionRepository; })
         .factory('ruleRepository', dao.createRuleRepository)
-        .factory('syncManager', function() { return new SyncManager(); })
+        .factory('syncManager', function() { return syncManager; })
         .value('Translations', translations)
         .filter('translate', function(Translations, $locale, $cookies) {
             return function(input) {
