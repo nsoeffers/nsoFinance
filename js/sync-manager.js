@@ -6,7 +6,7 @@ define(['cloud-repository', 'dao', 'moment'], function(cloudRepository, dao, mom
     SyncManager.prototype.sync = function(callback) {
         var now = new Date();
         var since = !!window.localStorage && !!window.localStorage.lastSync? window.localStorage.lastSync : '0';
-        dao.transactionRepository.findModifiedTransactions(since, function(transactions) { 
+        dao.transactionRepository.findModifiedTransactions(since, function(transactions, updateCallback) { 
             var wrapperCallback = function() {
                 window.localStorage.lastSync = moment(now).format('YYYYMMDDHHmmssSSS');
                 callback();
@@ -14,7 +14,7 @@ define(['cloud-repository', 'dao', 'moment'], function(cloudRepository, dao, mom
             if ( !transactions || transactions.length === 0){
                 wrapperCallback(0);
             } else {
-                cloudRepository.saveTransactions(transactions, wrapperCallback);
+                cloudRepository.saveTransactions(transactions, wrapperCallback, updateCallback);
             }
         });
     };

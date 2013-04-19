@@ -24,9 +24,9 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment'], function(gapi, dao, m
         });
     }
     
-    function saveTransactionsAndCreateTableIfNecessary(transactions, callback) {
+    function saveTransactionsAndCreateTableIfNecessary(transactions, callback, updateCallback) {
         var saveTransactionsWhenTableExists = function() {
-            window.setTimeout(saveTransactionsInBatch, 100, transactions, 0, callback);
+            window.setTimeout(saveTransactionsInBatch, 100, transactions, 0, callback, updateCallback);
         };
         if ( getTableId() === null || getTableId() === undefined) {
             createFusionTable(saveTransactionsWhenTableExists);
@@ -35,7 +35,7 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment'], function(gapi, dao, m
         }
     }
     
-    function saveTransactionsInBatch(transactions, batchIndex, callback){
+    function saveTransactionsInBatch(transactions, batchIndex, callback, updateCallback){
         var totalTransactionCount = transactions.length;
         var sqlQuery = "";
         var endOfBatch = ((batchIndex+1)*BATCH_SIZE) > totalTransactionCount? (totalTransactionCount % BATCH_SIZE) : BATCH_SIZE;
@@ -45,8 +45,15 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment'], function(gapi, dao, m
         var sqlRequest = gapi.client.fusiontables.query.sql({sql: sqlQuery});
         sqlRequest.execute(function(sqlResponse) {
             window.console.log(!!sqlResponse.rows? 'Succesfully saved:' + sqlResponse.rows.length + ' rows' : sqlResponse);
+            if ( sqlResponse.rows ) {
+                for(var rowIndex = 0; rowIndex < sqlResponse.rows.length; rowIndex++) {
+                    var transaction = transactions[(batchIndex*BATCH_SIZE)+rowIndex];
+                    transaction.serverId = sqlResponse.rows[rowIndex][0];
+                    updateCallback(transaction);
+                }
+            }
             if ( (batchIndex+1) < totalTransactionCount/BATCH_SIZE){
-                window.setTimeout(saveTransactionsInBatch, 550, transactions, batchIndex+1, callback);
+                window.setTimeout(saveTransactionsInBatch, 550, transactions, batchIndex+1, callback, updateCallback);
             } else {
                 callback(transactions.length);
             }
@@ -80,12 +87,12 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment'], function(gapi, dao, m
         });
     }
     
-    CloudRepository.prototype.saveTransactions = function(transactions, callback){
+    CloudRepository.prototype.saveTransactions = function(transactions, callback, updateCallback){
         if ( isAuthenticated ){
-            saveTransactionsAndCreateTableIfNecessary(transactions, callback);
+            saveTransactionsAndCreateTableIfNecessary(transactions, callback, updateCallback);
         } else {
             login(function() {
-                saveTransactionsAndCreateTableIfNecessary(transactions, callback);
+                saveTransactionsAndCreateTableIfNecessary(transactions, callback, updateCallback);
             });
         }        
     };

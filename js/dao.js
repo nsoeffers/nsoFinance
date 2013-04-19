@@ -1,6 +1,6 @@
 define('dao', ['domain', 'moment'], function(domain, moment) {
     
-    var DB_NAME = 'nsoFinance'
+    var DB_NAME = 'nsoFinance';
     var dao = {};
     
     var db;
@@ -109,7 +109,7 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
             var store = transaction.objectStore(STORE_NAME);            
             var lastChar = query.toUpperCase().slice(-1);
             var queryEnd = query.toUpperCase().slice(0, -1) + String.fromCharCode(lastChar.charCodeAt(0)+1);
-            var cursorRequest = store.index('caseInsensitiveName').openCursor(IDBKeyRange.bound(query.toUpperCase(), queryEnd, false, true));
+            var cursorRequest = store.index('caseInsensitiveName').openCursor(window.IDBKeyRange.bound(query.toUpperCase(), queryEnd, false, true));
             var results = [];
             cursorRequest.onsuccess = function(e) {
                 if ( !e.target || !e.target.result || e.target.result === null) {
@@ -160,7 +160,7 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
             var store = transaction.objectStore('Transaction');
             var fromKey = "UNTAGGED_" + moment(from).format('YYYYMMDD');
             var toKey = "UNTAGGED_" + moment(to).format('YYYYMMDD');
-            var cursorRequest = store.index('status').openCursor(IDBKeyRange.bound(fromKey, toKey, true, true), "prev");
+            var cursorRequest = store.index('status').openCursor(window.IDBKeyRange.bound(fromKey, toKey, true, true), "prev");
             var results = [];
             cursorRequest.onsuccess = function(e) {
                 if ( !e.target || !e.target.result || e.target.result === null) {
@@ -182,11 +182,23 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
             }
             var transaction = db.transaction([ 'Transaction' ], "readonly");
             var store = transaction.objectStore('Transaction');
-            var cursorRequest = store.index('modifiedOn').openCursor(IDBKeyRange.lowerBound(since, true), "prev");
+            var cursorRequest = store.index('modifiedOn').openCursor(window.IDBKeyRange.lowerBound(since, true), "prev");
             var results = [];
+            var updateCallback = function(entity) {
+                var updateTransaction = db.transaction([ 'Transaction' ], "readwrite");
+                var storeToUpdate = updateTransaction.objectStore('Transaction');
+                
+                var updateRequest= storeToUpdate.put(entity);
+                updateRequest.onsuccess = function(e){
+                    window.console.log('Updated entity with id:' + entity.id + ' and serverId:' + entity.serverId);  
+                };
+                updateRequest.onerror = function() {
+                    alert('Failed to update synced item');
+                };
+            };
             cursorRequest.onsuccess = function(e) {
                 if ( !e.target || !e.target.result || e.target.result === null) {
-                    callback(results);
+                    callback(results, updateCallback);
                     return;
                 }
                 results.push(domain.Transaction.createFromDBO(e.target.result.value));
