@@ -7,14 +7,14 @@ define(['cloud-repository', 'dao', 'moment'], function(cloudRepository, dao, mom
         var now = new Date();
         var since = !!window.localStorage && !!window.localStorage.lastSync? window.localStorage.lastSync : '0';
         dao.transactionRepository.findModifiedTransactions(since, function(transactions, updateCallback) { 
-            var wrapperCallback = function() {
+            var wrapperCallback = function(updatedTransactions) {
+                updateCallback(updatedTransactions, callback);
                 window.localStorage.lastSync = moment(now).format('YYYYMMDDHHmmssSSS');
-                callback();
             };
             if ( !transactions || transactions.length === 0){
                 wrapperCallback(0);
             } else {
-                cloudRepository.saveTransactions(transactions, wrapperCallback, updateCallback);
+                cloudRepository.saveTransactions(transactions, wrapperCallback);
             }
         });
     };

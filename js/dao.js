@@ -184,17 +184,21 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
             var store = transaction.objectStore('Transaction');
             var cursorRequest = store.index('modifiedOn').openCursor(window.IDBKeyRange.lowerBound(since, true), "prev");
             var results = [];
-            var updateCallback = function(entity) {
-                var updateTransaction = db.transaction([ 'Transaction' ], "readwrite");
-                var storeToUpdate = updateTransaction.objectStore('Transaction');
+            var updateCallback = function(updatedTransactions, callback) {
+                var dbTransaction = db.transaction([ 'Transaction' ], "readwrite");
+                var transactionStore = dbTransaction.objectStore('Transaction');
                 
-                var updateRequest= storeToUpdate.put(entity);
-                updateRequest.onsuccess = function(e){
-                    window.console.log('Updated entity with id:' + entity.id + ' and serverId:' + entity.serverId);  
+                dbTransaction.oncomplete = function(e){
+                    window.console.log('Updated entities');
+                    callback();                    
                 };
-                updateRequest.onerror = function() {
+                dbTransaction.onerror = function() {
                     alert('Failed to update synced item');
                 };
+                
+                for(var index in updatedTransactions){
+                    transactionStore.put(updatedTransactions[index]);
+                }
             };
             cursorRequest.onsuccess = function(e) {
                 if ( !e.target || !e.target.result || e.target.result === null) {
