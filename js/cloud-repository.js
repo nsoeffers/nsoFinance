@@ -40,7 +40,8 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment'], function(gapi, dao, m
         var sqlQuery = "";
         var endOfBatch = ((batchIndex+1)*BATCH_SIZE) > totalTransactionCount? (totalTransactionCount % BATCH_SIZE) : BATCH_SIZE;
         for(var i = 0; i < endOfBatch; i++){
-            sqlQuery += createInsertQuery(transactions[i+(batchIndex*BATCH_SIZE)]);
+            var transaction = transactions[i+(batchIndex*BATCH_SIZE)];
+            sqlQuery += !transaction.serverId? createInsertQuery(transaction) : createUpdateQuery(transaction);
         }
         var sqlRequest = gapi.client.fusiontables.query.sql({sql: sqlQuery});
         sqlRequest.execute(function(sqlResponse) {
@@ -65,6 +66,15 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment'], function(gapi, dao, m
             + t.description.replace("'", "\\'") + '\', \'' 
             + (t.creditAccount === null || t.creditAccount === undefined ? '' : t.creditAccount.type) + '\', \'' 
             + (t.creditAccount === null || t.creditAccount === undefined ? '' : t.creditAccount.name)  + '\');';
+    }
+
+    function createUpdateQuery(t){
+        var query = 'UPDATE ' + getTableId() + ' SET ' 
+            + 'creditAccountType = \'' + (t.creditAccount === null || t.creditAccount === undefined ? '' : t.creditAccount.type) + '\', ' 
+            + 'creditAccountName = \'' + (t.creditAccount === null || t.creditAccount === undefined ? '' : t.creditAccount.name)  + '\'' 
+            + ' WHERE ROWID = \'' + t.serverId + '\';';
+        window.console.log('QUERY: ' + query);
+        return query;
     }
     
     function createFusionTable(callback) {

@@ -12,7 +12,7 @@ define(['cloud-repository', 'dao', 'moment'], function(cloudRepository, dao, mom
                 window.localStorage.lastSync = moment(now).format('YYYYMMDDHHmmssSSS');
             };
             if ( !transactions || transactions.length === 0){
-                wrapperCallback(0);
+                wrapperCallback([]);
             } else {
                 cloudRepository.saveTransactions(transactions, wrapperCallback);
             }

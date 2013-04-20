@@ -185,6 +185,10 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
             var cursorRequest = store.index('modifiedOn').openCursor(window.IDBKeyRange.lowerBound(since, true), "prev");
             var results = [];
             var updateCallback = function(updatedTransactions, callback) {
+                if ( updatedTransactions === undefined || updatedTransactions === null || updatedTransactions.length === 0 ){
+                    callback();
+                    return;
+                }
                 var dbTransaction = db.transaction([ 'Transaction' ], "readwrite");
                 var transactionStore = dbTransaction.objectStore('Transaction');
                 
@@ -196,7 +200,7 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
                     alert('Failed to update synced item');
                 };
                 
-                for(var index in updatedTransactions){
+                for(var index = 0; index < updatedTransactions.length; index++){
                     transactionStore.put(updatedTransactions[index]);
                 }
             };

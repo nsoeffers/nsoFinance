@@ -95,6 +95,7 @@ define(['moment'], function(moment){
         transaction.debetAccount = dbo.debetAccount;
         transaction.assignedBy = dbo.assignedBy;    
         transaction.modifiedOn = dbo.modifiedOn;    
+        transaction.serverId = dbo.serverId;    
         return transaction;
     };
     Object.defineProperty( domain, "Transaction", {  value: Transaction,  writable: false, enumerable: true, configurable: false});    
