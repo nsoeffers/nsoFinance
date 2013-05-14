@@ -24,11 +24,8 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment', 'domain'], function(ga
         });
     }
     
-    function saveTransactionsAndCreateTableIfNecessary(transactions, callback) {
-        var saveTransactionsWhenTableExists = function() {
-            window.setTimeout(saveTransactionsInBatch, 100, transactions, 0, callback);
-        };
-        saveTransactionsWhenTableExists();
+    function _saveTransactions(transactions, callback) {
+        window.setTimeout(saveTransactionsInBatch, 100, transactions, 0, callback);
     }
     
     function saveTransactionsInBatch(transactions, batchIndex, callback){
@@ -56,12 +53,13 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment', 'domain'], function(ga
     }
     
     function createInsertQuery(t){
-        return 'INSERT INTO ' + getTableId() + '(date, amount, description, creditAccountType, creditAccountName) VALUES (\''
+        return 'INSERT INTO ' + getTableId() + '(date, amount, description, creditAccountType, creditAccountName, lastSyncedOn) VALUES (\''
             + moment(t.date).format('YYYY.MM.DD') + '\',' 
             + t.amount + ', \'' 
             + t.description.replace("'", "\\'") + '\', \'' 
             + (t.creditAccount === null || t.creditAccount === undefined ? '' : t.creditAccount.type) + '\', \'' 
-            + (t.creditAccount === null || t.creditAccount === undefined ? '' : t.creditAccount.name)  + '\');';
+            + (t.creditAccount === null || t.creditAccount === undefined ? '' : t.creditAccount.name)  + '\', \''
+            + moment().format('YYYY.MM.DD HH:mm:ss.SSS') + '\');' ;
     }
 
     function createUpdateQuery(t){
@@ -123,6 +121,7 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment', 'domain'], function(ga
         columnDefinitions.push({"name": 'description', "type": 'STRING'});
         columnDefinitions.push({"name": 'creditAccountType', "type": 'STRING'});
         columnDefinitions.push({"name": 'creditAccountName', "type": 'STRING'});
+        columnDefinitions.push({"name": 'lastSyncedOn', "type": 'DATETIME'});
         var createTableRequest = gapi.client.request({ 
             path: '/fusiontables/v1/tables',
             method: 'POST',
@@ -146,10 +145,10 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment', 'domain'], function(ga
     
     CloudRepository.prototype.saveTransactions = function(transactions, callback){
         if ( isAuthenticated ){
-            saveTransactionsAndCreateTableIfNecessary(transactions, callback);
+            _saveTransactions(transactions, callback);
         } else {
             login(function() {
-                saveTransactionsAndCreateTableIfNecessary(transactions, callback);
+                _saveTransactions(transactions, callback);
             });
         }        
     };
