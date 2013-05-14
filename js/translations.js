@@ -83,6 +83,8 @@ define(function() {
         "removeAllTransactions"         : "Remove all transactions",
         "removeAllDataDescription"      : "Select this button if you want to delete all data, you cannot undo this operation",
         "removeAllData"                 : "Remove all data",
+        "createTable"                   : "Create a new table",
+        "fusionTable"                   : "Select google fusion table to synchronize with",
         
         "product_name"                  : "nsoFinance",
         "description"                   : "Description",
@@ -179,6 +181,8 @@ define(function() {
         "removeAllTransactions"         : "Verwijder alle verrichtingen",
         "removeAllDataDescription"      : "Selecteer onderstaande knop indien u alle data wilt verwijderen. Deze actie kan niet teruggedraaid worden",
         "removeAllData"                 : "Verwijder alle data",
+        "createTable"                   : "Maak een nieuwe tabel",
+        "syncFusionTableId"             : "Selecteer de Google fusion table om mee te synchronizeren",
         
         "product_name"                  : "nsofinance",
         "description"                   : "Omschrijving",

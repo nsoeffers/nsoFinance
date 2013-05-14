@@ -90,7 +90,9 @@ define(['moment'], function(moment){
     
     Transaction.createFromDBO = function(dbo){
         var transaction = new Transaction(dbo.date, dbo.amount, dbo.description);
-        Object.defineProperty( transaction, "id", {  value: dbo.id,  writable: false, enumerable: true, configurable: false});
+        if ( !!dbo.id ) {
+            Object.defineProperty( transaction, "id", {  value: dbo.id,  writable: false, enumerable: true, configurable: false});
+        }
         transaction.creditAccount = dbo.creditAccount;
         transaction.debetAccount = dbo.debetAccount;
         transaction.assignedBy = dbo.assignedBy;    

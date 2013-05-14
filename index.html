@@ -45,7 +45,7 @@
                         <li ng-repeat="language in languages" ng-class="getLanguageSelectedClass(language)"><a ng-click="setLanguage(language)">{{language}}</a></li>
                     </ul>
                     <ul class="nav nav-pills pull-right">
-                        <li><a ng-click="sync()"><i class="icon-refresh"></i></a></li>
+                        <li><a ng-click="sync()" ng-show="isSyncConfigured"><i class="icon-refresh"></i></a></li>                        
                     </ul>
                 </div>
             </div>

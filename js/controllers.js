@@ -19,6 +19,7 @@ define(['jquery', 'angular', 'angularCookies', 'dao', 'domain', 'translations', 
                 
         $scope.languages = [];
         $scope.notifications = [];
+        $scope.isSyncConfigured = syncManager.isConfigured();
         $rootScope.categories = [];
         
         $rootScope.mapCategoryToLabel = function(category) {
@@ -738,7 +739,10 @@ define(['jquery', 'angular', 'angularCookies', 'dao', 'domain', 'translations', 
         };
     };
     
-    result.SettingsCtrl = function($scope, $window, transactionRepository) {
+    result.SettingsCtrl = function($scope, $window, transactionRepository, cloudRepository) {
+        
+        $scope.tableIds = [];
+        
         $scope.removeAllTransactions = function() {
             transactionRepository.reset(function(){ 
                 // TODO: Give feedback to user and issue a reload of webapp
@@ -752,7 +756,24 @@ define(['jquery', 'angular', 'angularCookies', 'dao', 'domain', 'translations', 
                 $window.location.reload();
             });
         };
-
+        
+        $scope.selectTable = function(tableId) {
+            cloudRepository.setTableId(tableId);
+        };
+        
+        $scope.createTable = function() {
+            cloudRepository.createFusionTable(findExistingFusionTables);
+        };
+        
+        function findExistingFusionTables() {
+            cloudRepository.findExistingFusionTableIds(function(tableIds) {
+                $scope.$apply(function() {
+                    $scope.tableIds = tableIds;
+                });
+            });
+        }
+        
+        findExistingFusionTables();
     };
     
     var translate = function(key, $cookies, $locale) {

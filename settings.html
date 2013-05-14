@@ -25,5 +25,20 @@
                 </a>
             </p>
         </div>
+        <div class="step">
+            <p>
+                <blockquote>
+                    <p class="muted" data-i18n-key="syncFusionTableId"></p>
+                </blockquote>
+                <label class="radio" ng-repeat="tableId in tableIds">
+                  <input type="radio" name="fusionTableId" id="{{tableId}}" value="{{tableId}}" ng-click="selectTable(tableId)">
+                  {{tableId}}
+                </label>
+                <a class="btn btn-primary" ng-click="createTable()">
+                    <i class="icon-file icon-white"></i>
+                    <span data-i18n-key="createTable"></span>
+                </a>
+            </p>            
+        </div>
     </div>
 </div>

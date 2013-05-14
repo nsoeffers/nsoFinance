@@ -1,4 +1,4 @@
-define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment'], function(gapi, dao, moment) {
+define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment', 'domain'], function(gapi, dao, moment, domain) {
         
     var CloudRepository = function(){
     };
@@ -28,11 +28,7 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment'], function(gapi, dao, m
         var saveTransactionsWhenTableExists = function() {
             window.setTimeout(saveTransactionsInBatch, 100, transactions, 0, callback);
         };
-        if ( getTableId() === null || getTableId() === undefined) {
-            createFusionTable(saveTransactionsWhenTableExists);
-        } else {
-            saveTransactionsWhenTableExists();
-        }
+        saveTransactionsWhenTableExists();
     }
     
     function saveTransactionsInBatch(transactions, batchIndex, callback){
@@ -77,7 +73,50 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment'], function(gapi, dao, m
         return query;
     }
     
-    function createFusionTable(callback) {
+    function _findExistingFusionTableIds(callback) {
+        var getRootFolderRequest = gapi.client.drive.about.get();
+        getRootFolderRequest.execute(function(result) {
+            var query = "title='nsoFinance' and trashed=false and mimeType='application/vnd.google-apps.fusiontable'";
+            var fileSearchRequest = gapi.client.drive.children.list({folderId: result.rootFolderId, q: query});
+            fileSearchRequest.execute(function(files){
+                var tableIds = [];
+                if ( !files || !files.items){
+                    callback(tableIds);
+                    return;
+                } 
+                for( var index = 0; index < files.items.length; index++ ){
+                    tableIds.push(files.items[index].id);
+                }
+                callback(tableIds);
+            });
+        });           
+    }
+    
+    function _findModifiedTransactions(callback){
+        var sqlQuery = 'SELECT ROWID, date, amount, description FROM ' + getTableId() + ' ';
+        var sqlRequest = gapi.client.fusiontables.query.sql({sql: sqlQuery});
+        sqlRequest.execute(function(sqlResponse) {
+            if ( !(sqlResponse.rows) ){
+                window.console.log('Unexpected result:' + sqlResponse);
+                callback([]);
+                return;
+            }
+            var results = [];
+            for( var index = 0; index < sqlResponse.rows.length; index++){
+                var transaction = {
+                    serverId: sqlResponse.rows[index][0],
+                    date: Date.parseExact(sqlResponse.rows[index][1], 'yyyy.MM.dd'),
+                    amount: parseFloat(sqlResponse.rows[index][2]),
+                    description: sqlResponse.rows[index][3]
+                };
+                results.push(domain.Transaction.createFromDBO(transaction));
+            }
+            callback(results);
+        });
+
+    }
+        
+    CloudRepository.prototype.createFusionTable = function(callback) {
         var columnDefinitions = [];
         columnDefinitions.push({"name": 'date', "type": 'DATETIME'});
         columnDefinitions.push({"name": 'amount', "type": 'NUMBER'});
@@ -93,7 +132,17 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment'], function(gapi, dao, m
             window.localStorage.fusionTableId = newFusionTable.tableId;
             callback();
         });
-    }
+    };
+    
+    CloudRepository.prototype.findExistingFusionTableIds = function(callback) {
+        if ( isAuthenticated ){
+            _findExistingFusionTableIds(callback);
+        } else {
+            login(function() {
+                _findExistingFusionTableIds(callback);
+            });
+        }                
+    };
     
     CloudRepository.prototype.saveTransactions = function(transactions, callback){
         if ( isAuthenticated ){
@@ -103,6 +152,26 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment'], function(gapi, dao, m
                 saveTransactionsAndCreateTableIfNecessary(transactions, callback);
             });
         }        
+    };
+    
+    CloudRepository.prototype.findModifiedTransactions = function(callback) {
+        if ( isAuthenticated ){
+            _findModifiedTransactions(callback);
+        } else {
+            login(function() {
+                _findModifiedTransactions(callback);
+            });
+        }                        
+    };
+    
+    CloudRepository.prototype.isConfigured = function() {
+        return !!getTableId();
+    };
+    
+    CloudRepository.prototype.setTableId = function(tableId){
+        if ( !!window.localStorage ) {
+            window.localStorage.fusionTableId = tableId;
+        }
     };
     
     return new CloudRepository();
