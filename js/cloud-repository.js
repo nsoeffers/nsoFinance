@@ -90,12 +90,13 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment', 'domain'], function(ga
         });           
     }
     
-    function _findModifiedTransactions(callback){
-        var sqlQuery = 'SELECT ROWID, date, amount, description FROM ' + getTableId() + ' ';
+    function _findModifiedTransactions(since, callback){
+        window.console.log('MODIFIED TRANSACTIONS SINCE: ' + since + ', ' + moment(since, 'YYYYMMDDHHmmssSSS').format('YYYY.MM.DD HH:mm:ss.SSS'));
+        var sqlQuery = 'SELECT ROWID, date, amount, description FROM ' + getTableId() + ' WHERE lastSyncedOn > \'' + moment(since, 'YYYYMMDDHHmmssSSS').format('YYYY.MM.DD HH:mm:ss.SSS') + '\'';
         var sqlRequest = gapi.client.fusiontables.query.sql({sql: sqlQuery});
         sqlRequest.execute(function(sqlResponse) {
             if ( !(sqlResponse.rows) ){
-                window.console.log('Unexpected result:' + sqlResponse);
+                window.console.log(sqlResponse);
                 callback([]);
                 return;
             }
@@ -153,12 +154,12 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment', 'domain'], function(ga
         }        
     };
     
-    CloudRepository.prototype.findModifiedTransactions = function(callback) {
+    CloudRepository.prototype.findModifiedTransactions = function(since, callback) {
         if ( isAuthenticated ){
-            _findModifiedTransactions(callback);
+            _findModifiedTransactions(since, callback);
         } else {
             login(function() {
-                _findModifiedTransactions(callback);
+                _findModifiedTransactions(since, callback);
             });
         }                        
     };

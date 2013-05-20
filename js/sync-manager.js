@@ -8,7 +8,7 @@ define(['cloud-repository', 'dao', 'moment'], function(cloudRepository, dao, mom
         var since = !!window.localStorage && !!window.localStorage.lastSync? window.localStorage.lastSync : '0';
         dao.transactionRepository.findModifiedTransactions(since, function(transactions, updateCallback) {             
             var findRemotelyModifiedTransactions = function() {
-                cloudRepository.findModifiedTransactions(function(transactions) {
+                cloudRepository.findModifiedTransactions(since, function(transactions) {
                     updateCallback(transactions, callback);
                 });
             };
