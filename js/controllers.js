@@ -739,7 +739,7 @@ define(['jquery', 'angular', 'angularCookies', 'dao', 'domain', 'translations', 
         };
     };
     
-    result.SettingsCtrl = function($scope, $window, transactionRepository, cloudRepository) {
+    result.SettingsCtrl = function($scope, $window, transactionRepository, cloudRepository, syncManager) {
         
         $scope.tableIds = [];
         
@@ -755,6 +755,7 @@ define(['jquery', 'angular', 'angularCookies', 'dao', 'domain', 'translations', 
                 // TODO: Give feedback to user and issue a reload of webapp
                 $window.location.reload();
             });
+            syncManager.reset();
         };
         
         $scope.selectTable = function(tableId) {

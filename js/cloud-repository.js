@@ -119,7 +119,7 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment', 'domain'], function(ga
     
     function _findModifiedTransactions(since, callback){
         window.console.log('MODIFIED TRANSACTIONS SINCE: ' + since + ', ' + moment(since, 'YYYYMMDDHHmmssSSS').format('YYYY.MM.DD HH:mm:ss.SSS'));
-        var sqlQuery = 'SELECT ROWID, date, amount, description FROM ' + getTableId() + ' WHERE lastSyncedOn > \'' + moment(since, 'YYYYMMDDHHmmssSSS').format('YYYY.MM.DD HH:mm:ss.SSS') + '\'';
+        var sqlQuery = 'SELECT ROWID, date, amount, description, creditAccountName, creditAccountType FROM ' + getTableId() + ' WHERE lastSyncedOn > \'' + moment(since, 'YYYYMMDDHHmmssSSS').format('YYYY.MM.DD HH:mm:ss.SSS') + '\'';
         var sqlRequest = gapi.client.fusiontables.query.sql({sql: sqlQuery});
         sqlRequest.execute(function(sqlResponse) {
             if ( !(sqlResponse.rows) ){
@@ -135,6 +135,12 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment', 'domain'], function(ga
                     amount: parseFloat(sqlResponse.rows[index][2]),
                     description: sqlResponse.rows[index][3]
                 };
+                if ( sqlResponse.rows[index][4] !== '' && sqlResponse.rows[index][5] !== ''){
+                    transaction.creditAccount = { 
+                        name: sqlResponse.rows[index][4],
+                        type: sqlResponse.rows[index][5]
+                    };
+                }
                 results.push(domain.Transaction.createFromDBO(transaction));
             }
             callback(results);

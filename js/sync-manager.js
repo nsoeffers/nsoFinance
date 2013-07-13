@@ -24,6 +24,10 @@ define(['cloud-repository', 'dao', 'moment'], function(cloudRepository, dao, mom
         });
     };
     
+    SyncManager.prototype.reset = function() {
+        window.localStorage.lastSync = undefined;  
+    };
+    
     SyncManager.prototype.isConfigured = function() {
         return !!dao && !!cloudRepository && !!cloudRepository.isConfigured();
     };
