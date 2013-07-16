@@ -303,6 +303,22 @@ div[ng-view].aboutToNavigate{
     font-size: 0.9em;
 }
 
+.card {
+    margin: 3px;
+    margin-bottom: 7px;
+    padding: 3px;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+}
+
+.card:nth-child(even){
+    background-color: #F0F0F0;
+}
+
+.card span {
+    font-weight: lighter;
+}
+
 @-webkit-keyframes rotateAnimation /* Safari and Chrome */
 {
     from {-webkit-transform: rotate(0deg);}
