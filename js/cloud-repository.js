@@ -76,7 +76,7 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment', 'domain'], function(ga
     }
     
     function createInsertQuery(t){
-        return { query: 'INSERT INTO ' + this.getTableId() + '(date, amount, description, creditAccountType, creditAccountName, lastSyncedOn) VALUES (\''
+        return { query: 'INSERT INTO ' + CloudRepository.prototype.getTableId() + '(date, amount, description, creditAccountType, creditAccountName, lastSyncedOn) VALUES (\''
             + moment(t.date).format('YYYY.MM.DD') + '\',' 
             + t.amount + ', \'' 
             + t.description.replace("'", "\\'") + '\', \'' 
@@ -87,7 +87,7 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment', 'domain'], function(ga
     }
 
     function createUpdateQuery(t){
-        return { query: 'UPDATE ' + this.getTableId() + ' SET ' 
+        return { query: 'UPDATE ' + CloudRepository.prototype.getTableId() + ' SET ' 
             + 'creditAccountType = \'' + (t.creditAccount === null || t.creditAccount === undefined ? '' : t.creditAccount.type) + '\', ' 
             + 'creditAccountName = \'' + (t.creditAccount === null || t.creditAccount === undefined ? '' : t.creditAccount.name)  + '\'' 
             + ' WHERE ROWID = \'' + t.serverId + '\';',
@@ -115,7 +115,7 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment', 'domain'], function(ga
     
     function _findModifiedTransactions(since, callback){
         window.console.log('MODIFIED TRANSACTIONS SINCE: ' + since + ', ' + moment(since, 'YYYYMMDDHHmmssSSS').format('YYYY.MM.DD HH:mm:ss.SSS'));
-        var sqlQuery = 'SELECT ROWID, date, amount, description, creditAccountName, creditAccountType FROM ' + this.getTableId() + ' WHERE lastSyncedOn > \'' + moment(since, 'YYYYMMDDHHmmssSSS').format('YYYY.MM.DD HH:mm:ss.SSS') + '\'';
+        var sqlQuery = 'SELECT ROWID, date, amount, description, creditAccountName, creditAccountType FROM ' + CloudRepository.prototype.getTableId() + ' WHERE lastSyncedOn > \'' + moment(since, 'YYYYMMDDHHmmssSSS').format('YYYY.MM.DD HH:mm:ss.SSS') + '\'';
         var sqlRequest = gapi.client.fusiontables.query.sql({sql: sqlQuery});
         sqlRequest.execute(function(sqlResponse) {
             if ( !(sqlResponse.rows) ){
