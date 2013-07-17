@@ -71,20 +71,23 @@
                 <div class="span1">{{transaction.amount | number:2}}</div>
                 <div class="span6">{{transaction.description}}</div>
                 <div class="span2" style="position: relative;"><span class="label {{calculateClassName(transaction.creditAccount)}}" ng-show="transaction.creditAccount">{{transaction.creditAccount.name}}</span></div>
-                <div class="span1"><img class="actionButton" src="img/rule.png" ng-click="toggleRuleForm()"/></div>
+                <div class="span1"><img class="actionButton" src="img/rule.png"/></div>
             </div>
-            <div class="card hidden-desktop" ng-repeat="transaction in transactions" ng-click="selectRow($event)" data-row-index="{{$index}}">    
+            <div class="card hidden-desktop" ng-repeat="transaction in transactions" data-row-index="{{$index}}">    
                 <div class="span">
                     <span data-i18n-key="transactionDateField"></span>: {{transaction.date | date:'yyyy-MM-dd'}}
                 </div>
                 <div class="span12">
                     <span data-i18n-key="transactionAmountField"></span>: {{transaction.amount | number:2}}
                 </div>
-                <div class="control-group">
+                <div class="span12">
                     <span data-i18n-key="transactionDescriptionField"></span>: {{transaction.description}}
-                <div class="control-group">
+                </div>
+                <div class="span12">
                     <span data-i18n-key="creditAccountField"></span>: 
-                    <div class="controls" style="position: relative;"><span class="label {{calculateClassName(transaction.creditAccount)}}" ng-show="transaction.creditAccount">{{transaction.creditAccount.name}}</span></div>
+                    <span class="label {{calculateClassName(transaction.creditAccount)}}" ng-show="transaction.creditAccount">{{transaction.creditAccount.name}}</span>
+                    <a href="#categoryBrowser" data-toggle="modal" ng-click="setCreditSideSelected()"><i class="icon-search"></i></a>
+                    <a href="#categoryCreator" data-toggle="modal" ng-click="addCreditCategory()"><i class="icon-plus"></i></a>
                 </div>
             </div>
         </div>

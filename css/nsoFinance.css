@@ -306,7 +306,7 @@ div[ng-view].aboutToNavigate{
 .card {
     margin: 3px;
     margin-bottom: 7px;
-    padding: 3px;
+    padding: 6px;
     border: 1px solid #aaa;
     border-radius: 3px;
 }
@@ -316,7 +316,7 @@ div[ng-view].aboutToNavigate{
 }
 
 .card span {
-    font-weight: lighter;
+    font-weight: bold;
 }
 
 @-webkit-keyframes rotateAnimation /* Safari and Chrome */
