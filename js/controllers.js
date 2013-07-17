@@ -742,6 +742,7 @@ define(['jquery', 'angular', 'angularCookies', 'dao', 'domain', 'translations', 
     result.SettingsCtrl = function($scope, $window, transactionRepository, cloudRepository, syncManager) {
         
         $scope.tableIds = [];
+        $scope.currentTableId = cloudRepository.getTableId();
         
         $scope.removeAllTransactions = function() {
             transactionRepository.reset(function(){ 
