@@ -1,5 +1,5 @@
 <div class="well well-small">
-    <h1 data-i18n-key="assign_title"></h1>
+    <h4 data-i18n-key="assign_title"></h1>
 </div>
 <div class="container-fluid" ng-init="init()">
     <div>
@@ -19,6 +19,7 @@
         <span data-i18n-key="no_unmapped_transactions"></span>
         <a href="#/import" data-i18n-key="goto_import"></a>
     </blockquote>
+    <div class="clearfix"></div>
     <div id="hiddenEditableFields" style="display: none; ">
         <span>
             <input id="creditCategoryChooser" type="text" 
@@ -58,9 +59,8 @@
                 </span>
         </div>
     </div>    
-    <div class="row-fluid table-fluid" id="assignmentTable" ng-show="transactions.length != 0">
-        <div class="span12">
-            <div class="row-fluid tableHeader">
+        <div class="table-fluid" id="assignmentTable" ng-show="transactions.length != 0">
+            <div class="row-fluid tableHeader hidden-phone">
                 <div class="span2" data-i18n-key="transactionDateField"></div>
                 <div class="span1" data-i18n-key="transactionAmountField"></div>
                 <div class="span6" data-i18n-key="transactionDescriptionField"></div>
@@ -68,15 +68,31 @@
                 <div class="span1"></div>
             </div>        
             <div id="waitForTransactions"></div>            
-            <div class="row-fluid" ng-repeat="transaction in transactions" ng-click="selectRow($event)" data-row-index="{{$index}}">    
+            <div class="row-fluid hidden-phone" ng-repeat="transaction in transactions" ng-click="selectRow($event)" data-row-index="{{$index}}">    
                 <div class="span2">{{transaction.date | date:'yyyy-MM-dd'}}</div>
                 <div class="span1">{{transaction.amount | number:2}}</div>
                 <div class="span6">{{transaction.description}}</div>
                 <div class="span2" style="position: relative;"><span class="label {{calculateClassName(transaction.creditAccount)}}" ng-show="transaction.creditAccount">{{transaction.creditAccount.name}}</span></div>
                 <div class="span1"><img class="actionButton" src="img/rule.png" ng-click="toggleRuleForm()"/></div>
             </div>
+            <div class="card visible-phone" ng-repeat="transaction in transactions" data-row-index="{{$index}}" ng-click="setSelectedTransaction($event)">    
+                <div class="span">
+                    <span data-i18n-key="transactionDateField"></span>: {{transaction.date | date:'yyyy-MM-dd'}}
+                </div>
+                <div class="span12">
+                    <span data-i18n-key="transactionAmountField"></span>: {{transaction.amount | number:2}}
+                </div>
+                <div class="span12">
+                    <span data-i18n-key="transactionDescriptionField"></span>: {{transaction.description}}
+                </div>
+                <div class="span12">
+                    <span data-i18n-key="creditAccountField"></span>: 
+                    <span class="label {{calculateClassName(transaction.creditAccount)}}" ng-show="transaction.creditAccount">{{transaction.creditAccount.name}}</span>
+                    <a href="#categoryBrowser" data-toggle="modal" ng-click="setCreditSideSelected()"><i class="icon-search"></i></a>
+                    <a href="#categoryCreator" data-toggle="modal" ng-click="addCreditCategory()"><i class="icon-plus"></i></a>
+                </div>
+            </div>
         </div>
-    </div>
     <div id="categoryBrowser" class="modal hide fade">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>

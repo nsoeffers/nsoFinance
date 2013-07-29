@@ -12,11 +12,7 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment', 'domain'], function(ga
             'https://www.googleapis.com/auth/fusiontables ' +
             'https://www.googleapis.com/auth/drive'
     };
-    
-    function getTableId() { 
-        return !!window.localStorage && !!window.localStorage.fusionTableId? window.localStorage.fusionTableId: null; 
-    }
-    
+        
     function login(callback) {
         gapi.auth.authorize(oAuthConfig, function() {
             isAuthenticated = true;
@@ -80,7 +76,7 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment', 'domain'], function(ga
     }
     
     function createInsertQuery(t){
-        return { query: 'INSERT INTO ' + getTableId() + '(date, amount, description, creditAccountType, creditAccountName, lastSyncedOn) VALUES (\''
+        return { query: 'INSERT INTO ' + CloudRepository.prototype.getTableId() + '(date, amount, description, creditAccountType, creditAccountName, lastSyncedOn) VALUES (\''
             + moment(t.date).format('YYYY.MM.DD') + '\',' 
             + t.amount + ', \'' 
             + t.description.replace("'", "\\'") + '\', \'' 
@@ -91,7 +87,7 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment', 'domain'], function(ga
     }
 
     function createUpdateQuery(t){
-        return { query: 'UPDATE ' + getTableId() + ' SET ' 
+        return { query: 'UPDATE ' + CloudRepository.prototype.getTableId() + ' SET ' 
             + 'creditAccountType = \'' + (t.creditAccount === null || t.creditAccount === undefined ? '' : t.creditAccount.type) + '\', ' 
             + 'creditAccountName = \'' + (t.creditAccount === null || t.creditAccount === undefined ? '' : t.creditAccount.name)  + '\'' 
             + ' WHERE ROWID = \'' + t.serverId + '\';',
@@ -119,7 +115,7 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment', 'domain'], function(ga
     
     function _findModifiedTransactions(since, callback){
         window.console.log('MODIFIED TRANSACTIONS SINCE: ' + since + ', ' + moment(since, 'YYYYMMDDHHmmssSSS').format('YYYY.MM.DD HH:mm:ss.SSS'));
-        var sqlQuery = 'SELECT ROWID, date, amount, description, creditAccountName, creditAccountType FROM ' + getTableId() + ' WHERE lastSyncedOn > \'' + moment(since, 'YYYYMMDDHHmmssSSS').format('YYYY.MM.DD HH:mm:ss.SSS') + '\'';
+        var sqlQuery = 'SELECT ROWID, date, amount, description, creditAccountName, creditAccountType FROM ' + CloudRepository.prototype.getTableId() + ' WHERE lastSyncedOn > \'' + moment(since, 'YYYYMMDDHHmmssSSS').format('YYYY.MM.DD HH:mm:ss.SSS') + '\'';
         var sqlRequest = gapi.client.fusiontables.query.sql({sql: sqlQuery});
         sqlRequest.execute(function(sqlResponse) {
             if ( !(sqlResponse.rows) ){
@@ -198,13 +194,17 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment', 'domain'], function(ga
     };
     
     CloudRepository.prototype.isConfigured = function() {
-        return !!getTableId();
+        return !!this.getTableId();
     };
     
     CloudRepository.prototype.setTableId = function(tableId){
         if ( !!window.localStorage ) {
             window.localStorage.fusionTableId = tableId;
         }
+    };
+    
+    CloudRepository.prototype.getTableId = function() { 
+        return !!window.localStorage && !!window.localStorage.fusionTableId? window.localStorage.fusionTableId: null; 
     };
     
     return new CloudRepository();

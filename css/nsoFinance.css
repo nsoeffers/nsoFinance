@@ -243,7 +243,6 @@ div[ng-view].aboutToNavigate{
 }
 
 #assignmentTable .row-fluid {
-    max-height: 40px;
     -webkit-transition: height 0.4s ease 0.2s;
 }
 
@@ -301,6 +300,22 @@ div[ng-view].aboutToNavigate{
     background-color: transparent;
     color: #3A87AD;
     font-size: 0.9em;
+}
+
+.card {
+    margin: 3px;
+    margin-bottom: 7px;
+    padding: 6px;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+}
+
+.card:nth-child(even){
+    background-color: #F0F0F0;
+}
+
+.card span {
+    font-weight: bold;
 }
 
 @-webkit-keyframes rotateAnimation /* Safari and Chrome */
