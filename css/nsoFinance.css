@@ -243,7 +243,6 @@ div[ng-view].aboutToNavigate{
 }
 
 #assignmentTable .row-fluid {
-    max-height: 40px;
     -webkit-transition: height 0.4s ease 0.2s;
 }
 
