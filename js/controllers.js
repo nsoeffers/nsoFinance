@@ -334,6 +334,7 @@ define(['jquery', 'angular', 'angularCookies', 'dao', 'domain', 'translations', 
         $scope.hideCategoryDetailTitle = true;
         $scope.showCategoryTypeInDetailForm = true;
         
+        var previousSelectedTransaction;
         var selectedTransaction;
         var creditCategoryChooser;
         var debetCategoryChooser;
@@ -463,18 +464,23 @@ define(['jquery', 'angular', 'angularCookies', 'dao', 'domain', 'translations', 
             }
         };
         
+        $scope.setSelectedTransaction = function(e) {
+            var currentTarget = $(e.currentTarget);            
+            var rowIndex = parseInt(currentTarget.data('rowIndex'), 10);
+            if ( rowIndex >= 0 && rowIndex < $scope.transactions.length) {
+                previousSelectedTransaction = selectedTransaction;
+                selectedTransaction = $scope.transactions[rowIndex];
+            }            
+        };
+        
         $scope.selectRow = function(e){            
             var currentTarget = $(e.currentTarget);            
             if ( currentTarget[0] === creditCategoryChooser.parents('.row-fluid')[0] ){
                 return;
             }
             hideRuleForm();
-            var previousSelectedTransaction;
-            var rowIndex = parseInt(currentTarget.data('rowIndex'), 10);
-            if ( rowIndex >= 0 && rowIndex < $scope.transactions.length) {
-                previousSelectedTransaction = selectedTransaction;
-                selectedTransaction = $scope.transactions[rowIndex];
-            }
+            
+            $scope.setSelectedTransaction(e);
             var creditColumn = currentTarget.children().last().prev();
             //var debetColumn = currentTarget.children().last().prev().prev();
             creditCategoryChooser.val(creditColumn.text());

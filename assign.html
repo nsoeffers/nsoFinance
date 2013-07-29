@@ -19,6 +19,7 @@
         <span data-i18n-key="no_unmapped_transactions"></span>
         <a href="#/import" data-i18n-key="goto_import"></a>
     </blockquote>
+    <div class="clearfix"></div>
     <div id="hiddenEditableFields" style="display: none; ">
         <span>
             <input id="creditCategoryChooser" type="text" 
@@ -74,7 +75,7 @@
                 <div class="span2" style="position: relative;"><span class="label {{calculateClassName(transaction.creditAccount)}}" ng-show="transaction.creditAccount">{{transaction.creditAccount.name}}</span></div>
                 <div class="span1"><img class="actionButton" src="img/rule.png" ng-click="toggleRuleForm()"/></div>
             </div>
-            <div class="card visible-phone" ng-repeat="transaction in transactions" data-row-index="{{$index}}">    
+            <div class="card visible-phone" ng-repeat="transaction in transactions" data-row-index="{{$index}}" ng-click="setSelectedTransaction($event)">    
                 <div class="span">
                     <span data-i18n-key="transactionDateField"></span>: {{transaction.date | date:'yyyy-MM-dd'}}
                 </div>
