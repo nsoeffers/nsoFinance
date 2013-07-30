@@ -142,9 +142,10 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
         };
         
         repository.resetAll = function() {
+            db.close();
             var deleteRequest = window.indexedDB.deleteDatabase(DB_NAME);
             deleteRequest.onsuccess = function() {
-                init();
+                resetConnection();
             };
             
             deleteRequest.onerror = function () {
@@ -375,6 +376,11 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
         };
     };
     
+    var resetConnection = function() {
+        isInitialized = false;
+        init();
+    };
+
     dao.transactionRepository = createTransactionRepository();
     
     return dao;
