@@ -85,15 +85,16 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment', 'domain'], function(ga
             + t.amount + ', \'' 
             + t.description.replace("'", "\\'") + '\', \'' 
             + (t.creditAccount === null || t.creditAccount === undefined ? '' : t.creditAccount.type) + '\', \'' 
-            + (t.creditAccount === null || t.creditAccount === undefined ? '' : t.creditAccount.name)  + '\', \''
-            + moment().format('YYYY.MM.DD HH:mm:ss.SSS') + '\');',
+            + (t.creditAccount === null || t.creditAccount === undefined ? '' : t.creditAccount.name)  + '\', '
+            + moment().format('YYYYMMDDHHmmssSSS') + ');',
             transaction: t};
     }
 
     function createUpdateQuery(t){
         return { query: 'UPDATE ' + getTableId() + ' SET ' 
             + 'creditAccountType = \'' + (t.creditAccount === null || t.creditAccount === undefined ? '' : t.creditAccount.type) + '\', ' 
-            + 'creditAccountName = \'' + (t.creditAccount === null || t.creditAccount === undefined ? '' : t.creditAccount.name)  + '\'' 
+            + 'creditAccountName = \'' + (t.creditAccount === null || t.creditAccount === undefined ? '' : t.creditAccount.name)  + '\',' 
+            + 'lastSyncedOn = ' + moment().format('YYYYMMDDHHmmssSSS')
             + ' WHERE ROWID = \'' + t.serverId + '\';',
             transaction: t };
     }
@@ -119,7 +120,7 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment', 'domain'], function(ga
     
     function _findModifiedTransactions(since, callback){
         window.console.log('MODIFIED TRANSACTIONS SINCE: ' + since + ', ' + moment(since, 'YYYYMMDDHHmmssSSS').format('YYYY.MM.DD HH:mm:ss.SSS'));
-        var sqlQuery = 'SELECT ROWID, date, amount, description, creditAccountName, creditAccountType FROM ' + getTableId() + ' WHERE lastSyncedOn > \'' + moment(since, 'YYYYMMDDHHmmssSSS').format('YYYY.MM.DD HH:mm:ss.SSS') + '\'';
+        var sqlQuery = 'SELECT ROWID, date, amount, description, creditAccountName, creditAccountType FROM ' + getTableId() + ' WHERE lastSyncedOn > ' + (!!since? since : 0);
         var sqlRequest = gapi.client.fusiontables.query.sql({sql: sqlQuery});
         sqlRequest.execute(function(sqlResponse) {
             if ( !(sqlResponse.rows) ){
@@ -155,7 +156,7 @@ define(['gapi!fusiontables,v1!drive,v2', 'dao', 'moment', 'domain'], function(ga
         columnDefinitions.push({"name": 'description', "type": 'STRING'});
         columnDefinitions.push({"name": 'creditAccountType', "type": 'STRING'});
         columnDefinitions.push({"name": 'creditAccountName', "type": 'STRING'});
-        columnDefinitions.push({"name": 'lastSyncedOn', "type": 'DATETIME'});
+        columnDefinitions.push({"name": 'lastSyncedOn', "type": 'NUMBER'});
         var createTableRequest = gapi.client.request({ 
             path: '/fusiontables/v1/tables',
             method: 'POST',
