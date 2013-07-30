@@ -34,6 +34,7 @@ define('dao', ['domain', 'moment'], function(domain, moment) {
             transactionStore.createIndex('status', 'status', {unique : false});
             transactionStore.createIndex('modifiedOn', 'modifiedOn', {unique : false});
             transactionStore.createIndex('assignedBy', 'assignedBy', {unique : false});
+            transactionStore.createIndex('serverId', 'serverId', {unique : true});
             
             db.createObjectStore("Rule", {keyPath: 'id', autoIncrement: true});                    
         };
