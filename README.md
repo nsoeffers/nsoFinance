@@ -1,18 +1,24 @@
-# README for a newly created project.
+App Engine Java Application
+Copyright (C) 2010-2012 Google Inc.
 
-There are a couple of things you should do first, before you can use all of Git's power:
+## Skeleton application for use with App Engine Java.
 
-  * Add a remote to this project: in the Cloud9 IDE command line, you can execute the following commands
-    `git remote add [remote name] [remote url (eg. 'git@github.com:/ajaxorg/node_chat')]` [Enter]
-  * Create new files inside your project
-  * Add them to to Git by executing the following command
-    `git add [file1, file2, file3, ...]` [Enter]
-  * Create a commit which can be pushed to the remote you just added
-    `git commit -m 'added new files'` [Enter]
-  * Push the commit the remote
-    `git push [remote name] master` [Enter]
+Requires [Apache Maven](http://maven.apache.org) 3.0 or greater, and JDK 6+ in order to run.
 
-That's it! If this doesn't work for you, please visit the excellent resources from [Github.com](http://help.github.com) and the [Pro Git](http://http://progit.org/book/) book.
-If you can't find your answers there, feel free to ask us via Twitter (@cloud9ide), [mailing list](groups.google.com/group/cloud9-ide) or IRC (#cloud9ide on freenode).
+To build, run
 
-Happy coding!
+    mvn package
+
+Building will run the tests, but to explicitly run tests you can use the test target
+
+    mvn test
+
+To start the app, use the [App Engine Maven Plugin](http://code.google.com/p/appengine-maven-plugin/) that is already included in this demo.  Just run the command.
+
+    mvn appengine:devserver
+
+For further information, consult the [Java App Engine](https://developers.google.com/appengine/docs/java/overview) documentation.
+
+To see all the available goals for the App Engine plugin, run
+
+    mvn help:describe -Dplugin=appengine
