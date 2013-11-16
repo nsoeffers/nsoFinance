@@ -171,7 +171,7 @@ INPUT:focus.ng-invalid-bank-account-number {
     margin: 8px;
 }
 
-div[previous-view] {
+/*div[previous-view] {
     position: absolute;
     left: -100%;
     top: 41px;
@@ -197,7 +197,7 @@ div[ng-view]{
 div[ng-view].aboutToNavigate{
     left: 100%;
     -webkit-transition: none;
-}
+} */
 
 #waitForTransactions {
     position: relative;
